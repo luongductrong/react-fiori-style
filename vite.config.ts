@@ -16,6 +16,7 @@ export default defineConfig({
     proxy: {
       "/api": {
         target: "https://s40lp1.ucc.cit.tum.de",
+        // target: "http://localhost:3000",
         changeOrigin: true,
         rewrite: (path) => path.replace(/^\/api/, ""),
       },

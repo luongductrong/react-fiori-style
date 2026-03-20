@@ -1,1 +1,22 @@
 @import "tailwindcss";
+
+@theme {
+  --color-primary: #0064d9;
+  --color-background: #ffffff;
+  --color-foreground: #1d2d3e;
+  --color-muted: #f5f6f7;
+  --color-muted-foreground: #556b82;
+  --color-border: #a8b3bd;
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  html {
+    scroll-behavior: smooth;
+  }
+  body {
+    @apply bg-background text-foreground;
+  }
+}
