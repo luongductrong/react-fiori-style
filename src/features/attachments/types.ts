@@ -124,3 +124,7 @@ export type AttachmentTitleResponse = {
 export type AttachmentTitleParams = {
   "sap-client": number;
 };
+
+export type RollbackVersionPayload = {
+  CurrentVersion: string;
+};

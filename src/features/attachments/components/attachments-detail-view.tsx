@@ -200,6 +200,7 @@ export function AttachmentsDetailView() {
         open={toastVisible}
         onClose={() => setToastVisible(false)}
         duration={2000}
+        className="py-1 px-2"
       >
         Failed to download file.
       </Toast>

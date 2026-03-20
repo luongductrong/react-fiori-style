@@ -8,3 +8,7 @@ export const API = {
   auditEndpoint: (fileId: string) => `/Attachments(${fileId})/_Audit`,
   attachmentTitleEndpoint: (fileId: string) => `/Attachments(${fileId})/Title`,
 };
+
+export const MUTATION_API = {
+  rollbackVersion: (fileId: string) => `/Attachments(${fileId})?sap-client=324`,
+};
