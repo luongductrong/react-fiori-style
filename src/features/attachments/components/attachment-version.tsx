@@ -26,6 +26,14 @@ const versionColumns = [
     Header: "Created By",
     accessor: "Ernam",
   },
+  {
+    Header: "",
+    id: "nav",
+    width: 60,
+    disableSortBy: true,
+    disableGroupBy: true,
+    Cell: () => <Icon name="navigation-right-arrow" />,
+  },
 ];
 
 export function AttachmentVersion({ fileId }: { fileId: string }) {
@@ -43,33 +51,6 @@ export function AttachmentVersion({ fileId }: { fileId: string }) {
 
   const versions = versionsData?.value ?? [];
 
-  const memoizedVersionColumns = React.useMemo(() => {
-    return [
-      ...versionColumns,
-      {
-        Header: "",
-        id: "nav",
-        width: 60,
-        disableSortBy: true,
-        disableGroupBy: true,
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        Cell: ({ row }: any) => (
-          <button
-            onClick={() => {
-              const item = row.original;
-              if (!item?.FileId) return;
-              navigate(
-                `/Attachments/${item.FileId}/Versions/${item.VersionNo}`,
-              );
-            }}
-          >
-            <Icon name="navigation-right-arrow" />
-          </button>
-        ),
-      },
-    ];
-  }, [navigate]);
-
   return (
     <AnalyticalTable
       header={
@@ -84,12 +65,17 @@ export function AttachmentVersion({ fileId }: { fileId: string }) {
         </Toolbar>
       }
       data={versions}
-      columns={memoizedVersionColumns}
+      columns={versionColumns}
       loading={isVersionsFetching}
       rowHeight={36}
       selectionMode="None"
       visibleRows={10}
       sortable
+      onRowClick={(e) => {
+        const item = e.detail.row.original;
+        if (!item?.FileId) return;
+        navigate(`/Attachments/${item.FileId}/Versions/${item.VersionNo}`);
+      }}
       groupable
       scaleWidthMode="Smart"
     />
