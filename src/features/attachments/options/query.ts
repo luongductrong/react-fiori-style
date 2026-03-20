@@ -10,6 +10,9 @@ export function getAttachmentsQueryOptions(params: AttachmentListParams) {
     queryFn: () => {
       const res = axiosInstance.get<AttachmentListResponse>(
         `${ODATA_SERVICE.ATTACHMENT}/${API.endpoint}`,
+        {
+          params,
+        },
       );
       return res;
     },

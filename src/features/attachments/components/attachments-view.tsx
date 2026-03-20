@@ -7,9 +7,12 @@ import { VariantManagement } from "@ui5/webcomponents-react/VariantManagement";
 import { VariantItem } from "@ui5/webcomponents-react/VariantItem";
 import { AnalyticalTable } from "@ui5/webcomponents-react/AnalyticalTable";
 import { useQuery } from "@tanstack/react-query";
-import { getAttachmentsQueryOptions } from "../hooks/query";
+import { getAttachmentsQueryOptions } from "../options/query";
+import { useNavigate } from "react-router";
+import { Icon } from "@ui5/webcomponents-react/Icon";
+import "@ui5/webcomponents-icons/navigation-right-arrow.js";
 
-const columns = [
+const rawColumns = [
   {
     Header: "Title",
     accessor: "Title",
@@ -29,7 +32,11 @@ const columns = [
 ];
 
 export function AttachmentsView() {
+  const navigate = useNavigate();
   const [filter, _setFilter] = React.useState<string | undefined>(undefined);
+  const [selectedIds, setSelectedIds] = React.useState<Record<string, boolean>>(
+    {},
+  );
   const { data, isFetching } = useQuery(
     getAttachmentsQueryOptions({
       "sap-client": 324,
@@ -43,6 +50,31 @@ export function AttachmentsView() {
   );
 
   const attachments = data?.value || [];
+
+  const columns = React.useMemo(() => {
+    return [
+      ...rawColumns,
+      {
+        Header: "",
+        id: "nav",
+        width: 60,
+        disableSortBy: true,
+        disableGroupBy: true,
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        Cell: ({ row }: any) => (
+          <button
+            onClick={() => {
+              const item = row.original;
+              if (!item?.FileId) return;
+              navigate(`/Attachments/${item.FileId}`);
+            }}
+          >
+            <Icon name="navigation-right-arrow" />
+          </button>
+        ),
+      },
+    ];
+  }, [navigate]);
 
   return (
     <DynamicPage
@@ -75,13 +107,30 @@ export function AttachmentsView() {
       }
     >
       <AnalyticalTable
+        header={
+          <div className="bg-background w-full py-2 px-4 rounded-t-xl font-bold">
+            Attachments
+            <span className="ml-1">({data?.["@odata.count"]})</span>
+          </div>
+        }
         data={attachments}
         columns={columns}
-        withNavigationHighlight
         sortable
         groupable
         selectionMode="Multiple"
         loading={isFetching}
+        rowHeight={36}
+        visibleRowCountMode="Auto"
+        withNavigationHighlight={true}
+        withRowHighlight={true}
+        selectionBehavior="RowSelector"
+        scaleWidthMode="Smart"
+        selectedRowIds={selectedIds}
+        onRowSelect={(e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          setSelectedIds(e.detail.selectedRowIds ?? {});
+        }}
       />
     </DynamicPage>
   );
