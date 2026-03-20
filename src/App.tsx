@@ -1,8 +1,17 @@
-import { useState } from "react";
+import * as React from "react";
 import heroImg from "./assets/hero.png";
+import { ODATA_SERVICE } from "./app-constant";
 
 function App() {
-  const [count, setCount] = useState(0);
+  const [count, setCount] = React.useState(0);
+  const [data, setData] = React.useState<string | null>(null);
+
+  React.useEffect(() => {
+    fetch(`${ODATA_SERVICE.ATTACHMENT}/Attachments`)
+      .then((res) => res.json())
+      .then((data) => setData(JSON.stringify(data, null, 2)))
+      .catch((err) => setData(`Error: ${err.message}`));
+  }, []);
 
   return (
     <>
@@ -77,6 +86,7 @@ function App() {
 
       <div className="ticks"></div>
       <section id="spacer"></section>
+      <p>{data}</p>
     </>
   );
 }
