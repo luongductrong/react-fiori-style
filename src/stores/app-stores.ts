@@ -2,18 +2,18 @@ import { create } from "zustand";
 import { devtools } from "zustand/middleware";
 
 export type AppState = {
-  exampleState: string | null;
+  viewMode: "table" | "grid";
 };
 
 export type AppAction = {
-  setExampleState: (_exampleState: AppState["exampleState"]) => void;
+  setViewMode: (_viewMode: AppState["viewMode"]) => void;
 };
 
 export type AppStore = AppState & AppAction;
 
 export const useAppStore = create<AppStore>()(
   devtools((set) => ({
-    exampleState: null,
-    setExampleState: (exampleState) => set({ exampleState }),
+    viewMode: "table",
+    setViewMode: (viewMode) => set({ viewMode }),
   })),
 );
