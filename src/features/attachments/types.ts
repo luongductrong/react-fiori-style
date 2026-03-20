@@ -96,3 +96,31 @@ export type AttachmentAuditsParams = {
   $skip: number;
   $top: number;
 };
+
+export type VersionDetail = {
+  FileId: string;
+  VersionNo: string;
+  FileName: string;
+  FileExtension: string;
+  MimeType: string;
+  FileSize: number;
+  FileContent: string;
+  Ernam: string;
+  __EntityControl: {
+    Deletable: boolean;
+    Updatable: boolean;
+  };
+};
+
+export type VersionDetailParams = {
+  "sap-client": number;
+  $select: string;
+};
+
+export type AttachmentTitleResponse = {
+  value: string;
+};
+
+export type AttachmentTitleParams = {
+  "sap-client": number;
+};

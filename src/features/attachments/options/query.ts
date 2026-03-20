@@ -10,6 +10,10 @@ import type {
   AttachmentDetailResponse,
   AttachmentVersionsParams,
   AttachmentVersionsResponse,
+  VersionDetail,
+  VersionDetailParams,
+  AttachmentTitleParams,
+  AttachmentTitleResponse,
 } from "../types";
 
 export function getAttachmentsQueryOptions(params: AttachmentListParams) {
@@ -93,6 +97,53 @@ export function getAttachmentAuditsQueryOptions(
       return res;
     },
     enabled: !!fileId,
+    staleTime: 2 * 60 * 1000, // 2 minutes
+    gcTime: 5 * 60 * 1000, // 5 minutes
+    refetchOnWindowFocus: false,
+    placeholderData: keepPreviousData,
+  });
+}
+
+export function getAttachmentVersionDetailQueryOptions(
+  fileId: string,
+  versionNo: string,
+  params: VersionDetailParams,
+) {
+  return queryOptions({
+    queryKey: ["attachments", fileId, "versions", versionNo, params],
+    queryFn: () => {
+      const res = axiosInstance.get<VersionDetail>(
+        `${ODATA_SERVICE.ATTACHMENT}${API.versionDetailEndpoint(fileId, versionNo)}`,
+        {
+          params,
+        },
+      );
+      return res;
+    },
+    enabled: !!fileId && !!versionNo,
+    staleTime: 2 * 60 * 1000, // 2 minutes
+    gcTime: 5 * 60 * 1000, // 5 minutes
+    refetchOnWindowFocus: false,
+    placeholderData: keepPreviousData,
+  });
+}
+
+export function getAttachmentTitleQueryOptions(
+  id: string,
+  params: AttachmentTitleParams,
+) {
+  return queryOptions({
+    queryKey: ["attachments", id, "title", params],
+    queryFn: () => {
+      const res = axiosInstance.get<AttachmentTitleResponse>(
+        `${ODATA_SERVICE.ATTACHMENT}${API.attachmentTitleEndpoint(id)}`,
+        {
+          params,
+        },
+      );
+      return res;
+    },
+    enabled: !!id,
     staleTime: 2 * 60 * 1000, // 2 minutes
     gcTime: 5 * 60 * 1000, // 5 minutes
     refetchOnWindowFocus: false,

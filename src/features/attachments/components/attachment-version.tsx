@@ -5,6 +5,9 @@ import { Toolbar } from "@ui5/webcomponents-react/Toolbar";
 import { ToolbarSpacer } from "@ui5/webcomponents-react/ToolbarSpacer";
 import { getAttachmentVersionsQueryOptions } from "../options/query";
 import { AnalyticalTable } from "@ui5/webcomponents-react/AnalyticalTable";
+import { useNavigate } from "react-router";
+import { Icon } from "@ui5/webcomponents-react/Icon";
+import "@ui5/webcomponents-icons/navigation-right-arrow.js";
 
 const versionColumns = [
   {
@@ -26,6 +29,7 @@ const versionColumns = [
 ];
 
 export function AttachmentVersion({ fileId }: { fileId: string }) {
+  const navigate = useNavigate();
   const { data: versionsData, isFetching: isVersionsFetching } = useQuery(
     getAttachmentVersionsQueryOptions(fileId, {
       "sap-client": 324,
@@ -39,7 +43,32 @@ export function AttachmentVersion({ fileId }: { fileId: string }) {
 
   const versions = versionsData?.value ?? [];
 
-  const memoizedVersionColumns = React.useMemo(() => versionColumns, []);
+  const memoizedVersionColumns = React.useMemo(() => {
+    return [
+      ...versionColumns,
+      {
+        Header: "",
+        id: "nav",
+        width: 60,
+        disableSortBy: true,
+        disableGroupBy: true,
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        Cell: ({ row }: any) => (
+          <button
+            onClick={() => {
+              const item = row.original;
+              if (!item?.FileId) return;
+              navigate(
+                `/Attachments/${item.FileId}/Versions/${item.VersionNo}`,
+              );
+            }}
+          >
+            <Icon name="navigation-right-arrow" />
+          </button>
+        ),
+      },
+    ];
+  }, [navigate]);
 
   return (
     <AnalyticalTable
