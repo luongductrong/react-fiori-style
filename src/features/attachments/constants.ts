@@ -10,6 +10,8 @@ export const API = {
 };
 
 export const MUTATION_API = {
+  deleteAttachment: (fileId: string) =>
+    `/Attachments(FileId=${fileId})?sap-client=324`,
   rollbackVersion: (fileId: string) => `/Attachments(${fileId})?sap-client=324`,
   updateAttachmentTitle: (fileId: string) =>
     `/Attachments(${fileId})?sap-client=324`,

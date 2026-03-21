@@ -53,6 +53,36 @@ export function rollbackVersionMutationOptions({
   });
 }
 
+export function deleteAttachmentMutationOptions({
+  fileId,
+  onSuccess,
+  onError,
+}: Params) {
+  return mutationOptions({
+    mutationFn: async () => {
+      let token = getCsrfToken();
+
+      if (!token) {
+        await fetchCsrfToken();
+        token = getCsrfToken();
+      }
+
+      const res = await axiosInstance.delete<unknown>(
+        `${ODATA_SERVICE.ATTACHMENT}${MUTATION_API.deleteAttachment(fileId)}`,
+        {
+          headers: {
+            "accept-language": "en",
+            ...(token ? { "x-csrf-token": token } : {}),
+          },
+        },
+      );
+      return res;
+    },
+    onSuccess,
+    onError,
+  });
+}
+
 export function updateAttachmentTitleMutationOptions({
   fileId,
   onSuccess,

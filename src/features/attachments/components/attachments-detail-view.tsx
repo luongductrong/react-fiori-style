@@ -26,7 +26,11 @@ import "@ui5/webcomponents-icons/arrow-bottom.js";
 import { downloadFile } from "../helpers";
 import { Toast } from "@ui5/webcomponents-react/Toast";
 import { Input } from "@ui5/webcomponents-react/Input";
-import { updateAttachmentTitleMutationOptions } from "../options/mutation";
+import { MessageBox } from "@ui5/webcomponents-react/MessageBox";
+import {
+  deleteAttachmentMutationOptions,
+  updateAttachmentTitleMutationOptions,
+} from "../options/mutation";
 
 export function AttachmentsDetailView() {
   const { id } = useParams();
@@ -35,6 +39,8 @@ export function AttachmentsDetailView() {
   const [isEditMode, setIsEditMode] = React.useState(false);
   const [title, setTitle] = React.useState("");
   const [toastVisible, setToastVisible] = React.useState(false);
+  const [toastMessage, setToastMessage] = React.useState("");
+  const [deleteDialogOpen, setDeleteDialogOpen] = React.useState(false);
   const { data: attachment, isLoading } = useQuery(
     getAttachmentDetailQueryOptions(id!, {
       "sap-client": 324,
@@ -58,6 +64,24 @@ export function AttachmentsDetailView() {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       onError: (error: any) => {
         alert(error?.response?.data?.error?.message || error.message);
+      },
+    }),
+  );
+
+  const { mutate: deleteAttachment, isPending: isDeleting } = useMutation(
+    deleteAttachmentMutationOptions({
+      fileId: id!,
+      onSuccess: () => {
+        alert("Attachment deleted successfully");
+        queryClient.invalidateQueries({
+          queryKey: ["attachments"],
+        });
+        navigate("/Attachments");
+      },
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      onError: (error: any) => {
+        setToastMessage(error?.response?.data?.error?.message || error.message);
+        setToastVisible(true);
       },
     }),
   );
@@ -140,6 +164,7 @@ export function AttachmentsDetailView() {
                           attachment._CurrentVersion.MimeType,
                         );
                         if (!success) {
+                          setToastMessage("Failed to download file.");
                           setToastVisible(true);
                         }
                       }}
@@ -157,7 +182,10 @@ export function AttachmentsDetailView() {
                     <ToolbarButton
                       design="Transparent"
                       text="Delete"
-                      disabled={!attachment?.__EntityControl?.Deletable}
+                      onClick={() => setDeleteDialogOpen(true)}
+                      disabled={
+                        isDeleting || !attachment?.__EntityControl?.Deletable
+                      }
                     />
                   </>
                 )}
@@ -271,10 +299,25 @@ export function AttachmentsDetailView() {
           duration={2000}
           className="py-1 px-2"
         >
-          Failed to download file.
+          {toastMessage}
         </Toast>
+        <MessageBox
+          open={deleteDialogOpen}
+          type="Confirm"
+          titleText="Delete Attachment"
+          actions={["Cancel", "OK"]}
+          onClose={(action) => {
+            setDeleteDialogOpen(false);
+            if (action === "OK" && attachment?.FileId) {
+              deleteAttachment();
+            }
+          }}
+        >
+          Are you sure you want to delete this attachment? This action cannot be
+          undone.
+        </MessageBox>
       </ObjectPage>
-      {isUpdating && (
+      {(isUpdating || isDeleting) && (
         <FlexBox
           alignItems="Center"
           justifyContent="Center"
