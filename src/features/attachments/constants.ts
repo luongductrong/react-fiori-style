@@ -11,4 +11,6 @@ export const API = {
 
 export const MUTATION_API = {
   rollbackVersion: (fileId: string) => `/Attachments(${fileId})?sap-client=324`,
+  updateAttachmentTitle: (fileId: string) =>
+    `/Attachments(${fileId})?sap-client=324`,
 };
