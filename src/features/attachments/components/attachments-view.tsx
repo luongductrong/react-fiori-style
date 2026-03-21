@@ -139,7 +139,11 @@ export function AttachmentsView() {
                 {data?.["@odata.count"] ? `(${data?.["@odata.count"]})` : ""}
               </Title>
               <ToolbarSpacer />
-              <ToolbarButton design="Transparent" text="New" />
+              <ToolbarButton
+                design="Transparent"
+                text="New"
+                onClick={() => navigate("/Attachments/New")}
+              />
               <ToolbarButton
                 design="Transparent"
                 text="Delete"

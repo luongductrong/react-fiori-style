@@ -11,6 +11,7 @@ import {
   AttachmentsView,
   VersionDetailView,
   UploadVersionView,
+  AttachmentNewView,
   AttachmentsDetailView,
 } from "@/features/attachments/components";
 
@@ -29,6 +30,11 @@ createRoot(document.getElementById("root")!).render(
             <Route
               path="/Attachments/:id"
               element={<AttachmentsDetailView />}
+              caseSensitive
+            />
+            <Route
+              path="/Attachments/New"
+              element={<AttachmentNewView />}
               caseSensitive
             />
             <Route
