@@ -47,3 +47,11 @@ export type CreateBizObjectPayload = {
 };
 
 export type CreateBizObjectResponse = BizObjectItem;
+
+export type UpdateBizObjectPayload = {
+  BoType: string;
+  BoTitle: string;
+  Status: string;
+};
+
+export type DeleteBizObjectResponse = unknown;

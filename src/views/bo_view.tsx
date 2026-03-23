@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { useNavigate } from 'react-router';
-import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { DynamicPage } from '@ui5/webcomponents-react/DynamicPage';
 import { DynamicPageHeader } from '@ui5/webcomponents-react/DynamicPageHeader';
 import { DynamicPageTitle } from '@ui5/webcomponents-react/DynamicPageTitle';
@@ -9,6 +9,7 @@ import { Toolbar } from '@ui5/webcomponents-react/Toolbar';
 import { ToolbarSpacer } from '@ui5/webcomponents-react/ToolbarSpacer';
 import { ToolbarButton } from '@ui5/webcomponents-react/ToolbarButton';
 import { Title } from '@ui5/webcomponents-react/Title';
+import { Label } from '@ui5/webcomponents-react/Label';
 import { List } from '@ui5/webcomponents-react/List';
 import { ListItemStandard } from '@ui5/webcomponents-react/ListItemStandard';
 import { Input } from '@ui5/webcomponents-react/Input';
@@ -19,12 +20,17 @@ import { FlexBox } from '@ui5/webcomponents-react/FlexBox';
 import { IllustratedMessage } from '@ui5/webcomponents-react/IllustratedMessage';
 import { Dialog } from '@ui5/webcomponents-react/Dialog';
 import { Button } from '@ui5/webcomponents-react/Button';
+import { Toast } from '@ui5/webcomponents-react/Toast';
 import type { AnalyticalTableColumnDefinition } from '@ui5/webcomponents-react/AnalyticalTable';
 import '@ui5/webcomponents-fiori/dist/illustrations/NoData.js';
 import '@ui5/webcomponents-icons/refresh.js';
 import '@ui5/webcomponents-icons/list.js';
 import '@ui5/webcomponents-icons/document.js';
 import { getBizObjectsQueryOptions } from '@/features/biz-object/options/query';
+import {
+	deleteBizObjectMutationOptions,
+	updateBizObjectMutationOptions,
+} from '@/features/biz-object/options/mutation';
 import type { BizObjectItem } from '@/features/biz-object/types';
 
 const rawColumns: AnalyticalTableColumnDefinition[] = [
@@ -57,15 +63,23 @@ const rawColumns: AnalyticalTableColumnDefinition[] = [
 		accessor: 'Ernam',
 		width: 140,
 	},
-	{
-		Header: 'Linked',
-		accessor: 'LinkAttachmentText',
-		width: 100,
-	},
+	
 ];
 
 type BizObjectTableItem = BizObjectItem & {
 	LinkAttachmentText: string;
+};
+
+type BizObjectFormState = {
+	BoType: string;
+	BoTitle: string;
+	Status: string;
+};
+
+const DEFAULT_FORM: BizObjectFormState = {
+	BoType: '',
+	BoTitle: '',
+	Status: '',
 };
 
 function formatDateTime(date?: string | null, time?: string | null) {
@@ -94,6 +108,9 @@ export function BoView() {
 	const [search, setSearch] = React.useState('');
 	const [selectedBoId, setSelectedBoId] = React.useState<string | null>(null);
 	const [detailOpen, setDetailOpen] = React.useState(false);
+	const [editForm, setEditForm] = React.useState<BizObjectFormState>(DEFAULT_FORM);
+	const [toastVisible, setToastVisible] = React.useState(false);
+	const [toastMessage, setToastMessage] = React.useState('');
 
 	const { data, isFetching, isLoading, error } = useQuery(
 		getBizObjectsQueryOptions({
@@ -144,6 +161,55 @@ export function BoView() {
 	const selectedBo = React.useMemo(() => {
 		return filteredBizObjects.find((item) => item.BoId === selectedBoId) ?? filteredBizObjects[0] ?? null;
 	}, [filteredBizObjects, selectedBoId]);
+
+	const canUpdate = Boolean(
+		selectedBo && editForm.BoType.trim() && editForm.BoTitle.trim() && editForm.Status.trim(),
+	);
+
+	React.useEffect(() => {
+		if (!detailOpen || !selectedBo) {
+			return;
+		}
+
+		setEditForm({
+			BoType: selectedBo.BoType || '',
+			BoTitle: selectedBo.BoTitle || '',
+			Status: selectedBo.Status || '',
+		});
+	}, [detailOpen, selectedBo]);
+
+	const { mutate: updateBizObject, isPending: isUpdating } = useMutation(
+		updateBizObjectMutationOptions({
+			boId: selectedBo?.BoId ?? '',
+			onSuccess: () => {
+				queryClient.invalidateQueries({ queryKey: ['biz-objects'] });
+				setToastMessage('Business Object updated successfully');
+				setToastVisible(true);
+				setDetailOpen(false);
+			},
+			onError: (error) => {
+				setToastMessage(error.message || 'Cannot update Business Object');
+				setToastVisible(true);
+			},
+		}),
+	);
+
+	const { mutate: deleteBizObject, isPending: isDeleting } = useMutation(
+		deleteBizObjectMutationOptions({
+			boId: selectedBo?.BoId ?? '',
+			onSuccess: () => {
+				queryClient.invalidateQueries({ queryKey: ['biz-objects'] });
+				setToastMessage('Business Object deleted successfully');
+				setToastVisible(true);
+				setDetailOpen(false);
+				setSelectedBoId(null);
+			},
+			onError: (error) => {
+				setToastMessage(error.message || 'Cannot delete Business Object');
+				setToastVisible(true);
+			},
+		}),
+	);
 
 	const columns = React.useMemo(
 		() => rawColumns,
@@ -305,6 +371,39 @@ export function BoView() {
 						</div>
 					</div>
 
+					<div className="rounded-2xl border border-slate-200 bg-white p-4">
+						<div className="text-xs uppercase tracking-[0.18em] text-slate-500">Edit BO</div>
+						<div className="mt-3 grid gap-4 md:grid-cols-3">
+							<div className="flex flex-col gap-1.5">
+								<Label>BoType</Label>
+								<Input
+									value={editForm.BoType}
+									placeholder="Enter BO type"
+									onInput={(event) => setEditForm((prev) => ({ ...prev, BoType: event.target.value }))}
+								/>
+							</div>
+							<div className="flex flex-col gap-1.5">
+								<Label>BoTitle</Label>
+								<Input
+									value={editForm.BoTitle}
+									placeholder="Enter BO title"
+									onInput={(event) => setEditForm((prev) => ({ ...prev, BoTitle: event.target.value }))}
+								/>
+							</div>
+							<div className="flex flex-col gap-1.5">
+								<Label>Status</Label>
+								<Input
+									value={editForm.Status}
+									placeholder="Enter BO status"
+									onInput={(event) => setEditForm((prev) => ({ ...prev, Status: event.target.value }))}
+								/>
+							</div>
+						</div>
+						<div className="mt-3 text-xs text-slate-500">
+							Changes here will be sent in the PUT request when you press Update.
+						</div>
+					</div>
+
 					<List>
 						<ListItemStandard text="BO ID" description={selectedBo.BoId} />
 						<ListItemStandard text="BoType" description={selectedBo.BoType} />
@@ -323,9 +422,37 @@ export function BoView() {
 				<div className="p-6 text-sm text-slate-500">No business object is selected.</div>
 			)}
 			<div slot="footer" className="flex items-center justify-end gap-2 px-2 pb-2 pt-4">
+				<Button
+					design="Emphasized"
+					disabled={!canUpdate || !selectedBo.__EntityControl?.Updatable || isUpdating || isDeleting}
+					onClick={() => {
+						if (!selectedBo) return;
+						updateBizObject({
+							BoType: editForm.BoType.trim(),
+							BoTitle: editForm.BoTitle.trim(),
+							Status: editForm.Status.trim(),
+						});
+					}}
+				>
+					Update
+				</Button>
+				<Button
+					design="Negative"
+					disabled={!selectedBo || !selectedBo.__EntityControl?.Deletable || isUpdating || isDeleting}
+					onClick={() => {
+						if (!selectedBo) return;
+						deleteBizObject();
+					}}
+				>
+					Delete
+				</Button>
 				<Button onClick={() => setDetailOpen(false)}>Close</Button>
 			</div>
 		</Dialog>
+
+		<Toast open={toastVisible} duration={2500} onClose={() => setToastVisible(false)}>
+			{toastMessage}
+		</Toast>
 		</DynamicPage>
 	);
 }
