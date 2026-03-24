@@ -96,7 +96,7 @@ export function AttachmentsView() {
   return (
     <DynamicPage
       headerArea={
-        <DynamicPageHeader>
+        <DynamicPageHeader style={{ padding: '1rem 2rem' }}>
           <AttachmentsFilterBar />
         </DynamicPageHeader>
       }
