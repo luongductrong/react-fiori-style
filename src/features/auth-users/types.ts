@@ -30,3 +30,11 @@ export type AuthUserListParams = {
   $filter?: string;
   $orderby?: string;
 };
+
+export type CreateAuthUserPayload = {
+  Uname: string;
+  Role: string;
+};
+
+export type CreateAuthUserResponse = AuthUserItem;
+

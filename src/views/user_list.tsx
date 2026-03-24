@@ -6,7 +6,6 @@ import { DynamicPageTitle } from '@ui5/webcomponents-react/DynamicPageTitle';
 import { Toolbar } from '@ui5/webcomponents-react/Toolbar';
 import { ToolbarButton } from '@ui5/webcomponents-react/ToolbarButton';
 import { ToolbarSpacer } from '@ui5/webcomponents-react/ToolbarSpacer';
-import { Title } from '@ui5/webcomponents-react/Title';
 import { FlexBox } from '@ui5/webcomponents-react/FlexBox';
 import { AnalyticalTable } from '@ui5/webcomponents-react/AnalyticalTable';
 import type { AnalyticalTableColumnDefinition } from '@ui5/webcomponents-react/AnalyticalTable';
@@ -16,8 +15,8 @@ import { IllustratedMessage } from '@ui5/webcomponents-react/IllustratedMessage'
 import { Input } from '@ui5/webcomponents-react/Input';
 import { Select } from '@ui5/webcomponents-react/Select';
 import { Option } from '@ui5/webcomponents-react/Option';
-import { Text } from '@ui5/webcomponents-react/Text';
 import { Icon } from '@ui5/webcomponents-react/Icon';
+import { useNavigate } from 'react-router';
 import '@ui5/webcomponents-fiori/dist/illustrations/NoData.js';
 import '@ui5/webcomponents-icons/refresh.js';
 import '@ui5/webcomponents-icons/group.js';
@@ -91,6 +90,7 @@ function pillClassName(tone: string) {
 }
 
 export function UserListView() {
+	const navigate = useNavigate();
 	const [search, setSearch] = React.useState('');
 	const [roleFilter, setRoleFilter] = React.useState('ALL');
 
@@ -232,6 +232,7 @@ export function UserListView() {
 
 						<Toolbar className="rounded-2xl border border-slate-200/80 bg-white/90 px-4 py-3 shadow-sm">
 							<ToolbarSpacer />
+							<ToolbarButton design="Emphasized" text="Create User" onClick={() => navigate('/Users/Create')} />
 							<div className="min-w-64">
 								<Input
 									placeholder="Search user, role, creator"
