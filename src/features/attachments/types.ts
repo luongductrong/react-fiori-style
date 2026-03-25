@@ -11,6 +11,8 @@ export type AttachmentListItem = {
   };
 };
 
+export type AttachmentSearchParams = AttachmentListParams;
+
 export type AttachmentListResponse = {
   value: AttachmentListItem[];
   '@odata.count': string;

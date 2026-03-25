@@ -15,11 +15,19 @@ import { FlexBox } from '@ui5/webcomponents-react/FlexBox';
 import { BusyIndicator } from '@ui5/webcomponents-react/BusyIndicator';
 import { MessageStrip } from '@ui5/webcomponents-react/MessageStrip';
 import { IllustratedMessage } from '@ui5/webcomponents-react/IllustratedMessage';
+import { Dialog } from '@ui5/webcomponents-react/Dialog';
+import { Input } from '@ui5/webcomponents-react/Input';
+import { Button } from '@ui5/webcomponents-react/Button';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 import '@ui5/webcomponents-fiori/dist/illustrations/NoData.js';
 import '@ui5/webcomponents-icons/refresh.js';
 import '@ui5/webcomponents-icons/navigation-left-arrow.js';
 import '@ui5/webcomponents-icons/document.js';
+import '@ui5/webcomponents-icons/value-help.js';
 import { getBizObjectLinkedAttachmentsQueryOptions } from '@/features/biz-object/options/query';
+import { linkAttachmentToBoMutationOptions } from '@/features/biz-object/options/mutation';
+import { getAttachmentsQueryOptions } from '@/features/attachments/options/query';
+import type { AttachmentListItem } from '@/features/attachments/types';
 
 type LinkedAttachmentRow = {
 	Title: string;
@@ -61,15 +69,58 @@ function formatDate(date?: string | null, time?: string | null) {
 	return `${date} ${time}`;
 }
 
+function escapeODataSearch(value: string) {
+	return value.replace(/'/g, "''");
+}
+
 export function BoWListAttchmentView() {
 	const navigate = useNavigate();
+	const queryClient = useQueryClient();
 	const params = useParams<{ boId: string }>();
 	const boId = params.boId || '';
+	const [searchOpen, setSearchOpen] = React.useState(false);
+	const [searchText, setSearchText] = React.useState('');
+	const [feedbackMessage, setFeedbackMessage] = React.useState('');
 
 	const { data, isFetching, isLoading, error, refetch } = useQuery(
 		getBizObjectLinkedAttachmentsQueryOptions(boId, {
 			'sap-client': 324,
 			$expand: '_Links($expand=_Attach)',
+		}),
+	);
+
+	const attachmentFilter = React.useMemo(() => {
+		const normalized = searchText.trim();
+		if (!normalized) return undefined;
+
+		const escaped = escapeODataSearch(normalized);
+		return `contains(FileId,'${escaped}') or contains(Title,'${escaped}') or contains(Ernam,'${escaped}')`;
+	}, [searchText]);
+
+	const { data: attachmentSearchData, isFetching: isSearching } = useQuery(
+		getAttachmentsQueryOptions({
+			'sap-client': 324,
+			$count: true,
+			$skip: 0,
+			$top: 25,
+			$select: 'CurrentVersion,Erdat,Ernam,FileId,IsActive,Title,__EntityControl/Deletable,__EntityControl/Updatable',
+			$filter: attachmentFilter,
+		}),
+	);
+
+	const { mutate: linkAttachment, isPending: isLinking } = useMutation(
+		linkAttachmentToBoMutationOptions({
+			boId,
+			onSuccess: () => {
+				setSearchOpen(false);
+				setFeedbackMessage('Attachment linked successfully');
+				queryClient.invalidateQueries({ queryKey: ['biz-object-linked-attachments', boId] });
+				queryClient.invalidateQueries({ queryKey: ['biz-objects'] });
+				refetch();
+			},
+			onError: (error) => {
+				setFeedbackMessage(error.message || 'Cannot link attachment');
+			},
 		}),
 	);
 
@@ -133,6 +184,7 @@ export function BoWListAttchmentView() {
 							<Toolbar className="mt-4 rounded-2xl border border-slate-200/80 bg-white/90 px-4 py-3 shadow-sm">
 								<Title level="H2">BO Attachment List</Title>
 								<ToolbarSpacer />
+								<ToolbarButton design="Emphasized" icon="value-help" text="Link to Attachment" onClick={() => setSearchOpen(true)} />
 								<ToolbarButton design="Transparent" icon="navigation-left-arrow" text="Back to BO" onClick={() => navigate('/BO')} />
 								<ToolbarButton design="Transparent" icon="refresh" text="Refresh" onClick={() => refetch()} />
 							</Toolbar>
@@ -148,6 +200,11 @@ export function BoWListAttchmentView() {
 			}}
 		>
 			<div className="mx-auto flex h-full w-full max-w-7xl flex-col gap-4 p-4">
+				{feedbackMessage ? (
+					<MessageStrip design="Information" hideCloseButton>
+						{feedbackMessage}
+					</MessageStrip>
+				) : null}
 				{error ? (
 					<MessageStrip design="Negative" hideCloseButton>
 						{error instanceof Error ? error.message : 'Cannot load linked attachments.'}
@@ -182,6 +239,70 @@ export function BoWListAttchmentView() {
 					<BusyIndicator delay={0} active size="L" />
 				</FlexBox>
 			) : null}
+
+			<Dialog
+				open={searchOpen}
+				headerText="Link Attachment"
+				onClose={() => setSearchOpen(false)}
+				style={{ width: 'min(96vw, 88rem)' }}
+			>
+				<div className="flex flex-col gap-4 p-2">
+					<div className="grid gap-4 md:grid-cols-[1fr_auto]">
+						<Input
+							value={searchText}
+							placeholder="Search by File ID, title, or creator"
+							onInput={(event) => setSearchText(event.target.value)}
+						/>
+						<Button design="Transparent" onClick={() => setSearchText('')}>
+							Clear
+						</Button>
+					</div>
+
+					<div className="overflow-hidden rounded-2xl border border-slate-200/80 bg-white shadow-sm">
+						<AnalyticalTable
+							data={attachmentSearchData?.value ?? []}
+							columns={[
+								{ Header: 'File ID', accessor: 'FileId', width: 260 },
+								{ Header: 'Title', accessor: 'Title', width: 320 },
+								{ Header: 'Creator', accessor: 'Ernam', width: 140 },
+								{ Header: 'Created On', accessor: 'Erdat', width: 140 },
+								{
+									Header: 'Action',
+									accessor: 'CurrentVersion',
+									width: 160,
+									Cell: ({ row }: any) => {
+										const item = row.original as AttachmentListItem;
+										return (
+											<Button
+												design="Emphasized"
+												disabled={isLinking}
+												onClick={() => {
+													linkAttachment({ bo_id: boId, file_id: item.FileId });
+												}}
+											>
+												Link
+											</Button>
+										);
+									},
+								},
+							] as AnalyticalTableColumnDefinition[]}
+							selectionMode="None"
+							loading={isSearching || isLinking}
+							visibleRowCountMode="Auto"
+							rowHeight={44}
+							scaleWidthMode="Smart"
+							noDataText={searchText ? 'No attachments match the current search.' : 'Type to search attachments.'}
+							style={{ height: '28rem' }}
+						/>
+					</div>
+
+					<div className="flex items-center justify-end gap-2 pt-2">
+						<Button design="Transparent" onClick={() => setSearchOpen(false)}>
+							Close
+						</Button>
+					</div>
+				</div>
+			</Dialog>
 		</DynamicPage>
 	);
 }

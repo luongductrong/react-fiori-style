@@ -122,3 +122,10 @@ export type UpdateBizObjectPayload = {
 };
 
 export type DeleteBizObjectResponse = unknown;
+
+export type LinkAttachmentPayload = {
+  bo_id: string;
+  file_id: string;
+};
+
+export type LinkAttachmentResponse = unknown;
