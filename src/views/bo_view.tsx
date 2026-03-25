@@ -21,6 +21,7 @@ import { IllustratedMessage } from '@ui5/webcomponents-react/IllustratedMessage'
 import { Dialog } from '@ui5/webcomponents-react/Dialog';
 import { Button } from '@ui5/webcomponents-react/Button';
 import { Toast } from '@ui5/webcomponents-react/Toast';
+import { MessageBox } from '@ui5/webcomponents-react/MessageBox';
 import type { AnalyticalTableColumnDefinition } from '@ui5/webcomponents-react/AnalyticalTable';
 import '@ui5/webcomponents-fiori/dist/illustrations/NoData.js';
 import '@ui5/webcomponents-icons/refresh.js';
@@ -117,6 +118,7 @@ export function BoView() {
 	const [editForm, setEditForm] = React.useState<BizObjectFormState>(DEFAULT_FORM);
 	const [toastVisible, setToastVisible] = React.useState(false);
 	const [toastMessage, setToastMessage] = React.useState('');
+	const [deleteDialogOpen, setDeleteDialogOpen] = React.useState(false);
 
 	const { data, isFetching, isLoading, error } = useQuery(
 		getBizObjectsQueryOptions({
@@ -464,16 +466,28 @@ export function BoView() {
 				<Button
 					design="Negative"
 					disabled={!selectedBo || !selectedBo.__EntityControl?.Deletable || isUpdating || isDeleting}
-					onClick={() => {
-						if (!selectedBo) return;
-						deleteBizObject();
-					}}
+					onClick={() => setDeleteDialogOpen(true)}
 				>
 					Delete
 				</Button>
 				<Button onClick={() => setDetailOpen(false)}>Close</Button>
 			</div>
 		</Dialog>
+
+		<MessageBox
+			open={deleteDialogOpen}
+			type="Confirm"
+			titleText="Delete Business Object"
+			actions={['Cancel', 'OK']}
+			onClose={(action) => {
+				setDeleteDialogOpen(false);
+				if (action === 'OK' && selectedBo?.BoId) {
+					deleteBizObject();
+				}
+			}}
+		>
+			Are you sure you want to delete this Business Object? This action cannot be undone.
+		</MessageBox>
 
 		<Toast open={toastVisible} duration={2500} onClose={() => setToastVisible(false)}>
 			{toastMessage}

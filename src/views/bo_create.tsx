@@ -40,19 +40,18 @@ export function BoCreateView() {
   const [form, setForm] = React.useState<FormState>(DEFAULT_FORM);
   const [toastVisible, setToastVisible] = React.useState(false);
   const [toastMessage, setToastMessage] = React.useState('');
+  const [navigateAfterToast, setNavigateAfterToast] = React.useState(false);
 
   const { mutate: createBizObject, isPending } = useMutation(
     createBizObjectMutationOptions({
       onSuccess: (data) => {
         queryClient.invalidateQueries({ queryKey: ['biz-objects'] });
         setToastMessage('Business Object created successfully');
+        setNavigateAfterToast(true);
         setToastVisible(true);
-        navigate('/BO', { replace: true });
-        window.setTimeout(() => {
-          navigate('/BO');
-        }, 500);
       },
       onError: (error) => {
+        setNavigateAfterToast(false);
         setToastMessage(error.message || 'Cannot create Business Object');
         setToastVisible(true);
       },
@@ -201,7 +200,17 @@ export function BoCreateView() {
         </FlexBox>
       ) : null}
 
-      <Toast open={toastVisible} duration={2000} onClose={() => setToastVisible(false)}>
+      <Toast
+        open={toastVisible}
+        duration={2200}
+        onClose={() => {
+          setToastVisible(false);
+          if (navigateAfterToast) {
+            setNavigateAfterToast(false);
+            navigate('/BO', { replace: true });
+          }
+        }}
+      >
         {toastMessage}
       </Toast>
     </DynamicPage>
