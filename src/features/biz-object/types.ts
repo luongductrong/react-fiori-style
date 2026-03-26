@@ -129,3 +129,5 @@ export type LinkAttachmentPayload = {
 };
 
 export type LinkAttachmentResponse = unknown;
+
+export type UnlinkAttachmentLinkResponse = unknown;

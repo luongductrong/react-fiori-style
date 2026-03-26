@@ -18,6 +18,8 @@ import { IllustratedMessage } from '@ui5/webcomponents-react/IllustratedMessage'
 import { Dialog } from '@ui5/webcomponents-react/Dialog';
 import { Input } from '@ui5/webcomponents-react/Input';
 import { Button } from '@ui5/webcomponents-react/Button';
+import { MessageBox } from '@ui5/webcomponents-react/MessageBox';
+import { Toast } from '@ui5/webcomponents-react/Toast';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import '@ui5/webcomponents-fiori/dist/illustrations/NoData.js';
 import '@ui5/webcomponents-icons/refresh.js';
@@ -25,7 +27,7 @@ import '@ui5/webcomponents-icons/navigation-left-arrow.js';
 import '@ui5/webcomponents-icons/document.js';
 import '@ui5/webcomponents-icons/value-help.js';
 import { getBizObjectLinkedAttachmentsQueryOptions } from '@/features/biz-object/options/query';
-import { linkAttachmentToBoMutationOptions } from '@/features/biz-object/options/mutation';
+import { linkAttachmentToBoMutationOptions, unlinkAttachmentFromBoMutationOptions } from '@/features/biz-object/options/mutation';
 import { getAttachmentsQueryOptions } from '@/features/attachments/options/query';
 import type { AttachmentListItem } from '@/features/attachments/types';
 
@@ -81,6 +83,8 @@ export function BoWListAttchmentView() {
 	const [searchOpen, setSearchOpen] = React.useState(false);
 	const [searchText, setSearchText] = React.useState('');
 	const [feedbackMessage, setFeedbackMessage] = React.useState('');
+	const [deleteDialogOpen, setDeleteDialogOpen] = React.useState(false);
+	const [selectedLinkTarget, setSelectedLinkTarget] = React.useState<LinkedAttachmentRow | null>(null);
 
 	const { data, isFetching, isLoading, error, refetch } = useQuery(
 		getBizObjectLinkedAttachmentsQueryOptions(boId, {
@@ -122,6 +126,55 @@ export function BoWListAttchmentView() {
 				setFeedbackMessage(error.message || 'Cannot link attachment');
 			},
 		}),
+	);
+
+	const { mutate: unlinkAttachment, isPending: isUnlinking } = useMutation(
+		unlinkAttachmentFromBoMutationOptions({
+			boId,
+			fileId: selectedLinkTarget?.FileId || '',
+			onSuccess: () => {
+				setDeleteDialogOpen(false);
+				setSelectedLinkTarget(null);
+				setFeedbackMessage('Attachment link deleted successfully');
+				queryClient.invalidateQueries({ queryKey: ['biz-object-linked-attachments', boId] });
+				queryClient.invalidateQueries({ queryKey: ['biz-objects'] });
+				refetch();
+			},
+			onError: (error) => {
+				setDeleteDialogOpen(false);
+				setSelectedLinkTarget(null);
+				setFeedbackMessage(error.message || 'Cannot delete attachment link');
+			},
+		}),
+	);
+
+	const tableColumns = React.useMemo<AnalyticalTableColumnDefinition[]>(
+		() => [
+			...columns,
+			{
+				Header: 'Action',
+				id: 'action',
+				accessor: 'FileId',
+				width: 160,
+				Cell: ({ row }: any) => {
+					const item = row.original as LinkedAttachmentRow;
+
+					return (
+						<Button
+							design="Negative"
+							disabled={isUnlinking}
+							onClick={() => {
+								setSelectedLinkTarget(item);
+								setDeleteDialogOpen(true);
+							}}
+						>
+							Unlink BO
+					</Button>
+					);
+				},
+			},
+		],
+		[isUnlinking],
 	);
 
 	const linkedAttachments = React.useMemo<LinkedAttachmentRow[]>(() => {
@@ -215,7 +268,7 @@ export function BoWListAttchmentView() {
 					{linkedAttachments.length > 0 ? (
 						<AnalyticalTable
 							data={linkedAttachments}
-							columns={columns}
+							columns={tableColumns}
 							sortable
 							groupable
 							selectionMode="None"
@@ -233,6 +286,28 @@ export function BoWListAttchmentView() {
 					)}
 				</div>
 			</div>
+
+			<MessageBox
+				open={deleteDialogOpen}
+				type="Confirm"
+				titleText="Delete Attachment Link"
+				actions={['Cancel', 'OK']}
+				onClose={(action) => {
+					setDeleteDialogOpen(false);
+					if (action === 'OK') {
+						unlinkAttachment();
+					}
+					if (action !== 'OK') {
+						setSelectedLinkTarget(null);
+					}
+				}}
+			>
+				Are you sure you want to delete the link for attachment {selectedLinkTarget?.FileId || '-'} from BO {boId}? This action cannot be undone.
+			</MessageBox>
+
+			<Toast open={Boolean(feedbackMessage)} duration={2200} onClose={() => setFeedbackMessage('')}>
+				{feedbackMessage}
+			</Toast>
 
 			{isLoading ? (
 				<FlexBox alignItems="Center" justifyContent="Center" style={{ position: 'absolute', inset: 0, pointerEvents: 'none' }}>
