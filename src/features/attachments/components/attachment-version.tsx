@@ -66,7 +66,7 @@ export function AttachmentVersion({ fileId }: { fileId: string }) {
           <Toolbar className="py-2 px-4 rounded-t-xl">
             <Title level="H4">Versions {totalCount ? `(${totalCount})` : ''}</Title>
             <ToolbarSpacer />
-            <Button design="Emphasized" icon="add" onClick={() => navigate(`/Attachments/${fileId}/Upload`)}>
+            <Button design="Emphasized" icon="add" onClick={() => navigate(`/attachments/${fileId}/upload`)}>
               Upload
             </Button>
           </Toolbar>
@@ -81,7 +81,7 @@ export function AttachmentVersion({ fileId }: { fileId: string }) {
         onRowClick={(e) => {
           const item = e.detail.row.original;
           if (!item?.FileId) return;
-          navigate(`/Attachments/${item.FileId}/Versions/${item.VersionNo}`);
+          navigate(`/attachments/${item.FileId}/versions/${item.VersionNo}`);
         }}
         groupable
         scaleWidthMode="Smart"

@@ -3,22 +3,14 @@ import { StrictMode } from 'react';
 import '@ui5/webcomponents/dist/Assets.js';
 import { Toaster } from '@/components/toast';
 import { createRoot } from 'react-dom/client';
+import { ToastDemoView } from '@/views/toast-demo';
 import '@ui5/webcomponents-react/dist/json-imports/i18n.js';
 import { QueryProvider } from '@/context-providers/query-provider';
 import { HashRouter, Navigate, Route, Routes } from 'react-router';
-import {
-  AttachmentNewView,
-  AttachmentsDetailView,
-  BoCreateView,
-  BoView,
-  BoWListAttchmentView,
-  UserCreateView,
-  UserListView,
-} from '@/views';
 import { ThemeProvider } from '@ui5/webcomponents-react/ThemeProvider';
 import { AttachmentNewView, AttachmentsDetailView, ShellHomeView } from '@/views';
 import { AttachmentsView, VersionDetailView, UploadVersionView, HomeView } from '@/views';
-import { ToastDemoView } from '@/views/toast-demo';
+import { BoCreateView, BoView, BoWListAttchmentView, UserCreateView, UserListView } from '@/views';
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
@@ -27,23 +19,32 @@ createRoot(document.getElementById('root')!).render(
         <Toaster />
         <HashRouter>
           <Routes>
-            <Route path="/shell-home" element={<ShellHomeView />} />
             <Route path="/demo" element={<ToastDemoView />} />
-            <Route path="/" element={<HomeView />} />
-            <Route path="/Attachments" element={<AttachmentsView />} />
-            <Route path="/BO" element={<BoView />} />
-            <Route path="/BizObject" element={<BoView />} />
-            <Route path="/BO/:boId/Attachments" element={<BoWListAttchmentView />} />
-            <Route path="/Users" element={<UserListView />} />
-            <Route path="/UserList" element={<UserListView />} />
-            <Route path="/Users/Create" element={<UserCreateView />} />
-            <Route path="/UserCreate" element={<UserCreateView />} />
-            <Route path="/BO/Create" element={<BoCreateView />} />
-            <Route path="/Attachments/New" element={<AttachmentNewView />} />
-            <Route path="/Attachments/:id" element={<AttachmentsDetailView />} />
-            <Route path="/Attachments/:id/Upload" element={<UploadVersionView />} />
-            <Route path="/Attachments/:id/Versions/:versionNo" element={<VersionDetailView />} />
-            <Route path="*" element={<Navigate replace to="/Attachments" />} />
+            <Route path="/login" element={<HomeView />} />
+            <Route path="/shell-home" element={<ShellHomeView />} />
+            {/*  */}
+            <Route path="/business-objects" element={<BoView />} />
+            <Route path="/BO" element={<Navigate replace to="/business-objects" />} />
+            <Route path="/BizObject" element={<Navigate replace to="/business-objects" />} />
+            <Route path="/business-objects/:boId/attachments" element={<BoWListAttchmentView />} />
+            <Route
+              path="/BO/:boId/Attachments"
+              element={<Navigate replace to="/business-objects/:boId/attachments" />}
+            />
+            <Route path="/business-objects/create" element={<BoCreateView />} />
+            <Route path="/BO/Create" element={<Navigate replace to="/business-objects/create" />} />
+            {/*  */}
+            <Route path="/users" element={<UserListView />} />
+            <Route path="/UserList" element={<Navigate replace to="/users" />} />
+            <Route path="/users/create" element={<UserCreateView />} />
+            <Route path="/UserCreate" element={<Navigate replace to="/users/create" />} />
+            {/* Attachments */}
+            <Route path="/attachments" element={<AttachmentsView />} />
+            <Route path="/attachments/new" element={<AttachmentNewView />} />
+            <Route path="/attachments/:id" element={<AttachmentsDetailView />} />
+            <Route path="/attachments/:id/upload" element={<UploadVersionView />} />
+            <Route path="/attachments/:id/versions/:versionNo" element={<VersionDetailView />} />
+            <Route path="*" element={<Navigate replace to="/shell-home" />} />
           </Routes>
         </HashRouter>
       </QueryProvider>

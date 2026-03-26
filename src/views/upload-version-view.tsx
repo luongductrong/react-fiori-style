@@ -46,7 +46,7 @@ export function UploadVersionView() {
         });
         setToastMessage('Version uploaded successfully');
         setToastVisible(true);
-        navigate(`/Attachments/${data.FileId}`);
+        navigate(`/attachments/${data.FileId}`);
       },
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       onError: (error: any) => {
@@ -122,8 +122,8 @@ export function UploadVersionView() {
                   }
                 }}
               >
-                <BreadcrumbsItem data-route="/Attachments">Attachments</BreadcrumbsItem>
-                <BreadcrumbsItem data-route={`/Attachments/${id}`}>
+                <BreadcrumbsItem data-route="/attachments">Attachments</BreadcrumbsItem>
+                <BreadcrumbsItem data-route={`/attachments/${id}`}>
                   {isTitleLoading ? 'Loading...' : title?.value || 'Unnamed Object'}
                 </BreadcrumbsItem>
                 <BreadcrumbsItem>Upload new version</BreadcrumbsItem>

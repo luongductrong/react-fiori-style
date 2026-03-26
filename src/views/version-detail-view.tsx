@@ -138,8 +138,8 @@ export function VersionDetailView() {
                   }
                 }}
               >
-                <BreadcrumbsItem data-route="/Attachments">Attachments</BreadcrumbsItem>
-                <BreadcrumbsItem data-route={`/Attachments/${id}`}>
+                <BreadcrumbsItem data-route="/attachments">Attachments</BreadcrumbsItem>
+                <BreadcrumbsItem data-route={`/attachments/${id}`}>
                   {isLoading ? 'Loading...' : title?.value || 'Unnamed Object'}
                 </BreadcrumbsItem>
                 <BreadcrumbsItem>{isLoading ? 'Loading...' : version?.FileName || 'Unnamed Object'}</BreadcrumbsItem>

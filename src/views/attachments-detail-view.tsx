@@ -70,7 +70,7 @@ export function AttachmentsDetailView() {
         queryClient.invalidateQueries({
           queryKey: ['attachments'],
         });
-        navigate('/Attachments');
+        navigate('/attachments');
       },
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       onError: (error: any) => {
@@ -175,7 +175,7 @@ export function AttachmentsDetailView() {
               </Toolbar>
             }
             breadcrumbs={
-              <Breadcrumbs onItemClick={() => navigate('/Attachments')}>
+              <Breadcrumbs onItemClick={() => navigate('/attachments')}>
                 <BreadcrumbsItem>Attachments</BreadcrumbsItem>
                 <BreadcrumbsItem>{isLoading ? 'Loading...' : attachment?.Title || 'Unnamed Object'}</BreadcrumbsItem>
               </Breadcrumbs>
@@ -206,7 +206,7 @@ export function AttachmentsDetailView() {
                 design="Transparent"
                 icon="decline"
                 tooltip="Close"
-                onClick={() => navigate('/Attachments')}
+                onClick={() => navigate('/attachments')}
               />
             }
           />

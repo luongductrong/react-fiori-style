@@ -32,7 +32,7 @@ export function AttachmentCard({ data, loading }: AttachmentCardProps) {
           subtitleText={`Version ${data.CurrentVersion}`}
           additionalText={data.IsActive ? 'Active' : 'Inactive'}
           interactive={true}
-          onClick={() => navigate(`/Attachments/${data.FileId}`)}
+          onClick={() => navigate(`/attachments/${data.FileId}`)}
         />
       }
       loading={loading}

@@ -33,7 +33,6 @@ export type AppAction = {
   showToast: (text: string, options?: ToastState['options']) => void;
   clearToast: () => void;
   setCsrfToken: (csrfToken: string) => void;
-  setViewMode: (_viewMode: AppState['viewMode']) => void;
   setCurrentUserRole: (_role: AppState['currentUserRole']) => void;
 };
 
@@ -76,7 +75,7 @@ export const useAppStore = create<AppStore>()(
     csrfToken: null,
     setCsrfToken: (csrfToken) => set({ csrfToken }),
     setCurrentUserRole: (currentUserRole) => {
-      sessionStorage.setItem('current-user-role', currentUserRole);
+      sessionStorage.setItem('current-user-role', currentUserRole); // ???
       set({ currentUserRole });
     },
   })),

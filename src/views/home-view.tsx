@@ -1,6 +1,5 @@
 import { toast } from '@/libs/toast';
 import { Controller, useForm } from 'react-hook-form';
-import { Toast } from '@ui5/webcomponents-react/Toast';
 import { useAppStore } from '@/stores/app-stores';
 
 type LoginFormValues = {
@@ -18,7 +17,6 @@ const LANGUAGE_OPTIONS = [
 ];
 
 export function HomeView() {
-  const [showToast, setShowToast] = React.useState(false);
   const setCurrentUserRole = useAppStore((state) => state.setCurrentUserRole);
 
   const {
@@ -31,15 +29,13 @@ export function HomeView() {
       password: '',
       language: 'vi',
       client: '3xx',
-        role: 'USER',
+      role: 'USER',
     },
   });
 
-  const onSubmit = (_values: LoginFormValues) => {
-    toast('This function is not implemented yet.');
   const onSubmit = (values: LoginFormValues) => {
+    toast('This function is not implemented yet.');
     setCurrentUserRole(values.role === 'ADMIN' ? 'ADMIN' : 'USER');
-    setShowToast(true);
     return;
   };
 

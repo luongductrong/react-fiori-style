@@ -64,9 +64,7 @@ export function BoCreateView() {
     <DynamicPage
       headerArea={
         <DynamicPageHeader>
-          <div className="p-4">
-           
-          </div>
+          <div className="p-4"></div>
         </DynamicPageHeader>
       }
       titleArea={
@@ -159,7 +157,7 @@ export function BoCreateView() {
                 <ToolbarButton
                   design="Transparent"
                   text="Cancel"
-                  onClick={() => navigate('/BO')}
+                  onClick={() => navigate('/business-objects')}
                   disabled={isPending}
                 />
                 <ToolbarSpacer />
@@ -167,7 +165,7 @@ export function BoCreateView() {
                   design="Transparent"
                   icon="decline"
                   text="Back to list"
-                  onClick={() => navigate('/BO')}
+                  onClick={() => navigate('/business-objects')}
                 />
               </Toolbar>
             </div>
@@ -189,13 +187,15 @@ export function BoCreateView() {
               </div>
             </div>
           </ObjectPageSection>
-
-        
         </ObjectPage>
       </div>
 
       {isPending ? (
-        <FlexBox alignItems="Center" justifyContent="Center" style={{ position: 'absolute', inset: 0, pointerEvents: 'none' }}>
+        <FlexBox
+          alignItems="Center"
+          justifyContent="Center"
+          style={{ position: 'absolute', inset: 0, pointerEvents: 'none' }}
+        >
           <BusyIndicator delay={0} active size="L" />
         </FlexBox>
       ) : null}
@@ -207,7 +207,7 @@ export function BoCreateView() {
           setToastVisible(false);
           if (navigateAfterToast) {
             setNavigateAfterToast(false);
-            navigate('/BO', { replace: true });
+            navigate('/business-objects', { replace: true });
           }
         }}
       >

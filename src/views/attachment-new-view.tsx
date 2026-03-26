@@ -36,7 +36,7 @@ export function AttachmentNewView() {
         queryClient.invalidateQueries({
           queryKey: ['attachments'],
         });
-        navigate(`/Attachments/${data.FileId}`);
+        navigate(`/attachments/${data.FileId}`);
       },
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       onError: (error: any) => {
@@ -115,13 +115,13 @@ export function AttachmentNewView() {
                 <ToolbarButton
                   design="Transparent"
                   text="Cancel"
-                  onClick={() => navigate('/Attachments')}
+                  onClick={() => navigate('/attachments')}
                   disabled={isCreating}
                 />
               </Toolbar>
             }
             breadcrumbs={
-              <Breadcrumbs onItemClick={() => navigate('/Attachments')}>
+              <Breadcrumbs onItemClick={() => navigate('/attachments')}>
                 <BreadcrumbsItem>Attachments</BreadcrumbsItem>
                 <BreadcrumbsItem>New Attachment</BreadcrumbsItem>
               </Breadcrumbs>
@@ -133,7 +133,7 @@ export function AttachmentNewView() {
                 design="Transparent"
                 icon="decline"
                 tooltip="Close"
-                onClick={() => navigate('/Attachments')}
+                onClick={() => navigate('/attachments')}
               />
             }
           />

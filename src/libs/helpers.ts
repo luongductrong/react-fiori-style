@@ -1,6 +1,5 @@
 import { ODATA_SERVICE } from '@/app-constant';
 import { axiosInstance } from './axios-instance';
-import { ODATA_SERVICE } from '@/app-constant';
 
 export function getCsrfToken() {
   return sessionStorage.getItem('x-csrf-token');

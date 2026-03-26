@@ -111,7 +111,7 @@ export function AttachmentsView() {
             <Toolbar className="py-2 px-4 rounded-t-xl">
               <Title level="H2">Attachments {totalCount ? `(${totalCount})` : ''}</Title>
               <ToolbarSpacer />
-              <ToolbarButton design="Transparent" text="New" onClick={() => navigate('/Attachments/New')} />
+              <ToolbarButton design="Transparent" text="New" onClick={() => navigate('/attachments/new')} />
               <ToolbarButton
                 icon="table-view"
                 tooltip="Toggle grid view"
@@ -131,7 +131,7 @@ export function AttachmentsView() {
           onRowClick={(e) => {
             const item = e.detail.row.original;
             if (!item?.FileId) return;
-            navigate(`/Attachments/${item.FileId}`);
+            navigate(`/attachments/${item.FileId}`);
           }}
         />
       )}
@@ -140,7 +140,7 @@ export function AttachmentsView() {
           <Toolbar className="py-2 px-4 rounded-xl">
             <Title level="H2">Attachments {totalCount ? `(${totalCount})` : ''}</Title>
             <ToolbarSpacer />
-            <ToolbarButton design="Transparent" text="New" onClick={() => navigate('/Attachments/New')} />
+            <ToolbarButton design="Transparent" text="New" onClick={() => navigate('/attachments/new')} />
             <ToolbarButton
               icon="list"
               tooltip="Toggle list view"
