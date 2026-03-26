@@ -9,14 +9,12 @@ import { Dialog } from '@ui5/webcomponents-react/Dialog';
 import type { SearchHelpToken } from './search-help.type';
 import { SearchHelpPreview } from './search-help-preview';
 import { FlexBox } from '@ui5/webcomponents-react/FlexBox';
-import { FilterGroupItem } from '@ui5/webcomponents-react/FilterGroupItem';
 
 interface SearchHelpDialogProps {
   options?: SearchHelpToken['key'][];
   field: string;
   label: string;
-
-  hidden?: boolean;
+  afterFilterStringBuild: (s: string) => void;
 }
 
 function createToken(defaultKey: SearchHelpToken['key']): SearchHelpToken {
@@ -30,7 +28,8 @@ function createToken(defaultKey: SearchHelpToken['key']): SearchHelpToken {
 
 const defaultOptions: SearchHelpToken['key'][] = ['contains', 'equal to', 'starts with', 'ends with'];
 
-export function SearchHelpDialog({ options = defaultOptions, field, label, hidden }: SearchHelpDialogProps) {
+export function SearchHelpDialog({ options = defaultOptions, field, label, ...props }: SearchHelpDialogProps) {
+  const { afterFilterStringBuild } = props;
   const [open, setOpen] = React.useState(false);
   const [tokens, setTokens] = React.useState<SearchHelpToken[]>(() => [createToken(options[0])]);
   const cleanTokens = React.useMemo(() => tokens.filter((token) => token.text.trim() !== ''), [tokens]);
@@ -68,16 +67,60 @@ export function SearchHelpDialog({ options = defaultOptions, field, label, hidde
     onClose();
   };
 
+  React.useEffect(() => {
+    const buildFilterString = function () {
+      if (cleanTokens.length === 0) {
+        return '';
+      }
+
+      const escapeValue = function (value: string) {
+        return value.replaceAll("'", "''");
+      };
+
+      const buildExpression = function (token: SearchHelpToken) {
+        const escapedText = escapeValue(token.text);
+
+        switch (token.key) {
+          case 'contains':
+            return `contains(${field},'${escapedText}')`;
+          case 'equal to':
+            return field === 'FileId' ? `${field} eq ${escapedText}` : `${field} eq '${escapedText}'`;
+          case 'starts with':
+            return `startswith(${field},'${escapedText}')`;
+          case 'ends with':
+            return `endswith(${field},'${escapedText}')`;
+        }
+      };
+
+      const wrapGroup = function (expressions: string[], operator: 'or' | 'and') {
+        if (expressions.length === 0) {
+          return '';
+        }
+
+        const result = expressions.join(` ${operator} `);
+        return expressions.length > 1 ? `(${result})` : result;
+      };
+
+      const positiveExpressions = cleanTokens.filter((token) => token.sign === 'positive').map(buildExpression);
+      const negativeExpressions = cleanTokens
+        .filter((token) => token.sign === 'negative')
+        .map((token) => `not ${buildExpression(token)}`);
+
+      return [wrapGroup(positiveExpressions, 'or'), wrapGroup(negativeExpressions, 'and')]
+        .filter(Boolean)
+        .join(' and ');
+    };
+    afterFilterStringBuild(buildFilterString());
+  }, [cleanTokens, afterFilterStringBuild, field]);
+
   return (
     <React.Fragment>
-      <FilterGroupItem filterKey={field} label={label} hiddenInFilterBar={hidden}>
-        <SearchHelpPreview
-          tokens={cleanTokens}
-          onTokensDelete={handleTokensDelete}
-          icon={<Icon className="h-full" name="value-help" onClick={() => setOpen(true)} />}
-          onValueHelpTrigger={() => setOpen(true)}
-        />
-      </FilterGroupItem>
+      <SearchHelpPreview
+        tokens={cleanTokens}
+        onTokensDelete={handleTokensDelete}
+        icon={<Icon className="h-full" name="value-help" onClick={() => setOpen(true)} />}
+        onValueHelpTrigger={() => setOpen(true)}
+      />
       <Dialog
         headerText={`Conditions: ${label}`}
         footer={
@@ -95,7 +138,7 @@ export function SearchHelpDialog({ options = defaultOptions, field, label, hidde
             }
           />
         }
-        className="w-2/3 h-9/10"
+        className="w-2/3 max-w-6xl h-9/10"
         resizable={true}
         draggable={true}
         open={open}

@@ -6,48 +6,83 @@ import { FilterBar } from '@ui5/webcomponents-react/FilterBar';
 import { SearchHelpDialog } from '@/components/search-help-dialog';
 import { FilterGroupItem } from '@ui5/webcomponents-react/FilterGroupItem';
 
-export function AttachmentsFilterBar() {
+interface AttachmentsFilterBarProps {
+  onFilterChange: (_filter: string) => void;
+  onSearchChange: (_search: string) => void;
+}
+
+export function AttachmentsFilterBar({ onFilterChange, onSearchChange }: AttachmentsFilterBarProps) {
+  const [count, setCount] = React.useState<number>(0);
   const [filterKeys, setFilterKeys] = React.useState<string[]>(['FileId', 'Title', 'IsActive', 'Ernam']);
+  const [idFilterString, setIdFilterString] = React.useState<string>('');
+  const [titleFilterString, setTitleFilterString] = React.useState<string>('');
+  const [createdByFilterString, setCreatedByFilterString] = React.useState<string>('');
+  const [isActive, setIsActive] = React.useState<string>('');
+
+  const handleOnGo = function () {
+    const isActiveFilter = isActive ? `IsActive eq ${isActive}` : '';
+    const filter = [idFilterString, titleFilterString, createdByFilterString, isActiveFilter]
+      .filter(Boolean)
+      .join(' and ');
+    onFilterChange(filter);
+  };
+
+  const onClear = function () {
+    setIsActive('');
+    setCount((prev) => prev + 1);
+    setFilterKeys(['FileId', 'Title', 'IsActive', 'Ernam']);
+    setIdFilterString('');
+    setTitleFilterString('');
+    setCreatedByFilterString('');
+    onFilterChange('');
+  };
 
   return (
-    <>
-      <FilterBar
-        hideToolbar={true}
-        showGoOnFB={true}
-        showResetButton={true}
-        onAfterFiltersDialogOpen={function fQ() {}}
-        onClear={function fQ() {}}
-        onFiltersDialogCancel={function fQ() {}}
-        onFiltersDialogClose={function fQ() {}}
-        onFiltersDialogOpen={function fQ() {}}
-        onFiltersDialogSave={(e) => setFilterKeys(e.detail.selectedFilterKeys)}
-        onFiltersDialogSearch={function fQ() {}}
-        onFiltersDialogSelectionChange={function fQ() {}}
-        onGo={function fQ(e) {
-          console.log(e);
-        }}
-        onReorder={function fQ() {}}
-        onRestore={() => setFilterKeys(['FileId', 'Title', 'IsActive', 'Ernam'])}
-        onToggleFilters={function fQ() {}}
-        search={<Input className="*:h-full h-6.5" />}
-      >
+    <FilterBar
+      hideToolbar={true}
+      showGoOnFB={true}
+      showResetButton={true}
+      onAfterFiltersDialogOpen={function fQ() {}}
+      onClear={onClear}
+      onFiltersDialogCancel={function fQ() {}}
+      onFiltersDialogClose={function fQ() {}}
+      onFiltersDialogOpen={function fQ() {}}
+      onFiltersDialogSave={(e) => setFilterKeys(e.detail.selectedFilterKeys)}
+      onFiltersDialogSearch={(e) => alert(e.target.value)}
+      onFiltersDialogSelectionChange={function fQ() {}}
+      onGo={handleOnGo}
+      onReorder={function fQ() {}}
+      onRestore={onClear}
+      onToggleFilters={function fQ() {}}
+      search={<Input className="*:h-full h-6.5" onChange={(e) => onSearchChange(e.target.value)} />}
+    >
+      <FilterGroupItem filterKey="FileId" label="File ID" hiddenInFilterBar={!filterKeys.includes('FileId')}>
         <SearchHelpDialog
+          key={count}
           label="File ID"
           field="FileId"
           options={['equal to']}
-          hidden={!filterKeys.includes('FileId')}
+          afterFilterStringBuild={setIdFilterString}
         />
-        <SearchHelpDialog label="File Title" field="Title" hidden={!filterKeys.includes('Title')} />
-        <FilterGroupItem filterKey="IsActive" label="Active" hiddenInFilterBar={!filterKeys.includes('IsActive')}>
-          <Select className="h-6.5">
-            <Option>Yes</Option>
-            <Option>No</Option>
-          </Select>
-        </FilterGroupItem>
-        <SearchHelpDialog label="Created By" field="Ernam" hidden={!filterKeys.includes('Ernam')} />
-      </FilterBar>
-    </>
+      </FilterGroupItem>
+      <FilterGroupItem filterKey="Title" label="File Title" hiddenInFilterBar={!filterKeys.includes('Title')}>
+        <SearchHelpDialog key={count} label="File Title" field="Title" afterFilterStringBuild={setTitleFilterString} />
+      </FilterGroupItem>
+      <FilterGroupItem filterKey="IsActive" label="Active" hiddenInFilterBar={!filterKeys.includes('IsActive')}>
+        <Select value={isActive} onChange={(e) => setIsActive(e.target.value)} className="h-6.5">
+          <Option value="">All</Option>
+          <Option value="true">Yes</Option>
+          <Option value="false">No</Option>
+        </Select>
+      </FilterGroupItem>
+      <FilterGroupItem filterKey="Ernam" label="Created By" hiddenInFilterBar={!filterKeys.includes('Ernam')}>
+        <SearchHelpDialog
+          key={count}
+          label="Created By"
+          field="Ernam"
+          afterFilterStringBuild={setCreatedByFilterString}
+        />
+      </FilterGroupItem>
+    </FilterBar>
   );
 }
-
-// $filter=(startswith(Title,'test')%20or%20startswith(Title,'demo'))%20and%20not%20contains(Title,'123')%20and%20startswith(Ernam,'DEV')%20and%20IsActive%20eq%20true

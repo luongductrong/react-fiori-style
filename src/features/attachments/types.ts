@@ -23,6 +23,7 @@ export type AttachmentListParams = {
   $skip: number;
   $top: number;
   $filter?: string;
+  $search?: string;
 };
 
 export type AttachmentDetailParams = {

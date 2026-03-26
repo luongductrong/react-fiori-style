@@ -55,7 +55,8 @@ export function AttachmentsView() {
   const navigate = useNavigate();
   const viewMode = useAppStore((state) => state.viewMode);
   const setViewMode = useAppStore((state) => state.setViewMode);
-  const [filter, _setFilter] = React.useState<string | undefined>(undefined);
+  const [search, setSearch] = React.useState<string>('');
+  const [filter, setFilter] = React.useState<string>('');
   const [selectedIds, setSelectedIds] = React.useState<Record<string, boolean>>({});
   const selectedCount = React.useMemo(() => Object.keys(selectedIds).length, [selectedIds]);
   const { data, isFetching, hasNextPage, fetchNextPage, isFetchingNextPage } = useInfiniteQuery(
@@ -65,7 +66,8 @@ export function AttachmentsView() {
       $top: 10,
       $count: true,
       $select: 'CurrentVersion,Erdat,Ernam,FileId,IsActive,Title,__EntityControl/Deletable,__EntityControl/Updatable',
-      $filter: filter,
+      $filter: filter || undefined,
+      $search: search || undefined,
     }),
   );
 
@@ -101,7 +103,7 @@ export function AttachmentsView() {
     <DynamicPage
       headerArea={
         <DynamicPageHeader style={{ padding: '1rem 2rem' }}>
-          <AttachmentsFilterBar />
+          <AttachmentsFilterBar onFilterChange={setFilter} onSearchChange={setSearch} />
         </DynamicPageHeader>
       }
       style={{
