@@ -22,7 +22,7 @@ import { ObjectPageTitle } from '@ui5/webcomponents-react/ObjectPageTitle';
 import { ObjectPageHeader } from '@ui5/webcomponents-react/ObjectPageHeader';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { ObjectPageSection } from '@ui5/webcomponents-react/ObjectPageSection';
-import { getAttachmentTitleQueryOptions } from '@/features/attachments/options/query';
+import { attachmentTitleQueryOptions } from '@/features/attachments/options/query';
 import { uploadVersionMutationOptions } from '@/features/attachments/options/mutation';
 
 export function UploadVersionView() {
@@ -34,7 +34,7 @@ export function UploadVersionView() {
   const [toastMessage, setToastMessage] = React.useState('');
   const navigate = useNavigate();
   const { data: title, isLoading: isTitleLoading } = useQuery(
-    getAttachmentTitleQueryOptions(id!, {
+    attachmentTitleQueryOptions(id!, {
       'sap-client': 324,
     }),
   );

@@ -3,7 +3,6 @@ import '@ui5/webcomponents-icons/document.js';
 import { Card } from '@ui5/webcomponents-react/Card';
 import { Icon } from '@ui5/webcomponents-react/Icon';
 import { List } from '@ui5/webcomponents-react/List';
-import { CheckBox } from '@ui5/webcomponents-react/CheckBox';
 import { CardHeader } from '@ui5/webcomponents-react/CardHeader';
 import { ListItemStandard } from '@ui5/webcomponents-react/ListItemStandard';
 
@@ -18,12 +17,10 @@ type Attachment = {
 
 type AttachmentCardProps = {
   data: Attachment;
-  selected?: boolean;
-  onSelectChange?: (checked: boolean) => void;
   loading?: boolean;
 };
 
-export function AttachmentCard({ data, selected = false, onSelectChange, loading }: AttachmentCardProps) {
+export function AttachmentCard({ data, loading }: AttachmentCardProps) {
   const navigate = useNavigate();
 
   return (
@@ -36,7 +33,6 @@ export function AttachmentCard({ data, selected = false, onSelectChange, loading
           additionalText={data.IsActive ? 'Active' : 'Inactive'}
           interactive={true}
           onClick={() => navigate(`/Attachments/${data.FileId}`)}
-          action={<CheckBox checked={selected} onChange={(e) => onSelectChange?.(e.target.checked ?? false)} />}
         />
       }
       loading={loading}

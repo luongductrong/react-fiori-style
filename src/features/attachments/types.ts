@@ -25,6 +25,7 @@ export type AttachmentListParams = {
   $skip: number;
   $top: number;
   $filter?: string;
+  $search?: string;
 };
 
 export type AttachmentDetailParams = {
@@ -164,4 +165,27 @@ export type CreateAttachmentResponse = {
   FileId: string;
   Title: string;
   EditLock: boolean;
+};
+
+type BizObject = {
+  BoId: string;
+  BoType: string;
+  BoTitle: string;
+};
+
+type AttachmentBizObject = {
+  BoId: string;
+  FileId: string;
+  _Bo: BizObject;
+};
+
+export type AttachmentBizObjectsResponse = {
+  value: AttachmentBizObject[];
+  '@odata.count': string;
+};
+
+export type AttachmentBizObjectsParams = {
+  'sap-client': number;
+  $count: boolean;
+  $expand: string;
 };

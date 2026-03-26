@@ -1,29 +1,30 @@
 import * as React from 'react';
+import { cn } from '@/libs/utils';
 import '@ui5/webcomponents-icons/list.js';
+import '@ui5/webcomponents-icons/home.js';
 import { useNavigate } from 'react-router';
 import '@ui5/webcomponents-icons/table-view.js';
-import { useQuery } from '@tanstack/react-query';
 import { useAppStore } from '@/stores/app-stores';
+import { Bar } from '@ui5/webcomponents-react/Bar';
 import { Grid } from '@ui5/webcomponents-react/Grid';
 import { Icon } from '@ui5/webcomponents-react/Icon';
 import { Title } from '@ui5/webcomponents-react/Title';
+import { Button } from '@ui5/webcomponents-react/Button';
+import { useInfiniteQuery } from '@tanstack/react-query';
 import { FlexBox } from '@ui5/webcomponents-react/FlexBox';
 import { Toolbar } from '@ui5/webcomponents-react/Toolbar';
 import '@ui5/webcomponents-icons/navigation-right-arrow.js';
 import '@ui5/webcomponents-fiori/dist/illustrations/NoData.js';
 import { DynamicPage } from '@ui5/webcomponents-react/DynamicPage';
-import { VariantItem } from '@ui5/webcomponents-react/VariantItem';
 import { ToolbarButton } from '@ui5/webcomponents-react/ToolbarButton';
 import { ToolbarSpacer } from '@ui5/webcomponents-react/ToolbarSpacer';
-import { AnalyticalTable } from '@ui5/webcomponents-react/AnalyticalTable';
-import { DynamicPageTitle } from '@ui5/webcomponents-react/DynamicPageTitle';
+import { attachmentsQueryOptions } from '@/features/attachments/options/query';
 import { DynamicPageHeader } from '@ui5/webcomponents-react/DynamicPageHeader';
-import { VariantManagement } from '@ui5/webcomponents-react/VariantManagement';
 import { IllustratedMessage } from '@ui5/webcomponents-react/IllustratedMessage';
-import { getAttachmentsQueryOptions } from '@/features/attachments/options/query';
 import { AttachmentsFilterBar, AttachmentCard } from '@/features/attachments/components';
+import { AnalyticalTable, type AnalyticalTableCellInstance } from '@ui5/webcomponents-react/AnalyticalTable';
 
-const rawColumns = [
+const columns = [
   {
     Header: 'Title',
     accessor: 'Title',
@@ -35,8 +36,7 @@ const rawColumns = [
   {
     Header: 'Is Active',
     accessor: 'IsActive',
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    Cell: (props: any) => (props.value ? 'Yes' : 'No'),
+    Cell: (props: AnalyticalTableCellInstance) => (props.value ? 'Yes' : 'No'),
   },
   {
     Header: 'Created On',
@@ -46,91 +46,72 @@ const rawColumns = [
     Header: 'Created By',
     accessor: 'Ernam',
   },
+  {
+    Header: '',
+    id: 'nav',
+    width: 60,
+    disableSortBy: true,
+    disableGroupBy: true,
+    Cell: () => <Icon name="navigation-right-arrow" />,
+  },
 ];
 
 export function AttachmentsView() {
   const navigate = useNavigate();
   const viewMode = useAppStore((state) => state.viewMode);
   const setViewMode = useAppStore((state) => state.setViewMode);
-  const [filter, _setFilter] = React.useState<string | undefined>(undefined);
-  const [selectedIds, setSelectedIds] = React.useState<Record<string, boolean>>({});
-  const selectedCount = React.useMemo(() => Object.keys(selectedIds).length, [selectedIds]);
-  const { data, isFetching } = useQuery(
-    getAttachmentsQueryOptions({
+  const [search, setSearch] = React.useState<string>('');
+  const [filter, setFilter] = React.useState<string>('');
+  const { data, isFetching, hasNextPage, fetchNextPage, isFetchingNextPage } = useInfiniteQuery(
+    attachmentsQueryOptions({
       'sap-client': 324,
       $skip: 0,
-      $top: 20,
+      $top: 10,
       $count: true,
       $select: 'CurrentVersion,Erdat,Ernam,FileId,IsActive,Title,__EntityControl/Deletable,__EntityControl/Updatable',
-      $filter: filter,
+      $filter: filter || undefined,
+      $search: search || undefined,
     }),
   );
 
-  const attachments = data?.value || [];
-
-  const columns = React.useMemo(() => {
-    return [
-      ...rawColumns,
-      {
-        Header: '',
-        id: 'nav',
-        width: 60,
-        disableSortBy: true,
-        disableGroupBy: true,
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        Cell: ({ row }: any) => (
-          <button
-            onClick={() => {
-              const item = row.original;
-              if (!item?.FileId) return;
-              navigate(`/Attachments/${item.FileId}`);
-            }}
-          >
-            <Icon name="navigation-right-arrow" />
-          </button>
-        ),
-      },
-    ];
-  }, [navigate]);
+  const attachments = React.useMemo(() => {
+    return data?.pages.flatMap((page) => page.value) || [];
+  }, [data?.pages]);
+  const totalCount = data?.pages[data.pages.length - 1]['@odata.count'] ?? 0;
 
   return (
     <DynamicPage
       headerArea={
-        <DynamicPageHeader>
-          <AttachmentsFilterBar />
+        <DynamicPageHeader style={{ padding: '1rem 2rem' }}>
+          <FlexBox alignItems="Center" className="text-primary gap-2">
+            <Icon
+              name="home"
+              className="text-primary"
+              onClick={(e) => {
+                e.stopPropagation();
+                navigate('/shell-home');
+              }}
+              mode="Interactive"
+            />
+            <Title level="H1" className="text-primary">
+              Attachments
+            </Title>
+          </FlexBox>
+          <AttachmentsFilterBar onFilterChange={setFilter} onSearchChange={setSearch} />
         </DynamicPageHeader>
       }
       style={{
         height: '100dvh',
-        overflow: 'hidden',
-        position: 'relative',
-        zIndex: 0,
       }}
-      titleArea={
-        <DynamicPageTitle
-          className="p-3"
-          heading={
-            <VariantManagement onClick={function fQ() {}}>
-              <VariantItem selected>Standard</VariantItem>
-            </VariantManagement>
-          }
-          snappedHeading={
-            <VariantManagement onClick={function fQ() {}}>
-              <VariantItem selected>Standard</VariantItem>
-            </VariantManagement>
-          }
-          style={{ minHeight: '0px' }}
-        />
-      }
+      showFooter={true}
     >
       {viewMode === 'table' && (
         <AnalyticalTable
           header={
             <Toolbar className="py-2 px-4 rounded-t-xl">
-              <Title level="H2">Attachments {data?.['@odata.count'] ? `(${data?.['@odata.count']})` : ''}</Title>
+              <Title level="H2">Attachments {totalCount ? `(${totalCount})` : ''}</Title>
               <ToolbarSpacer />
               <ToolbarButton design="Transparent" text="New" onClick={() => navigate('/Attachments/New')} />
-              <ToolbarButton design="Transparent" text="Delete" disabled={selectedCount === 0} />
               <ToolbarButton
                 icon="table-view"
                 tooltip="Toggle grid view"
@@ -143,29 +124,23 @@ export function AttachmentsView() {
           columns={columns}
           sortable
           groupable
-          selectionMode="Multiple"
-          loading={isFetching}
+          loading={isFetching || isFetchingNextPage}
           rowHeight={36}
-          visibleRowCountMode="Auto"
-          withNavigationHighlight={true}
-          withRowHighlight={true}
-          selectionBehavior="RowSelector"
           scaleWidthMode="Smart"
-          selectedRowIds={selectedIds}
-          onRowSelect={(e) => {
-            e.preventDefault();
-            e.stopPropagation();
-            setSelectedIds(e.detail.selectedRowIds ?? {});
+          visibleRowCountMode="Auto"
+          onRowClick={(e) => {
+            const item = e.detail.row.original;
+            if (!item?.FileId) return;
+            navigate(`/Attachments/${item.FileId}`);
           }}
         />
       )}
       {viewMode === 'grid' && (
         <FlexBox direction="Column" style={{ width: '100%', gap: '1rem' }}>
           <Toolbar className="py-2 px-4 rounded-xl">
-            <Title level="H2">Attachments {data?.['@odata.count'] ? `(${data?.['@odata.count']})` : ''}</Title>
+            <Title level="H2">Attachments {totalCount ? `(${totalCount})` : ''}</Title>
             <ToolbarSpacer />
             <ToolbarButton design="Transparent" text="New" onClick={() => navigate('/Attachments/New')} />
-            <ToolbarButton design="Transparent" text="Delete" disabled={selectedCount === 0} />
             <ToolbarButton
               icon="list"
               tooltip="Toggle list view"
@@ -175,29 +150,18 @@ export function AttachmentsView() {
           </Toolbar>
           {attachments.length === 0 && <IllustratedMessage name="NoData" />}
           <Grid defaultSpan="XL3 L4 M6 S12" hSpacing="1.5rem" vSpacing="1.5rem" className="px-3 md:px-0">
-            {attachments.map((attachment, index) => (
-              <AttachmentCard
-                key={attachment.FileId}
-                data={attachment}
-                selected={selectedIds[index]}
-                onSelectChange={(checked) => {
-                  if (checked) {
-                    setSelectedIds((prev) => ({
-                      ...prev,
-                      [index]: true,
-                    }));
-                  } else {
-                    setSelectedIds((prev) => {
-                      const { [index]: _, ...rest } = prev;
-                      return rest;
-                    });
-                  }
-                }}
-                loading={isFetching}
-              />
+            {attachments.map((attachment) => (
+              <AttachmentCard key={attachment.FileId} data={attachment} loading={isFetching || isFetchingNextPage} />
             ))}
           </Grid>
         </FlexBox>
+      )}
+      {hasNextPage && (
+        <Bar className={cn({ 'rounded-xl mt-4': viewMode === 'grid' })}>
+          <Button onClick={() => fetchNextPage()} disabled={isFetchingNextPage}>
+            More [{attachments.length}/{totalCount}]
+          </Button>
+        </Bar>
       )}
     </DynamicPage>
   );

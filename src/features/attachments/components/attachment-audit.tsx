@@ -1,8 +1,9 @@
-import * as React from 'react';
-import { useQuery } from '@tanstack/react-query';
+import { Bar } from '@ui5/webcomponents-react/Bar';
 import { Title } from '@ui5/webcomponents-react/Title';
+import { Button } from '@ui5/webcomponents-react/Button';
+import { useInfiniteQuery } from '@tanstack/react-query';
 import { Toolbar } from '@ui5/webcomponents-react/Toolbar';
-import { getAttachmentAuditsQueryOptions } from '../options/query';
+import { attachmentAuditsQueryOptions } from '../options/query';
 import { ToolbarSpacer } from '@ui5/webcomponents-react/ToolbarSpacer';
 import { AnalyticalTable } from '@ui5/webcomponents-react/AnalyticalTable';
 
@@ -30,37 +31,51 @@ const auditColumns = [
 ];
 
 export function AttachmentAudit({ fileId }: { fileId: string }) {
-  const { data: auditsData, isFetching: isAuditsFetching } = useQuery(
-    getAttachmentAuditsQueryOptions(fileId, {
+  const {
+    data: auditsData,
+    isFetching,
+    fetchNextPage,
+    hasNextPage,
+    isFetchingNextPage,
+  } = useInfiniteQuery(
+    attachmentAuditsQueryOptions(fileId, {
       'sap-client': 324,
       $count: true,
       $select: 'Action,Erdat,Ernam,Erzet,FileId,Note,Uname',
       $skip: 0,
-      $top: 10,
+      $top: 5,
     }),
   );
 
-  const audits = auditsData?.value ?? [];
-
-  const memoizedAuditColumns = React.useMemo(() => auditColumns, []);
+  const audits = auditsData?.pages.flatMap((page) => page.value) ?? [];
+  const totalCount = auditsData?.pages[0]['@odata.count'] ?? 0;
 
   return (
-    <AnalyticalTable
-      header={
-        <Toolbar className="py-2 px-4 rounded-t-xl">
-          <Title level="H4">Audit {auditsData?.['@odata.count'] ? `(${auditsData['@odata.count']})` : ''}</Title>
-          <ToolbarSpacer />
-        </Toolbar>
-      }
-      data={audits}
-      columns={memoizedAuditColumns}
-      loading={isAuditsFetching}
-      rowHeight={36}
-      selectionMode="None"
-      visibleRows={10}
-      sortable
-      groupable
-      scaleWidthMode="Smart"
-    />
+    <>
+      <AnalyticalTable
+        header={
+          <Toolbar className="py-2 px-4 rounded-t-xl">
+            <Title level="H4">Audit {totalCount ? `(${totalCount})` : ''}</Title>
+            <ToolbarSpacer />
+          </Toolbar>
+        }
+        data={audits}
+        columns={auditColumns}
+        loading={isFetching || isFetchingNextPage}
+        rowHeight={36}
+        selectionMode="None"
+        visibleRows={10}
+        sortable
+        groupable
+        scaleWidthMode="Smart"
+      />
+      {hasNextPage && (
+        <Bar>
+          <Button onClick={() => fetchNextPage()} disabled={isFetchingNextPage}>
+            More [{audits.length}/{totalCount}]
+          </Button>
+        </Bar>
+      )}
+    </>
   );
 }

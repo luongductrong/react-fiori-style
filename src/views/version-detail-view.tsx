@@ -22,9 +22,9 @@ import { ObjectPageTitle } from '@ui5/webcomponents-react/ObjectPageTitle';
 import { ObjectPageHeader } from '@ui5/webcomponents-react/ObjectPageHeader';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { ObjectPageSection } from '@ui5/webcomponents-react/ObjectPageSection';
-import { getAttachmentTitleQueryOptions } from '@/features/attachments/options/query';
+import { attachmentTitleQueryOptions } from '@/features/attachments/options/query';
 import { rollbackVersionMutationOptions } from '@/features/attachments/options/mutation';
-import { getAttachmentVersionDetailQueryOptions } from '@/features/attachments/options/query';
+import { attachmentVersionDetailQueryOptions } from '@/features/attachments/options/query';
 
 export function VersionDetailView() {
   const { id, versionNo } = useParams();
@@ -33,14 +33,14 @@ export function VersionDetailView() {
   const [toastMessage, setToastMessage] = React.useState('');
   const navigate = useNavigate();
   const { data: version, isLoading } = useQuery(
-    getAttachmentVersionDetailQueryOptions(id!, versionNo!, {
+    attachmentVersionDetailQueryOptions(id!, versionNo!, {
       'sap-client': 324,
       $select:
         'Ernam,FileContent,FileExtension,FileId,FileName,FileSize,MimeType,VersionNo,__EntityControl/Deletable,__EntityControl/Updatable',
     }),
   );
   const { data: title } = useQuery(
-    getAttachmentTitleQueryOptions(id!, {
+    attachmentTitleQueryOptions(id!, {
       'sap-client': 324,
     }),
   );

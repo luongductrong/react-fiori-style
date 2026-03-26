@@ -1,4 +1,4 @@
-import * as React from 'react';
+import { toast } from '@/libs/toast';
 import { Controller, useForm } from 'react-hook-form';
 import { Toast } from '@ui5/webcomponents-react/Toast';
 import { useAppStore } from '@/stores/app-stores';
@@ -35,6 +35,8 @@ export function HomeView() {
     },
   });
 
+  const onSubmit = (_values: LoginFormValues) => {
+    toast('This function is not implemented yet.');
   const onSubmit = (values: LoginFormValues) => {
     setCurrentUserRole(values.role === 'ADMIN' ? 'ADMIN' : 'USER');
     setShowToast(true);
@@ -215,16 +217,6 @@ export function HomeView() {
       <footer className="absolute bottom-[0.95rem] left-4 right-4 z-10 text-center text-[0.7rem] text-[rgba(52,76,98,0.88)] sm:left-auto sm:right-5 sm:text-left">
         Copyright (c) 2026 SAP SE All Rights Reserved.
       </footer>
-
-      <Toast
-        className="px-2 py-1"
-        open={showToast}
-        onClose={() => {
-          setShowToast(false);
-        }}
-      >
-        This function is not implemented yet.
-      </Toast>
     </main>
   );
 }

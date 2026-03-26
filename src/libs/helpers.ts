@@ -1,3 +1,4 @@
+import { ODATA_SERVICE } from '@/app-constant';
 import { axiosInstance } from './axios-instance';
 import { ODATA_SERVICE } from '@/app-constant';
 

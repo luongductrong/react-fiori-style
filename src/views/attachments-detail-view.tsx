@@ -17,12 +17,13 @@ import { MessageBox } from '@ui5/webcomponents-react/MessageBox';
 import { Breadcrumbs } from '@ui5/webcomponents-react/Breadcrumbs';
 import { BusyIndicator } from '@ui5/webcomponents-react/BusyIndicator';
 import { ToolbarButton } from '@ui5/webcomponents-react/ToolbarButton';
+import { AttachmentBizObjects } from '@/features/attachments/components';
 import { BreadcrumbsItem } from '@ui5/webcomponents-react/BreadcrumbsItem';
 import { ObjectPageTitle } from '@ui5/webcomponents-react/ObjectPageTitle';
 import { ObjectPageHeader } from '@ui5/webcomponents-react/ObjectPageHeader';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { ObjectPageSection } from '@ui5/webcomponents-react/ObjectPageSection';
-import { getAttachmentDetailQueryOptions } from '@/features/attachments/options/query';
+import { attachmentDetailQueryOptions } from '@/features/attachments/options/query';
 import { deleteAttachmentMutationOptions } from '@/features/attachments/options/mutation';
 import { updateAttachmentTitleMutationOptions } from '@/features/attachments/options/mutation';
 import { AttachmentVersion, AttachmentAudit, FilePreview } from '@/features/attachments/components';
@@ -37,7 +38,7 @@ export function AttachmentsDetailView() {
   const [toastMessage, setToastMessage] = React.useState('');
   const [deleteDialogOpen, setDeleteDialogOpen] = React.useState(false);
   const { data: attachment, isLoading } = useQuery(
-    getAttachmentDetailQueryOptions(id!, {
+    attachmentDetailQueryOptions(id!, {
       'sap-client': 324,
       $select: 'CurrentVersion,Erdat,Ernam,FileId,IsActive,Title,__EntityControl/Deletable,__EntityControl/Updatable',
       $expand: '_CurrentVersion($select=FileContent,FileId,FileName,MimeType,VersionNo)',
@@ -233,6 +234,14 @@ export function AttachmentsDetailView() {
           <AttachmentAudit fileId={id!} />
         </ObjectPageSection>
         <ObjectPageSection
+          aria-label="Business Objects"
+          id="business-objects"
+          titleText="Business Objects"
+          style={{ display: isLoading ? 'none' : 'block' }}
+        >
+          <AttachmentBizObjects fileId={id!} />
+        </ObjectPageSection>
+        <ObjectPageSection
           aria-label="File Preview"
           id="file-preview"
           titleText="File Preview"
@@ -249,21 +258,21 @@ export function AttachmentsDetailView() {
         <Toast open={toastVisible} onClose={() => setToastVisible(false)} duration={2000} className="py-1 px-2">
           {toastMessage}
         </Toast>
-        <MessageBox
-          open={deleteDialogOpen}
-          type="Confirm"
-          titleText="Delete Attachment"
-          actions={['Cancel', 'OK']}
-          onClose={(action) => {
-            setDeleteDialogOpen(false);
-            if (action === 'OK' && attachment?.FileId) {
-              deleteAttachment();
-            }
-          }}
-        >
-          Are you sure you want to delete this attachment? This action cannot be undone.
-        </MessageBox>
       </ObjectPage>
+      <MessageBox
+        open={deleteDialogOpen}
+        type="Confirm"
+        titleText="Delete Attachment"
+        actions={['Cancel', 'OK']}
+        onClose={(action) => {
+          setDeleteDialogOpen(false);
+          if (action === 'OK' && attachment?.FileId) {
+            deleteAttachment();
+          }
+        }}
+      >
+        Are you sure you want to delete this attachment? This action cannot be undone.
+      </MessageBox>
       {(isUpdating || isDeleting) && (
         <FlexBox
           alignItems="Center"
