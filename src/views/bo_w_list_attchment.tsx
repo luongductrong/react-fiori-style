@@ -16,7 +16,6 @@ import { BusyIndicator } from '@ui5/webcomponents-react/BusyIndicator';
 import { MessageStrip } from '@ui5/webcomponents-react/MessageStrip';
 import { IllustratedMessage } from '@ui5/webcomponents-react/IllustratedMessage';
 import { Dialog } from '@ui5/webcomponents-react/Dialog';
-import { Input } from '@ui5/webcomponents-react/Input';
 import { Button } from '@ui5/webcomponents-react/Button';
 import { MessageBox } from '@ui5/webcomponents-react/MessageBox';
 import { Toast } from '@ui5/webcomponents-react/Toast';
@@ -26,6 +25,7 @@ import '@ui5/webcomponents-icons/refresh.js';
 import '@ui5/webcomponents-icons/navigation-left-arrow.js';
 import '@ui5/webcomponents-icons/document.js';
 import '@ui5/webcomponents-icons/value-help.js';
+import { AttachmentsFilterBar } from '@/features/attachments/components/attachments-filter-bar';
 import { getBizObjectLinkedAttachmentsQueryOptions } from '@/features/biz-object/options/query';
 import {
   linkAttachmentToBoMutationOptions,
@@ -76,20 +76,29 @@ function formatDate(date?: string | null, time?: string | null) {
   return `${date} ${time}`;
 }
 
-function escapeODataSearch(value: string) {
-  return value.replace(/'/g, "''");
-}
-
 export function BoWListAttchmentView() {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const params = useParams<{ boId: string }>();
   const boId = params.boId || '';
   const [searchOpen, setSearchOpen] = React.useState(false);
-  const [searchText, setSearchText] = React.useState('');
+  const [attachmentSearchFilter, setAttachmentSearchFilter] = React.useState('');
+  const [attachmentSearchText, setAttachmentSearchText] = React.useState('');
   const [feedbackMessage, setFeedbackMessage] = React.useState('');
   const [deleteDialogOpen, setDeleteDialogOpen] = React.useState(false);
   const [selectedLinkTarget, setSelectedLinkTarget] = React.useState<LinkedAttachmentRow | null>(null);
+
+  const openLinkDialog = React.useCallback(() => {
+    setAttachmentSearchFilter('');
+    setAttachmentSearchText('');
+    setSearchOpen(true);
+  }, []);
+
+  const closeLinkDialog = React.useCallback(() => {
+    setSearchOpen(false);
+    setAttachmentSearchFilter('');
+    setAttachmentSearchText('');
+  }, []);
 
   const { data, isFetching, isLoading, error, refetch } = useQuery(
     getBizObjectLinkedAttachmentsQueryOptions(boId, {
@@ -98,14 +107,6 @@ export function BoWListAttchmentView() {
     }),
   );
 
-  const attachmentFilter = React.useMemo(() => {
-    const normalized = searchText.trim();
-    if (!normalized) return undefined;
-
-    const escaped = escapeODataSearch(normalized);
-    return `contains(FileId,'${escaped}') or contains(Title,'${escaped}') or contains(Ernam,'${escaped}')`;
-  }, [searchText]);
-
   const { data: attachmentData, isFetching: isSearching } = useInfiniteQuery(
     attachmentsQueryOptions({
       'sap-client': 324,
@@ -113,7 +114,8 @@ export function BoWListAttchmentView() {
       $skip: 0,
       $top: 25,
       $select: 'CurrentVersion,Erdat,Ernam,FileId,IsActive,Title,__EntityControl/Deletable,__EntityControl/Updatable',
-      $filter: attachmentFilter,
+      $filter: attachmentSearchFilter || undefined,
+      $search: attachmentSearchText || undefined,
     }),
   );
 
@@ -250,7 +252,7 @@ export function BoWListAttchmentView() {
                   design="Emphasized"
                   icon="value-help"
                   text="Link to Attachment"
-                  onClick={() => setSearchOpen(true)}
+                  onClick={openLinkDialog}
                 />
                 <ToolbarButton
                   design="Transparent"
@@ -342,20 +344,14 @@ export function BoWListAttchmentView() {
       <Dialog
         open={searchOpen}
         headerText="Link Attachment"
-        onClose={() => setSearchOpen(false)}
+        onClose={closeLinkDialog}
         style={{ width: 'min(96vw, 88rem)' }}
       >
         <div className="flex flex-col gap-4 p-2">
-          <div className="grid gap-4 md:grid-cols-[1fr_auto]">
-            <Input
-              value={searchText}
-              placeholder="Search by File ID, title, or creator"
-              onInput={(event) => setSearchText(event.target.value)}
-            />
-            <Button design="Transparent" onClick={() => setSearchText('')}>
-              Clear
-            </Button>
-          </div>
+          <AttachmentsFilterBar
+            onFilterChange={setAttachmentSearchFilter}
+            onSearchChange={setAttachmentSearchText}
+          />
 
           <div className="overflow-hidden rounded-2xl border border-slate-200/80 bg-white shadow-sm">
             <AnalyticalTable
@@ -392,13 +388,17 @@ export function BoWListAttchmentView() {
               visibleRowCountMode="Auto"
               rowHeight={44}
               scaleWidthMode="Smart"
-              noDataText={searchText ? 'No attachments match the current search.' : 'Type to search attachments.'}
+              noDataText={
+                attachmentSearchFilter || attachmentSearchText
+                  ? 'No attachments match the current search.'
+                  : 'Type to search attachments.'
+              }
               style={{ height: '28rem' }}
             />
           </div>
 
           <div className="flex items-center justify-end gap-2 pt-2">
-            <Button design="Transparent" onClick={() => setSearchOpen(false)}>
+            <Button design="Transparent" onClick={closeLinkDialog}>
               Close
             </Button>
           </div>
