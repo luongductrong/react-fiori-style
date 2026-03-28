@@ -204,6 +204,10 @@ export function BoWListAttchmentView() {
     });
   }, [data]);
 
+  const linkedAttachmentFileIds = React.useMemo(() => {
+    return new Set(linkedAttachments.map((item) => item.FileId));
+  }, [linkedAttachments]);
+
   const activeCount = linkedAttachments.filter((item) => item.IsActive).length;
   const inactiveCount = linkedAttachments.length - activeCount;
 
@@ -368,6 +372,12 @@ export function BoWListAttchmentView() {
                     width: 160,
                     Cell: ({ row }: any) => {
                       const item = row.original as AttachmentListItem;
+                      const isAlreadyLinked = linkedAttachmentFileIds.has(item.FileId);
+
+                      if (isAlreadyLinked) {
+                        return <span className="text-sm font-medium text-slate-500">Linked</span>;
+                      }
+
                       return (
                         <Button
                           design="Emphasized"
