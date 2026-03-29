@@ -2,7 +2,7 @@
 
 specVersion: '4.0'
 metadata:
-  name: app.dev221.reactfiori
+  name: app.gsp26sap20.fileattachments
 type: application
 builder:
   resources:
@@ -17,9 +17,8 @@ builder:
           url: https://s40lp1.ucc.cit.tum.de
           client: '324'
         app:
-          name: ZTRONGDEV221_RF
-          description: React Fiori App
-          package: YTRONG_QE180172_221
+          name: ZGSP26SAP20UI
+          package: YGSP26SAP20_FILE_ATTACH
           transport: S40K908842
         exclude:
           - /test/

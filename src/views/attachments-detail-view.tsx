@@ -55,8 +55,7 @@ export function AttachmentsDetailView() {
         alert('Title updated successfully');
         setIsEditMode(false);
       },
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      onError: (error: any) => {
+      onError: (error) => {
         alert(error?.response?.data?.error?.message || error.message);
       },
     }),
@@ -72,8 +71,7 @@ export function AttachmentsDetailView() {
         });
         navigate('/attachments');
       },
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      onError: (error: any) => {
+      onError: (error) => {
         setToastMessage(error?.response?.data?.error?.message || error.message);
         setToastVisible(true);
       },

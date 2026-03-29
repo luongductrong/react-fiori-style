@@ -1,5 +1,6 @@
 import { MUTATION_API } from '../constants';
 import { ODATA_SERVICE } from '@/app-constant';
+import type { AxiosApiError } from '@/types/common';
 import { axiosInstance } from '@/libs/axios-instance';
 import type { CreateAttachmentPayload } from '../types';
 import { mutationOptions } from '@tanstack/react-query';
@@ -10,12 +11,12 @@ import type { UploadVersionPayload, CreateAttachmentResponse } from '../types';
 type Params = {
   fileId: string;
   onSuccess?: () => void;
-  onError?: (_error: Error) => void;
+  onError?: (_error: AxiosApiError) => void;
 };
 
 type CreateAttachmentParams = {
   onSuccess?: (data: CreateAttachmentResponse) => void;
-  onError?: (_error: Error) => void;
+  onError?: (_error: AxiosApiError) => void;
 };
 
 export function rollbackVersionMutationOptions({ fileId, onSuccess, onError }: Params) {
