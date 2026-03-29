@@ -3,13 +3,12 @@ import { cn } from '@/libs/utils';
 import '@ui5/webcomponents-icons/add.js';
 import { FilePreview } from './file-preview';
 import '@ui5/webcomponents-icons/decline.js';
+import { MAX_FILE_SIZE } from '@/app-constant';
 import type { UploadedFileData } from '../types';
 import { Button } from '@ui5/webcomponents-react/Button';
 import { FlexBox } from '@ui5/webcomponents-react/FlexBox';
 import { MessageStrip } from '@ui5/webcomponents-react/MessageStrip';
-import { FileUploader } from '@ui5/webcomponents-react/FileUploader';
-
-const MAX_SIZE = 5 * 1024 * 1024; // 5MB
+import { FileUploader, type FileUploaderPropTypes } from '@ui5/webcomponents-react/FileUploader';
 
 function getFileExtension(fileName: string) {
   const lastDot = fileName.lastIndexOf('.');
@@ -48,16 +47,15 @@ export function UploadVersion({ className, onUpload, onCancel }: UploadVersionPr
   const [error, setError] = React.useState<string | null>(null);
   const [loading, setLoading] = React.useState(false);
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const handleChange = async (e: any) => {
-    const file: File | undefined = e.target?.files?.[0];
+  const handleChange: FileUploaderPropTypes['onChange'] = async function (event) {
+    const file: File | undefined = event.target?.files?.[0];
     if (!file) return;
 
     setError(null);
     setFileData(null);
 
-    if (file.size > MAX_SIZE) {
-      setError('File exceeds 5MB, please select a smaller file.');
+    if (file.size > MAX_FILE_SIZE) {
+      setError(`File exceeds ${MAX_FILE_SIZE / 1024 / 1024}MB, please select a smaller file.`);
       return;
     }
 

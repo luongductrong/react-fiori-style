@@ -38,8 +38,7 @@ export function AttachmentNewView() {
         });
         navigate(`/attachments/${data.FileId}`);
       },
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      onError: (error: any) => {
+      onError: (error) => {
         setToastMessage(error?.response?.data?.error?.message || error.message);
         setToastVisible(true);
       },

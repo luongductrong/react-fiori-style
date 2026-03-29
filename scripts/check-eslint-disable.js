@@ -3,6 +3,7 @@ import path from 'path';
 import { fileURLToPath } from 'url';
 
 const red = (text) => `\x1b[31m${text}\x1b[0m`;
+const green = (text) => `\x1b[32m${text}\x1b[0m`;
 
 // resolve __dirname (ESM)
 const __filename = fileURLToPath(import.meta.url);
@@ -60,4 +61,6 @@ if (violations.length > 0) {
   console.error(red('(X) Lint process terminated: eslint-disable detected.'));
 
   process.exit(1);
+} else {
+  console.log(green('\nNo eslint-disable found in src directory. Continue lint process...\n'));
 }
