@@ -81,7 +81,7 @@ const rawColumns: AnalyticalTableColumnDefinition[] = [
   },
 ];
 
-const ROLE_OPTIONS = ['ADMIN', 'USER', 'POWERUSER', 'SUPPORT'];
+const ROLE_OPTIONS = ['ADMIN', 'USER'];
 
 function getRoleTone(role?: string) {
   const normalized = (role || '').toUpperCase();
@@ -263,8 +263,8 @@ export function UserListView() {
         setRoleDialogOpen(false);
         setSelectedUser(null);
       },
-      onError: (error) => {
-        setFeedbackMessage(error.message || 'Cannot update user role');
+      onError: () => {
+        setFeedbackMessage( 'Cannot update user role');
       },
     }),
   );

@@ -28,7 +28,7 @@ const DEFAULT_FORM: FormState = {
   Role: '',
 };
 
-const ROLE_OPTIONS = ['ADMIN', 'USER', 'POWERUSER', 'SUPPORT'];
+const ROLE_OPTIONS = ['ADMIN', 'USER'];
 
 export function UserCreateView() {
   const navigate = useNavigate();
