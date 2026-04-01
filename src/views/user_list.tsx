@@ -12,10 +12,10 @@ import type {
   AnalyticalTableCellInstance,
   AnalyticalTableColumnDefinition,
 } from '@ui5/webcomponents-react/AnalyticalTable';
-import { MessageStrip } from '@ui5/webcomponents-react/MessageStrip';
 import { BusyIndicator } from '@ui5/webcomponents-react/BusyIndicator';
 import { IllustratedMessage } from '@ui5/webcomponents-react/IllustratedMessage';
 import { MessageBox } from '@ui5/webcomponents-react/MessageBox';
+import { Toast } from '@ui5/webcomponents-react/Toast';
 import { Input } from '@ui5/webcomponents-react/Input';
 import { Select } from '@ui5/webcomponents-react/Select';
 import { Option } from '@ui5/webcomponents-react/Option';
@@ -142,11 +142,10 @@ export function UserListView() {
   const queryClient = useQueryClient();
   const [search, setSearch] = React.useState('');
   const [roleFilter, setRoleFilter] = React.useState('ALL');
-  const [feedbackMessage, setFeedbackMessage] = React.useState('');
+  const [toastVisible, setToastVisible] = React.useState(false);
+  const [toastMessage, setToastMessage] = React.useState('');
   const [roleDialogOpen, setRoleDialogOpen] = React.useState(false);
   const [deleteDialogOpen, setDeleteDialogOpen] = React.useState(false);
-  const [deleteDeniedDialogOpen, setDeleteDeniedDialogOpen] = React.useState(false);
-  const [deleteDeniedMessage, setDeleteDeniedMessage] = React.useState('');
   const [selectedUser, setSelectedUser] = React.useState<UserTableItem | null>(null);
   const [roleDraft, setRoleDraft] = React.useState('');
 
@@ -196,6 +195,15 @@ export function UserListView() {
   const updatableCount = users.filter((user) => user.__EntityControl?.Updatable).length;
   const deletableCount = users.filter((user) => user.__EntityControl?.Deletable).length;
 
+  React.useEffect(() => {
+    if (!error) {
+      return;
+    }
+
+    setToastMessage((error as Error).message || 'Cannot load Auth users');
+    setToastVisible(true);
+  }, [error]);
+
   const columns = React.useMemo(() => {
     return rawColumns.map((column) => {
       if (column.accessor === 'RoleTone') {
@@ -238,7 +246,6 @@ export function UserListView() {
                   design="Emphasized"
                   icon="edit"
                   onClick={() => {
-                    setFeedbackMessage('');
                     setSelectedUser(value);
                     setRoleDraft(value.Role || '');
                     setRoleDialogOpen(true);
@@ -250,7 +257,6 @@ export function UserListView() {
                   design="Negative"
                   icon="delete"
                   onClick={() => {
-                    setFeedbackMessage('');
                     setSelectedUser(value);
                     setDeleteDialogOpen(true);
                   }}
@@ -271,12 +277,14 @@ export function UserListView() {
     updateAuthUserMutationOptions({
       onSuccess: () => {
         queryClient.invalidateQueries({ queryKey: ['auth-users'] });
-        setFeedbackMessage('User role updated successfully');
+        setToastMessage('User role updated successfully');
+        setToastVisible(true);
         setRoleDialogOpen(false);
         setSelectedUser(null);
       },
       onError: () => {
-        setFeedbackMessage( 'Cannot update user role');
+        setToastMessage('Cannot update user role');
+        setToastVisible(true);
       },
     }),
   );
@@ -292,7 +300,8 @@ export function UserListView() {
     deleteAuthUserMutationOptions({
       onSuccess: () => {
         queryClient.invalidateQueries({ queryKey: ['auth-users'] });
-        setFeedbackMessage('User deleted successfully');
+        setToastMessage('User deleted successfully');
+        setToastVisible(true);
         setDeleteDialogOpen(false);
         setSelectedUser(null);
       },
@@ -301,12 +310,13 @@ export function UserListView() {
 
         if (status === 403) {
           setDeleteDialogOpen(false);
-          setDeleteDeniedMessage('You do not have permission to delete this user.');
-          setDeleteDeniedDialogOpen(true);
+          setToastMessage('You do not have permission to delete this user.');
+          setToastVisible(true);
           return;
         }
 
-        setFeedbackMessage(error.message || 'Cannot delete user');
+        setToastMessage(error.message || 'Cannot delete user');
+        setToastVisible(true);
       },
     }),
   );
@@ -405,23 +415,7 @@ export function UserListView() {
       }}
     >
       <div className="mx-auto flex h-full w-full max-w-[96rem] flex-col gap-4 p-4">
-        {feedbackMessage ? (
-          <MessageStrip
-            design={
-              feedbackMessage === 'Sign in with role ADMIN to update roles or delete users.'
-                ? 'Negative'
-                : 'Information'
-            }
-            hideCloseButton
-          >
-            {feedbackMessage}
-          </MessageStrip>
-        ) : null}
-        {error ? (
-          <MessageStrip design="Negative" hideCloseButton>
-            {(error as Error).message || 'Cannot load Auth users'}
-          </MessageStrip>
-        ) : null}
+        {error ? null : null}
 
         <div
           className="overflow-hidden rounded-2xl border border-slate-200/80 bg-white shadow-sm"
@@ -515,15 +509,9 @@ export function UserListView() {
         Are you sure you want to delete {selectedUser?.Uname || 'this user'}? This action cannot be undone.
       </MessageBox>
 
-      <MessageBox
-        open={deleteDeniedDialogOpen}
-        type="Information"
-        titleText="Permission Denied"
-        actions={['OK']}
-        onClose={() => setDeleteDeniedDialogOpen(false)}
-      >
-        {deleteDeniedMessage}
-      </MessageBox>
+      <Toast open={toastVisible} duration={2500} onClose={() => setToastVisible(false)}>
+        {toastMessage}
+      </Toast>
 
       {isLoading ? (
         <FlexBox

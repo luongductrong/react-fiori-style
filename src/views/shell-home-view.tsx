@@ -70,7 +70,7 @@ export function ShellHomeView() {
                 onClick={() => navigate('/users')}
                 avatar={<Icon name="person-placeholder" />}
                 subtitleText="Users Management"
-                titleText="Users"
+                titleText="Admin"
               />
             }
           ></Card>
