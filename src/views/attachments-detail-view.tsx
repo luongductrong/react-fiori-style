@@ -154,14 +154,25 @@ export function AttachmentsDetailView() {
                       design="Emphasized"
                       text="Edit"
                       onClick={() => setIsEditMode(true)}
-                      disabled={!attachment?.__EntityControl?.Updatable}
+                      disabled={!attachment?.IsActive || !attachment?.__EntityControl?.Updatable}
                     />
-                    <ToolbarButton
-                      design="Transparent"
-                      text="Delete"
-                      onClick={() => setDeleteDialogOpen(true)}
-                      disabled={isDeleting || !attachment?.__EntityControl?.Deletable}
-                    />
+                    {(!attachment || attachment?.IsActive) && (
+                      <ToolbarButton
+                        design="Transparent"
+                        text="Delete"
+                        onClick={() => setDeleteDialogOpen(true)}
+                        disabled={isDeleting || !attachment?.IsActive || !attachment?.__EntityControl?.Deletable}
+                      />
+                    )}
+                    {attachment && !attachment?.IsActive && (
+                      <ToolbarButton
+                        design="Transparent"
+                        text="Restore"
+                        onClick={() => alert('Restore clicked')}
+                        // TODO: Implement restore logic
+                        disabled={attachment?.IsActive}
+                      />
+                    )}
                   </>
                 )}
                 {isEditMode && (
@@ -216,12 +227,26 @@ export function AttachmentsDetailView() {
           </FlexBox>
         )}
         <ObjectPageSection
+          aria-label="File Preview"
+          id="file-preview"
+          titleText="File Preview"
+          style={{ display: isLoading ? 'none' : 'block' }}
+        >
+          <div className="p-2 rounded-lg bg-background">
+            <FilePreview
+              mimeType={attachment?._CurrentVersion?.MimeType}
+              fileContent={attachment?._CurrentVersion?.FileContent}
+              fileName={attachment?._CurrentVersion?.FileName}
+            />
+          </div>
+        </ObjectPageSection>
+        <ObjectPageSection
           aria-label="Versions"
           id="versions"
           titleText="Versions"
           style={{ display: isLoading ? 'none' : 'block' }}
         >
-          <AttachmentVersion fileId={id!} />
+          <AttachmentVersion fileId={id!} isActive={attachment?.IsActive || false} />
         </ObjectPageSection>
         <ObjectPageSection
           aria-label="Audit"
@@ -238,20 +263,6 @@ export function AttachmentsDetailView() {
           style={{ display: isLoading ? 'none' : 'block' }}
         >
           <AttachmentBizObjects fileId={id!} />
-        </ObjectPageSection>
-        <ObjectPageSection
-          aria-label="File Preview"
-          id="file-preview"
-          titleText="File Preview"
-          style={{ display: isLoading ? 'none' : 'block' }}
-        >
-          <div className="p-2 rounded-lg bg-background">
-            <FilePreview
-              mimeType={attachment?._CurrentVersion?.MimeType}
-              fileContent={attachment?._CurrentVersion?.FileContent}
-              fileName={attachment?._CurrentVersion?.FileName}
-            />
-          </div>
         </ObjectPageSection>
         <Toast open={toastVisible} onClose={() => setToastVisible(false)} duration={2000} className="py-1 px-2">
           {toastMessage}

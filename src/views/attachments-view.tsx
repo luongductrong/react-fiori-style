@@ -83,20 +83,21 @@ export function AttachmentsView() {
     <DynamicPage
       headerArea={
         <DynamicPageHeader style={{ padding: '1rem 2rem' }}>
-          <FlexBox alignItems="Center" className="text-primary gap-2">
-            <Icon
-              name="home"
-              className="text-primary"
-              onClick={(e) => {
-                e.stopPropagation();
-                navigate('/shell-home');
-              }}
-              mode="Interactive"
-            />
-            <Title level="H1" className="text-primary">
-              Attachments
-            </Title>
-          </FlexBox>
+          <Button
+            design="Transparent"
+            tooltip="Click to go to home page"
+            onClick={() => {
+              navigate('/shell-home');
+            }}
+            className="cursor-pointer"
+          >
+            <FlexBox alignItems="Center" className="text-primary gap-2">
+              <Icon name="home" className="text-primary" mode="Interactive" />
+              <Title level="H1" className="text-primary cursor-pointer">
+                Attachments
+              </Title>
+            </FlexBox>
+          </Button>
           <AttachmentsFilterBar onFilterChange={setFilter} onSearchChange={setSearch} />
         </DynamicPageHeader>
       }

@@ -38,7 +38,7 @@ const versionColumns = [
   },
 ];
 
-export function AttachmentVersion({ fileId }: { fileId: string }) {
+export function AttachmentVersion({ fileId, isActive }: { fileId: string; isActive: boolean }) {
   const navigate = useNavigate();
   const {
     data: versionsData,
@@ -66,7 +66,13 @@ export function AttachmentVersion({ fileId }: { fileId: string }) {
           <Toolbar className="py-2 px-4 rounded-t-xl">
             <Title level="H4">Versions {totalCount ? `(${totalCount})` : ''}</Title>
             <ToolbarSpacer />
-            <Button design="Emphasized" icon="add" onClick={() => navigate(`/attachments/${fileId}/upload`)}>
+            <Button
+              design="Emphasized"
+              icon="add"
+              onClick={() => navigate(`/attachments/${fileId}/upload`)}
+              disabled={!isActive}
+              className="h-8"
+            >
               Upload
             </Button>
           </Toolbar>
