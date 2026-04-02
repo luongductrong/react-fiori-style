@@ -5,6 +5,8 @@ import { FilePreview } from './file-preview';
 import '@ui5/webcomponents-icons/decline.js';
 import { MAX_FILE_SIZE } from '@/app-constant';
 import type { UploadedFileData } from '../types';
+import '@ui5/webcomponents-icons/upload-to-cloud.js';
+import { Icon } from '@ui5/webcomponents-react/Icon';
 import { Button } from '@ui5/webcomponents-react/Button';
 import { FlexBox } from '@ui5/webcomponents-react/FlexBox';
 import { MessageStrip } from '@ui5/webcomponents-react/MessageStrip';
@@ -87,11 +89,27 @@ export function UploadVersion({ className, onUpload, onCancel }: UploadVersionPr
       style={{ gap: '1rem' }}
       className={cn('w-full', className)}
     >
+      {error && (
+        <MessageStrip design="Negative" hideCloseButton>
+          {error}
+        </MessageStrip>
+      )}
       {!fileData && (
-        <FileUploader hideInput onChange={handleChange}>
-          <Button disabled={loading} design="Positive" icon="add">
-            {loading ? 'Processing...' : 'Choose file'}
-          </Button>
+        <FileUploader hideInput onChange={handleChange} className="w-full">
+          <div className="w-full min-h-[50dvh] rounded-xl border-2 border-dashed flex flex-col items-center justify-center cursor-pointer p-6">
+            <div className="text-base text-center font-medium">
+              <Icon className="size-10 text-primary" name="upload-to-cloud" />
+              {loading ? (
+                <p className="text-lg font-semibold text-muted-foreground">Processing...</p>
+              ) : (
+                <>
+                  <p className="text-lg font-semibold">Drop file here</p>
+                  <p className="text-muted-foreground text-sm">or click to choose</p>
+                </>
+              )}
+            </div>
+            <p className="text-sm text-muted-foreground mt-2">Maximum size: {MAX_FILE_SIZE / 1024 / 1024}MB</p>
+          </div>
         </FileUploader>
       )}
       {fileData && (
@@ -109,12 +127,6 @@ export function UploadVersion({ className, onUpload, onCancel }: UploadVersionPr
           </Button>
         </FlexBox>
       )}
-      {!fileData && (
-        <MessageStrip design="Information">
-          Upload a new version of the file. The file must be less than 5MB.
-        </MessageStrip>
-      )}
-      {error && <MessageStrip design="Negative">{error}</MessageStrip>}
       {fileData && (
         <FilePreview mimeType={fileData.MimeType} fileContent={fileData.FileContent} fileName={fileData.FileName} />
       )}
