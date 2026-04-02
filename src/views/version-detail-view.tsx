@@ -51,7 +51,7 @@ export function VersionDetailView() {
         queryClient.invalidateQueries({
           queryKey: ['attachments', id],
         });
-        setToastMessage('Version rolled back successfully');
+        setToastMessage(`Version ${versionNo} is now current`);
         setToastVisible(true);
       },
       onError: (error) => {

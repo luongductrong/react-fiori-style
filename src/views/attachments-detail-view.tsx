@@ -249,20 +249,20 @@ export function AttachmentsDetailView() {
           <AttachmentVersion fileId={id!} isActive={attachment?.IsActive || false} />
         </ObjectPageSection>
         <ObjectPageSection
-          aria-label="Audit"
-          id="audit"
-          titleText="Audit"
-          style={{ display: isLoading ? 'none' : 'block' }}
-        >
-          <AttachmentAudit fileId={id!} />
-        </ObjectPageSection>
-        <ObjectPageSection
           aria-label="Business Objects"
           id="business-objects"
           titleText="Business Objects"
           style={{ display: isLoading ? 'none' : 'block' }}
         >
           <AttachmentBizObjects fileId={id!} isActive={attachment?.IsActive || false} />
+        </ObjectPageSection>
+        <ObjectPageSection
+          aria-label="Audit"
+          id="audit"
+          titleText="Audit"
+          style={{ display: isLoading ? 'none' : 'block' }}
+        >
+          <AttachmentAudit fileId={id!} />
         </ObjectPageSection>
         <Toast open={toastVisible} onClose={() => setToastVisible(false)} duration={2000} className="py-1 px-2">
           {toastMessage}
