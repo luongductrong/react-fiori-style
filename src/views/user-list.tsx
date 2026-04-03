@@ -2,7 +2,6 @@ import * as React from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { DynamicPage } from '@ui5/webcomponents-react/DynamicPage';
 import { DynamicPageHeader } from '@ui5/webcomponents-react/DynamicPageHeader';
-import { DynamicPageTitle } from '@ui5/webcomponents-react/DynamicPageTitle';
 import { Toolbar } from '@ui5/webcomponents-react/Toolbar';
 import { ToolbarButton } from '@ui5/webcomponents-react/ToolbarButton';
 import { ToolbarSpacer } from '@ui5/webcomponents-react/ToolbarSpacer';
@@ -21,6 +20,7 @@ import { Select } from '@ui5/webcomponents-react/Select';
 import { Option } from '@ui5/webcomponents-react/Option';
 import { Button } from '@ui5/webcomponents-react/Button';
 import { Icon } from '@ui5/webcomponents-react/Icon';
+import { Title } from '@ui5/webcomponents-react/Title';
 import { useNavigate } from 'react-router';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import '@ui5/webcomponents-fiori/dist/illustrations/NoData.js';
@@ -138,7 +138,11 @@ function UserNameCell({ row }: AnalyticalTableCellInstance) {
   );
 }
 
-export function UserListView() {
+type UserListViewProps = {
+  embedded?: boolean;
+};
+
+export function UserListView({ embedded = false }: UserListViewProps = {}) {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const [search, setSearch] = React.useState('');
@@ -207,6 +211,31 @@ export function UserListView() {
 
   const columns = React.useMemo(() => {
     return rawColumns.map((column) => {
+      if (column.id === 'actions') {
+        return {
+          ...column,
+          Cell: ({ row }: AnalyticalTableCellInstance) => {
+            const value = row.original as UserTableItem;
+
+            return (
+              <div className="flex items-center justify-end gap-2">
+              
+                <Button
+                  design="Negative"
+                  icon="delete"
+                  onClick={() => {
+                    setSelectedUser(value);
+                    setDeleteDialogOpen(true);
+                  }}
+                >
+                  Delete
+                </Button>
+              </div>
+            );
+          },
+        };
+      }
+
       if (column.accessor === 'RoleTone') {
         return {
           ...column,
@@ -232,41 +261,6 @@ export function UserListView() {
         return {
           ...column,
           Cell: UserNameCell,
-        };
-      }
-
-      if (column.id === 'actions') {
-        return {
-          ...column,
-          Cell: ({ row }: AnalyticalTableCellInstance) => {
-            const value = row.original as UserTableItem;
-
-            return (
-              <div className="flex items-center justify-end gap-2">
-                <Button
-                  design="Emphasized"
-                  icon="edit"
-                  onClick={() => {
-                    setSelectedUser(value);
-                    setRoleDraft(value.Role || '');
-                    setRoleDialogOpen(true);
-                  }}
-                >
-                  Update Role
-                </Button>
-                <Button
-                  design="Negative"
-                  icon="delete"
-                  onClick={() => {
-                    setSelectedUser(value);
-                    setDeleteDialogOpen(true);
-                  }}
-                >
-                  Delete
-                </Button>
-              </div>
-            );
-          },
         };
       }
 
@@ -322,123 +316,68 @@ export function UserListView() {
     }),
   );
 
-  return (
-    <DynamicPage
-      titleArea={
-        <DynamicPageTitle
-          className="p-3"
-          heading={
-            <div className="flex items-center gap-3">
-              <span className="inline-flex h-11 w-11 items-center justify-center rounded-2xl bg-sky-600/10 text-sky-700">
-                <Icon name="group" />
-              </span>
-              <div>
-                <div className="text-lg font-semibold text-slate-900">User List</div>
-                <div className="text-sm text-slate-500">Browse Auth users from the SAP Auth service</div>
-              </div>
-            </div>
-          }
-          style={{ minHeight: '0px' }}
-        />
-      }
-      headerArea={
-        <DynamicPageHeader>
-          <div className="flex flex-col gap-4 p-4">
-            <div className="rounded-3xl border border-slate-200/80 bg-[linear-gradient(135deg,rgba(255,255,255,0.95),rgba(239,246,255,0.9))] p-4 shadow-sm">
-              <div className="grid gap-4 lg:grid-cols-4">
-                <div className="rounded-2xl border border-slate-200 bg-white/90 p-4 shadow-sm">
-                  <div className="flex items-center gap-2 text-xs uppercase tracking-[0.2em] text-slate-500">
-                    <Icon name="person-placeholder" />
-                    Total users
-                  </div>
-                  <div className="mt-2 text-3xl font-semibold text-slate-900">{totalCount}</div>
-                </div>
-                <div className="rounded-2xl border border-slate-200 bg-white/90 p-4 shadow-sm">
-                  <div className="flex items-center gap-2 text-xs uppercase tracking-[0.2em] text-slate-500">
-                    <Icon name="checklist" />
-                    Admin users
-                  </div>
-                  <div className="mt-2 text-3xl font-semibold text-slate-900">{adminCount}</div>
-                </div>
-                <div className="rounded-2xl border border-slate-200 bg-white/90 p-4 shadow-sm">
-                  <div className="flex items-center gap-2 text-xs uppercase tracking-[0.2em] text-slate-500">
-                    <Icon name="group" />
-                    Updatable
-                  </div>
-                  <div className="mt-2 text-3xl font-semibold text-slate-900">{updatableCount}</div>
-                </div>
-                <div className="rounded-2xl border border-slate-200 bg-white/90 p-4 shadow-sm">
-                  <div className="flex items-center gap-2 text-xs uppercase tracking-[0.2em] text-slate-500">
-                    <Icon name="group" />
-                    Deletable
-                  </div>
-                  <div className="mt-2 text-3xl font-semibold text-slate-900">{deletableCount}</div>
-                </div>
-              </div>
-            </div>
-
-            <Toolbar className="rounded-2xl border border-slate-200/80 bg-white/90 px-4 py-3 shadow-sm">
-              <ToolbarSpacer />
-              <ToolbarButton design="Emphasized" text="Create User" onClick={() => navigate('/users/create')} />
-              <ToolbarButton design="Transparent" icon="home" text="Home" onClick={() => navigate('/')} />
-              <div className="min-w-64">
-                <Input
-                  placeholder="Search user, role, creator"
-                  value={search}
-                  onInput={(event) => setSearch(event.target.value)}
-                />
-              </div>
-              <div className="min-w-40">
-                <Select
-                  value={roleFilter}
-                  onChange={(event) => setRoleFilter(event.detail.selectedOption?.value || 'ALL')}
-                >
-                  <Option value="ALL">All roles</Option>
-                  {roleOptions
-                    .filter((role) => role !== 'ALL')
-                    .map((role) => (
-                      <Option key={role} value={role}>
-                        {role}
-                      </Option>
-                    ))}
-                </Select>
-              </div>
-              <ToolbarButton design="Transparent" icon="refresh" text="Refresh" onClick={() => refetch()} />
-            </Toolbar>
-          </div>
-        </DynamicPageHeader>
-      }
-      style={{
-        height: '100dvh',
-        overflow: 'hidden',
-        position: 'relative',
-        background: 'linear-gradient(180deg,rgba(242,247,251,0.98) 0%,rgba(231,240,248,0.98) 100%)',
-      }}
-    >
-      <div className="mx-auto flex h-full w-full max-w-[96rem] flex-col gap-4 p-4">
-        {error ? null : null}
-
-        <div
-          className="overflow-hidden rounded-2xl border border-slate-200/80 bg-white shadow-sm"
-          style={{ height: '680px' }}
-        >
-          <AnalyticalTable
-            data={tableRows}
-            columns={columns}
-            sortable
-            groupable
-            loading={isFetching || isLoading}
-            visibleRowCountMode="Fixed"
-            style={{ height: '100%' }}
-            scaleWidthMode="Smart"
-            rowHeight={44}
-            selectionMode="None"
-            noDataText={search || roleFilter !== 'ALL' ? 'No users match the current filters.' : 'No users found.'}
+  const content = (
+    <>
+      <div className="flex flex-col gap-4">
+        <FlexBox alignItems="Center" className="text-primary gap-2">
+          <Icon
+            name="home"
+            className="text-primary"
+            onClick={(e) => {
+              e.stopPropagation();
+              navigate('/shell-home');
+            }}
+            mode="Interactive"
           />
-        </div>
+          <Title level="H1" className="text-primary">
+            Users
+          </Title>
+        </FlexBox>
 
-        {!isFetching && tableRows.length === 0 ? <IllustratedMessage name="NoData" /> : null}
+        <Toolbar className="rounded-2xl border border-slate-200/80 bg-white/90 px-4 py-3 shadow-sm">
+          <ToolbarButton design="Emphasized" text="Create User" onClick={() => navigate('/users/create')} />
+          <ToolbarSpacer />
+          <div className="min-w-64">
+            <Input placeholder="Search user, role, creator" value={search} onInput={(event) => setSearch(event.target.value)} />
+          </div>
+          <div className="min-w-40">
+            <Select value={roleFilter} onChange={(event) => setRoleFilter(event.detail.selectedOption?.value || 'ALL')}>
+              <Option value="ALL">All roles</Option>
+              {roleOptions
+                .filter((role) => role !== 'ALL')
+                .map((role) => (
+                  <Option key={role} value={role}>
+                    {role}
+                  </Option>
+                ))}
+            </Select>
+          </div>
+          <ToolbarButton design="Transparent" icon="refresh" text="Refresh" onClick={() => refetch()} />
+        </Toolbar>
       </div>
+
+      {error ? null : null}
+
+      <div
+        className={embedded ? 'overflow-hidden rounded-2xl border border-slate-200/80 bg-white shadow-sm' : 'overflow-hidden rounded-2xl border border-slate-200/80 bg-white shadow-sm'}
+        style={{ height: embedded ? 'min(72dvh, 56rem)' : '680px' }}
+      >
+        <AnalyticalTable
+          data={tableRows}
+          columns={columns}
+          sortable
+          groupable
+          loading={isFetching || isLoading}
+          visibleRowCountMode="Fixed"
+          style={{ height: '100%' }}
+          scaleWidthMode="Smart"
+          rowHeight={44}
+          selectionMode="None"
+          noDataText={search || roleFilter !== 'ALL' ? 'No users match the current filters.' : 'No users found.'}
+        />
+      </div>
+
+      {!isFetching && tableRows.length === 0 ? <IllustratedMessage name="NoData" /> : null}
 
       {roleDialogOpen && selectedUser ? (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/40 p-4 backdrop-blur-sm">
@@ -456,11 +395,7 @@ export function UserListView() {
             <div className="mt-5 grid gap-4">
               <div>
                 <label className="mb-2 block text-sm font-medium text-slate-700">Role</label>
-                <Input
-                  value={roleDraft}
-                  onInput={(event) => setRoleDraft(event.target.value)}
-                  placeholder="Enter role"
-                />
+                <Input value={roleDraft} onInput={(event) => setRoleDraft(event.target.value)} placeholder="Enter role" />
               </div>
               <div>
                 <label className="mb-2 block text-sm font-medium text-slate-700">Quick select</label>
@@ -515,14 +450,68 @@ export function UserListView() {
       </Toast>
 
       {isLoading ? (
-        <FlexBox
-          alignItems="Center"
-          justifyContent="Center"
-          style={{ position: 'absolute', inset: 0, pointerEvents: 'none' }}
-        >
+        <FlexBox alignItems="Center" justifyContent="Center" style={{ position: 'absolute', inset: 0, pointerEvents: 'none' }}>
           <BusyIndicator delay={0} active size="L" />
         </FlexBox>
       ) : null}
+    </>
+  );
+
+  if (embedded) {
+    return <section className="flex min-h-0 flex-1 flex-col gap-4 p-4">{content}</section>;
+  }
+
+  return (
+    <DynamicPage
+      headerArea={
+        <DynamicPageHeader style={{ padding: '1rem 2rem' }}>
+          <div className="flex flex-col gap-4">
+            <FlexBox alignItems="Center" className="text-primary gap-2">
+              <Icon
+                name="home"
+                className="text-primary"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  navigate('/shell-home');
+                }}
+                mode="Interactive"
+              />
+              <Title level="H1" className="text-primary">
+                Users
+              </Title>
+            </FlexBox>
+
+            <Toolbar className="rounded-2xl border border-slate-200/80 bg-white/90 px-4 py-3 shadow-sm">
+              <ToolbarButton design="Emphasized" text="Create User" onClick={() => navigate('/users/create')} />
+              <ToolbarSpacer />
+              <div className="min-w-64">
+                <Input placeholder="Search user, role, creator" value={search} onInput={(event) => setSearch(event.target.value)} />
+              </div>
+              <div className="min-w-40">
+                <Select value={roleFilter} onChange={(event) => setRoleFilter(event.detail.selectedOption?.value || 'ALL')}>
+                  <Option value="ALL">All roles</Option>
+                  {roleOptions
+                    .filter((role) => role !== 'ALL')
+                    .map((role) => (
+                      <Option key={role} value={role}>
+                        {role}
+                      </Option>
+                    ))}
+                </Select>
+              </div>
+              <ToolbarButton design="Transparent" icon="refresh" text="Refresh" onClick={() => refetch()} />
+            </Toolbar>
+          </div>
+        </DynamicPageHeader>
+      }
+      style={{
+        height: '100dvh',
+        overflow: 'hidden',
+        position: 'relative',
+        background: 'linear-gradient(180deg,rgba(242,247,251,0.98) 0%,rgba(231,240,248,0.98) 100%)',
+      }}
+    >
+      <section className="mx-auto flex w-full max-w-[96rem] flex-col gap-4 p-4 h-full">{content}</section>
     </DynamicPage>
   );
 }

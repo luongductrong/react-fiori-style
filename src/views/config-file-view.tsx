@@ -2,7 +2,6 @@ import * as React from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { DynamicPage } from '@ui5/webcomponents-react/DynamicPage';
 import { DynamicPageHeader } from '@ui5/webcomponents-react/DynamicPageHeader';
-import { DynamicPageTitle } from '@ui5/webcomponents-react/DynamicPageTitle';
 import { AnalyticalTable } from '@ui5/webcomponents-react/AnalyticalTable';
 import type { AnalyticalTableCellInstance, AnalyticalTableColumnDefinition } from '@ui5/webcomponents-react/AnalyticalTable';
 import { Bar } from '@ui5/webcomponents-react/Bar';
@@ -54,12 +53,21 @@ const columns: AnalyticalTableColumnDefinition[] = [
   { Header: 'File Ext', accessor: 'FileExt', width: 140 },
   { Header: 'Mime Type', accessor: 'MimeType', width: 360 },
   { Header: 'Max Bytes', accessor: 'MaxBytes', width: 140 },
-  { Header: 'Status', accessor: 'IsActive', width: 120 },
+  {
+    Header: 'Status',
+    accessor: 'IsActive',
+    width: 120,
+    Cell: ({ value }: AnalyticalTableCellInstance) => (value === 'X' ? 'true' : 'false'),
+  },
   { Header: 'Description', accessor: 'Description' },
   { id: 'actions', Header: 'Actions', accessor: 'FileExt', width: 220 },
 ];
 
-export function ConfigFileView() {
+type ConfigFileViewProps = {
+  embedded?: boolean;
+};
+
+export function ConfigFileView({ embedded = false }: ConfigFileViewProps = {}) {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const [search, setSearch] = React.useState('');
@@ -225,97 +233,78 @@ export function ConfigFileView() {
     updateMutation(payload);
   };
 
-  return (
-    <DynamicPage
-      headerArea={
-        <DynamicPageHeader>
-          <div className="mx-auto flex w-full max-w-[96rem] items-center gap-4 px-4 py-3">
-            <Toolbar className="rounded-2xl border border-slate-200/80 bg-white/90 px-4 py-3 shadow-sm">
-              <Title level="H2">Configuration File</Title>
-              <ToolbarSpacer />
-              <ToolbarButton design="Transparent" icon="refresh" text="Refresh" onClick={() => refetch()} />
-              <ToolbarButton design="Transparent" icon="home" text="Home" onClick={() => navigate('/admin')} />
-              <ToolbarButton design="Emphasized" icon="add" text="Add Config File" onClick={openCreateDialog} />
-            </Toolbar>
-          </div>
-        </DynamicPageHeader>
-      }
-      titleArea={
-        <DynamicPageTitle
-          className="p-3"
-          heading={
-            <div className="flex items-center gap-3">
-              <span className="inline-flex h-10 w-10 items-center justify-center rounded-2xl bg-sky-600/10 text-sky-700">
-                <Icon name="document" />
-              </span>
-              <div>
-                <div className="text-lg font-semibold text-slate-900">Configuration File Management</div>
-                <div className="text-sm text-slate-500">Manage file extension rules, mime types, and file limits</div>
-              </div>
-            </div>
-          }
-          snappedHeading={
-            <div className="flex items-center gap-2 text-slate-900">
-              <Icon name="document" />
-              <span>Configuration File Management</span>
-            </div>
-          }
-          style={{ minHeight: '0px' }}
-        />
-      }
-      style={{
-        height: '100dvh',
-        overflow: 'hidden',
-        position: 'relative',
-        background: 'linear-gradient(180deg,rgba(242,247,251,0.98) 0%,rgba(231,240,248,0.98) 100%)',
-      }}
-    >
-      <div className="mx-auto flex h-full w-full max-w-[96rem] flex-col gap-4 p-4">
-        {error ? null : null}
-        <div className="overflow-hidden rounded-2xl border border-slate-200/80 bg-white shadow-sm">
-          <Toolbar className="border-b border-slate-200/80 px-4 py-3">
-            <ToolbarSpacer />
-            <Input
-              placeholder="Search file ext, mime type, description"
-              value={search}
-              onInput={(event) => setSearch(event.target.value)}
-              style={{ minWidth: '20rem' }}
-            />
-          </Toolbar>
-
-          <AnalyticalTable
-            data={filteredConfigFiles}
-            columns={columnsWithActions}
-            loading={isLoading || isFetching}
-            rowHeight={44}
-            selectionMode="None"
-            visibleRows={10}
-            sortable
-            groupable
-            scaleWidthMode="Smart"
-            onRowClick={(event) => {
-              const item = event.detail.row.original as ConfigFileItem;
-              setDialogMode('edit');
-              setEditingKey(item.FileExt);
-              setForm({
-                FileExt: item.FileExt,
-                MimeType: item.MimeType,
-                MaxBytes: String(item.MaxBytes),
-                IsActive: item.IsActive || 'X',
-                Description: item.Description || '',
-              });
-              setDialogOpen(true);
+  const content = (
+    <>
+      <div className="flex flex-col gap-4">
+        <FlexBox alignItems="Center" className="text-primary gap-2">
+          <Icon
+            name="home"
+            className="text-primary"
+            onClick={(e) => {
+              e.stopPropagation();
+              navigate('/shell-home');
             }}
+            mode="Interactive"
           />
+          <Title level="H1" className="text-primary">
+            Configuration Files
+          </Title>
+        </FlexBox>
 
-          {!isLoading && filteredConfigFiles.length === 0 ? (
-            <div className="border-t border-slate-200/80 p-6">
-              <IllustratedMessage name="NoData" />
-            </div>
-          ) : null}
-        </div>
+        <Toolbar className="rounded-2xl border border-slate-200/80 bg-white/90 px-4 py-3 shadow-sm">
+          <ToolbarButton design="Emphasized" icon="add" text="Add Config File" onClick={openCreateDialog} />
+          <ToolbarSpacer />
+          <Input
+            placeholder="Search file ext, mime type, description"
+            value={search}
+            onInput={(event) => setSearch(event.target.value)}
+            style={{ minWidth: '20rem' }}
+          />
+          <ToolbarButton design="Transparent" icon="refresh" text="Refresh" onClick={() => refetch()} />
+        </Toolbar>
       </div>
 
+      {error ? null : null}
+
+      <div className="overflow-hidden rounded-2xl border border-slate-200/80 bg-white shadow-sm">
+       
+
+        <AnalyticalTable
+          data={filteredConfigFiles}
+          columns={columnsWithActions}
+          loading={isLoading || isFetching}
+          rowHeight={44}
+          selectionMode="None"
+          visibleRows={10}
+          sortable
+          groupable
+          scaleWidthMode="Smart"
+          onRowClick={(event) => {
+            const item = event.detail.row.original as ConfigFileItem;
+            setDialogMode('edit');
+            setEditingKey(item.FileExt);
+            setForm({
+              FileExt: item.FileExt,
+              MimeType: item.MimeType,
+              MaxBytes: String(item.MaxBytes),
+              IsActive: item.IsActive || 'X',
+              Description: item.Description || '',
+            });
+            setDialogOpen(true);
+          }}
+        />
+
+        {!isLoading && filteredConfigFiles.length === 0 ? (
+          <div className="border-t border-slate-200/80 p-6">
+            <IllustratedMessage name="NoData" />
+          </div>
+        ) : null}
+      </div>
+    </>
+  );
+
+  const dialogs = (
+    <>
       <Dialog
         open={dialogOpen}
         headerText={dialogMode === 'create' ? 'Add Configuration File' : 'Edit Configuration File'}
@@ -407,6 +396,42 @@ export function ConfigFileView() {
       <Toast open={toastVisible} duration={2500} onClose={() => setToastVisible(false)}>
         {toastMessage}
       </Toast>
+    </>
+  );
+
+  if (embedded) {
+    return <section className="flex min-h-0 flex-1 flex-col gap-4 p-4">{content}{dialogs}</section>;
+  }
+
+  return (
+    <DynamicPage
+      headerArea={
+        <DynamicPageHeader style={{ padding: '1rem 2rem' }}>
+          <div className="flex flex-col gap-4">
+            <Toolbar className="rounded-2xl border border-slate-200/80 bg-white/90 px-4 py-3 shadow-sm">
+              <ToolbarButton design="Emphasized" icon="add" text="Add Config File" onClick={openCreateDialog} />
+              <ToolbarButton design="Transparent" icon="home" text="Home" onClick={() => navigate('/shell-home')} />
+              <ToolbarSpacer />
+              <Input
+                placeholder="Search file ext, mime type, description"
+                value={search}
+                onInput={(event) => setSearch(event.target.value)}
+                style={{ minWidth: '20rem' }}
+              />
+              <ToolbarButton design="Transparent" icon="refresh" text="Refresh" onClick={() => refetch()} />
+            </Toolbar>
+          </div>
+        </DynamicPageHeader>
+      }
+      style={{
+        height: '100dvh',
+        overflow: 'hidden',
+        position: 'relative',
+        background: 'linear-gradient(180deg,rgba(242,247,251,0.98) 0%,rgba(231,240,248,0.98) 100%)',
+      }}
+    >
+      <section className="mx-auto flex w-full max-w-[96rem] flex-col gap-4 p-4 h-full">{content}</section>
+      {dialogs}
     </DynamicPage>
   );
 }

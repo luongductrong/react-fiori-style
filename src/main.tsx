@@ -8,7 +8,7 @@ import '@ui5/webcomponents-react/dist/json-imports/i18n.js';
 import { QueryProvider } from '@/context-providers/query-provider';
 import { HashRouter, Navigate, Route, Routes } from 'react-router';
 import { ThemeProvider } from '@ui5/webcomponents-react/ThemeProvider';
-import { AttachmentNewView, AttachmentsDetailView, ShellHomeView, AdminHomeView, ConfigFileView } from '@/views';
+import { AttachmentNewView, AttachmentsDetailView, ShellHomeView, AdminHomeView } from '@/views';
 import { AttachmentsView, VersionDetailView, UploadVersionView, HomeView } from '@/views';
 import { BoCreateView, BoDetailView, BoView, BoWListAttchmentView, UserCreateView, UserListView } from '@/views';
 
@@ -40,8 +40,8 @@ createRoot(document.getElementById('root')!).render(
             <Route path="/UserList" element={<Navigate replace to="/users" />} />
             <Route path="/users/create" element={<UserCreateView />} />
             <Route path="/UserCreate" element={<Navigate replace to="/users/create" />} />
-            <Route path="/configuration-files" element={<ConfigFileView />} />
-            <Route path="/config-files" element={<Navigate replace to="/configuration-files" />} />
+            <Route path="/configuration-files" element={<Navigate replace to="/admin" />} />
+            <Route path="/config-files" element={<Navigate replace to="/admin" />} />
             {/* Attachments */}
             <Route path="/attachments" element={<AttachmentsView />} />
             <Route path="/attachments/new" element={<AttachmentNewView />} />
