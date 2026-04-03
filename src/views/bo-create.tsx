@@ -19,6 +19,7 @@ import { Icon } from '@ui5/webcomponents-react/Icon';
 import '@ui5/webcomponents-icons/decline.js';
 import '@ui5/webcomponents-icons/document.js';
 import { createBizObjectMutationOptions } from '@/features/biz-object/options/mutation';
+import { getBackendErrorMessage } from '@/libs/error-message';
 
 type FormState = {
   BoType: string;
@@ -53,7 +54,7 @@ export function BoCreateView() {
       },
       onError: (error) => {
         setNavigateAfterToast(false);
-        setToastMessage(error.message || 'Cannot create Business Object');
+        setToastMessage(getBackendErrorMessage(error, 'Cannot create Business Object'));
         setToastVisible(true);
       },
     }),

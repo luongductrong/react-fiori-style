@@ -28,6 +28,7 @@ import '@ui5/webcomponents-icons/refresh.js';
 import { getBizObjectLinkedAttachmentsQueryOptions, getBizObjectsQueryOptions } from '@/features/biz-object/options/query';
 import { deleteBizObjectMutationOptions, updateBizObjectMutationOptions } from '@/features/biz-object/options/mutation';
 import type { AnalyticalTableCellInstance, AnalyticalTableColumnDefinition } from '@ui5/webcomponents-react/AnalyticalTable';
+import { getBackendErrorMessage } from '@/libs/error-message';
 
 type LinkedAttachmentRow = {
   FileId: string;
@@ -173,7 +174,7 @@ export function BoDetailView() {
       return;
     }
 
-    setToastMessage(error instanceof Error ? error.message : 'Cannot load Business Object data.');
+    setToastMessage(getBackendErrorMessage(error, 'Cannot load Business Object data.'));
     setToastVisible(true);
   }, [error]);
 
@@ -186,7 +187,7 @@ export function BoDetailView() {
         setToastVisible(true);
       },
       onError: (updateError) => {
-        setToastMessage(updateError.message || 'Cannot update Business Object');
+        setToastMessage(getBackendErrorMessage(updateError, 'Cannot update Business Object'));
         setToastVisible(true);
       },
     }),
@@ -202,7 +203,7 @@ export function BoDetailView() {
         setToastVisible(true);
       },
       onError: (deleteError) => {
-        setToastMessage(deleteError.message || 'Cannot delete Business Object');
+        setToastMessage(getBackendErrorMessage(deleteError, 'Cannot delete Business Object'));
         setToastVisible(true);
       },
     }),

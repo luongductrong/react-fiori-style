@@ -32,6 +32,7 @@ import { useNavigate } from 'react-router';
 import { createConfigFileMutationOptions, deleteConfigFileMutationOptions, updateConfigFileMutationOptions } from '@/features/config-files/options/mutation';
 import { getConfigFilesQueryOptions } from '@/features/config-files/options/query';
 import type { ConfigFileItem, CreateConfigFilePayload, UpdateConfigFilePayload } from '@/features/config-files/types';
+import { getBackendErrorMessage } from '@/libs/error-message';
 
 type ConfigFileFormState = {
   FileExt: string;
@@ -83,7 +84,7 @@ export function ConfigFileView() {
       return;
     }
 
-    setToastMessage(error instanceof Error ? error.message : 'Cannot load configuration files.');
+    setToastMessage(getBackendErrorMessage(error, 'Cannot load configuration files.'));
     setToastVisible(true);
   }, [error]);
 
@@ -108,7 +109,7 @@ export function ConfigFileView() {
         setDialogOpen(false);
       },
       onError: (createError: Error) => {
-        setToastMessage(createError.message || 'Cannot create configuration file');
+        setToastMessage(getBackendErrorMessage(createError, 'Cannot create configuration file'));
         setToastVisible(true);
       },
     }),
@@ -124,7 +125,7 @@ export function ConfigFileView() {
         setDialogOpen(false);
       },
       onError: (updateError: Error) => {
-        setToastMessage(updateError.message || 'Cannot update configuration file');
+        setToastMessage(getBackendErrorMessage(updateError, 'Cannot update configuration file'));
         setToastVisible(true);
       },
     }),
@@ -139,7 +140,7 @@ export function ConfigFileView() {
         setDeleteTarget(null);
       },
       onError: (deleteError: Error) => {
-        setToastMessage(deleteError.message || 'Cannot delete configuration file');
+        setToastMessage(getBackendErrorMessage(deleteError, 'Cannot delete configuration file'));
         setToastVisible(true);
       },
     }),

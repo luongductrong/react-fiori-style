@@ -34,6 +34,7 @@ import {
 } from '@/features/biz-object/options/mutation';
 import { attachmentsQueryOptions } from '@/features/attachments/options/query';
 import type { AttachmentListItem } from '@/features/attachments/types';
+import { getBackendErrorMessage } from '@/libs/error-message';
 
 type LinkedAttachmentRow = {
   Title: string;
@@ -144,7 +145,7 @@ export function BoWListAttchmentView() {
         refetch();
       },
       onError: (error) => {
-        setFeedbackMessage(error.message || 'Cannot link attachment');
+        setFeedbackMessage(getBackendErrorMessage(error, 'Cannot link attachment'));
       },
     }),
   );
@@ -164,7 +165,7 @@ export function BoWListAttchmentView() {
       onError: (error) => {
         setDeleteDialogOpen(false);
         setSelectedLinkTarget(null);
-        setFeedbackMessage(error.message || 'Cannot delete attachment link');
+        setFeedbackMessage(getBackendErrorMessage(error, 'Cannot delete attachment link'));
       },
     }),
   );
@@ -288,7 +289,7 @@ export function BoWListAttchmentView() {
         ) : null}
         {error ? (
           <MessageStrip design="Negative" hideCloseButton>
-            {error instanceof Error ? error.message : 'Cannot load linked attachments.'}
+              {getBackendErrorMessage(error, 'Cannot load linked attachments.')}
           </MessageStrip>
         ) : null}
 

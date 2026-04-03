@@ -23,6 +23,7 @@ import '@ui5/webcomponents-icons/refresh.js';
 import { getBizObjectsQueryOptions } from '@/features/biz-object/options/query';
 import type { BizObjectItem } from '@/features/biz-object/types';
 import { BizObjectFilterBar } from '@/features/biz-object/components/biz-object-filter-bar';
+import { getBackendErrorMessage } from '@/libs/error-message';
 
 const rawColumns: AnalyticalTableColumnDefinition[] = [
   { Header: 'BO ID', accessor: 'BoId', width: 260 },
@@ -114,7 +115,7 @@ export function BoView() {
       return;
     }
 
-    setToastMessage(error instanceof Error ? error.message : 'Cannot load BizObject data.');
+    setToastMessage(getBackendErrorMessage(error, 'Cannot load BizObject data.'));
     setToastVisible(true);
   }, [error]);
 

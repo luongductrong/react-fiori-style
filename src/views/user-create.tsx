@@ -17,6 +17,7 @@ import { BusyIndicator } from '@ui5/webcomponents-react/BusyIndicator';
 import { Toast } from '@ui5/webcomponents-react/Toast';
 import { Icon } from '@ui5/webcomponents-react/Icon';
 import { createAuthUserMutationOptions } from '@/features/auth-users/options/mutation';
+import { getBackendErrorMessage } from '@/libs/error-message';
 
 type FormState = {
   Uname: string;
@@ -49,7 +50,7 @@ export function UserCreateView() {
         navigate('/users', { replace: true });
       },
       onError: (error) => {
-        setErrorMessage(error.message || 'Cannot create user');
+        setErrorMessage(getBackendErrorMessage(error, 'Cannot create user'));
       },
     }),
   );
@@ -69,7 +70,7 @@ export function UserCreateView() {
                 <div className="text-sm text-slate-500">Create a new Auth user with CSRF protection</div>
               </div>
             </div>
-          }
+          }  
           style={{ minHeight: '0px' }}
         />
       }

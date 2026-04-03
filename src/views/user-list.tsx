@@ -34,6 +34,7 @@ import '@ui5/webcomponents-icons/checklist.js';
 import { getAuthUsersQueryOptions } from '@/features/auth-users/options/query';
 import { deleteAuthUserMutationOptions, updateAuthUserMutationOptions } from '@/features/auth-users/options/mutation';
 import type { AuthUserItem } from '@/features/auth-users/types';
+import { getBackendErrorMessage } from '@/libs/error-message';
 
 type UserTableItem = AuthUserItem & {
   RoleTone: string;
@@ -200,7 +201,7 @@ export function UserListView() {
       return;
     }
 
-    setToastMessage((error as Error).message || 'Cannot load Auth users');
+    setToastMessage(getBackendErrorMessage(error, 'Cannot load Auth users'));
     setToastVisible(true);
   }, [error]);
 
@@ -282,8 +283,8 @@ export function UserListView() {
         setRoleDialogOpen(false);
         setSelectedUser(null);
       },
-      onError: () => {
-        setToastMessage('Cannot update user role');
+      onError: (error) => {
+        setToastMessage(getBackendErrorMessage(error, 'Cannot update user role'));
         setToastVisible(true);
       },
     }),
@@ -315,7 +316,7 @@ export function UserListView() {
           return;
         }
 
-        setToastMessage(error.message || 'Cannot delete user');
+        setToastMessage(getBackendErrorMessage(error, 'Cannot delete user'));
         setToastVisible(true);
       },
     }),
