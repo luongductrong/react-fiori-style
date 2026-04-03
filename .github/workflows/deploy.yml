@@ -27,6 +27,8 @@ jobs:
         run: npm run lint
 
       - name: Build
+        env:
+          VITE_ODATA_ORIGIN: ${{ vars.VITE_ODATA_ORIGIN }}
         run: npm run build
 
       - name: Deploy to SAP
