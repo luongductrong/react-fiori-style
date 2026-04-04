@@ -13,8 +13,6 @@ import { IllustratedMessage } from '@ui5/webcomponents-react/IllustratedMessage'
 import { Input } from '@ui5/webcomponents-react/Input';
 import { Label } from '@ui5/webcomponents-react/Label';
 import { MessageBox } from '@ui5/webcomponents-react/MessageBox';
-import { Option } from '@ui5/webcomponents-react/Option';
-import { Select } from '@ui5/webcomponents-react/Select';
 import { Toast } from '@ui5/webcomponents-react/Toast';
 import { Title } from '@ui5/webcomponents-react/Title';
 import { Toolbar } from '@ui5/webcomponents-react/Toolbar';
@@ -58,7 +56,7 @@ const columns: AnalyticalTableColumnDefinition[] = [
     Header: 'Status',
     accessor: 'IsActive',
     width: 120,
-    Cell: ({ value }: AnalyticalTableCellInstance) => (value === 'X' ? 'true' : 'false'),
+    Cell: ({ value }: AnalyticalTableCellInstance) => (value === 'X' ? 'Active' : 'Inactive'),
   },
   { Header: 'Description', accessor: 'Description' },
   { id: 'actions', Header: 'Actions', accessor: 'FileExt', width: 220 },
@@ -211,7 +209,7 @@ export function ConfigFileView({ embedded = false }: ConfigFileViewProps = {}) {
     const payload: CreateConfigFilePayload | UpdateConfigFilePayload = {
       MimeType: trimmedMimeType,
       MaxBytes: parsedMaxBytes,
-      IsActive: form.IsActive,
+      IsActive: dialogMode === 'create' ? 'X' : form.IsActive || 'X',
       Description: trimmedDescription,
     };
 
@@ -331,16 +329,6 @@ export function ConfigFileView({ embedded = false }: ConfigFileViewProps = {}) {
               placeholder="15728640"
               onInput={(event) => setForm((prev) => ({ ...prev, MaxBytes: event.target.value }))}
             />
-          </div>
-          <div className="flex flex-col gap-1.5">
-            <Label>Status</Label>
-            <Select
-              value={form.IsActive}
-              onChange={(event) => setForm((prev) => ({ ...prev, IsActive: event.detail.selectedOption?.value || 'X' }))}
-            >
-              <Option value="X">Active</Option>
-              <Option value="">Inactive</Option>
-            </Select>
           </div>
           <div className="flex flex-col gap-1.5 md:col-span-2">
             <Label>Description</Label>
