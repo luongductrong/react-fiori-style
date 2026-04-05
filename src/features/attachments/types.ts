@@ -189,3 +189,19 @@ export type AttachmentBizObjectsParams = {
   $count: boolean;
   $expand: string;
 };
+
+export type GooglePickerDocument = {
+  id: string;
+  serviceId: string;
+  mimeType: string;
+  name: string;
+  description: string;
+  type: string; // 'file' | 'folder'
+  lastEditedUtc: number;
+  iconUrl: string;
+  url: string;
+  embedUrl: string;
+  driveSuccess: boolean;
+  sizeBytes: number;
+  parentId: string;
+};

@@ -10,3 +10,5 @@ export type ApiError = {
 };
 
 export type AxiosApiError = AxiosError<ApiError>;
+
+export type { Extension, MimeType, GoogleWorkspaceMimeType } from '@/app-constant';

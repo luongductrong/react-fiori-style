@@ -5,6 +5,9 @@ on:
 
 jobs:
   lint:
+    permissions:
+      pull-requests: write
+      issues: write
     runs-on: ubuntu-latest
     timeout-minutes: 5
 
@@ -23,3 +26,33 @@ jobs:
 
       - name: Run lint
         run: npm run lint
+
+      - name: Comment PR
+        if: failure()
+        uses: actions/github-script@v8
+        with:
+          script: |
+            const commits = await github.rest.pulls.listCommits({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              pull_number: context.issue.number,
+            });
+
+            const authors = [...new Set(
+              commits.data
+                .map(c => c.author?.login)
+                .filter(Boolean)
+            )];
+
+            const mentions = authors.map(a => `@${a}`).join(' ');
+
+            const body = authors.length
+              ? `Lint checks failed. ${mentions} fix it.`
+              : `Lint checks failed. Fix it.`;
+
+            await github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body
+            });

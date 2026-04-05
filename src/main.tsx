@@ -11,6 +11,7 @@ import { ThemeProvider } from '@ui5/webcomponents-react/ThemeProvider';
 import { AttachmentNewView, AttachmentsDetailView, ShellHomeView } from '@/views';
 import { AttachmentsView, VersionDetailView, UploadVersionView, HomeView } from '@/views';
 import { BoCreateView, BoView, BoWListAttchmentView, UserCreateView, UserListView } from '@/views';
+import { GoogleDrivePicker } from '@/features/attachments/components';
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
@@ -45,6 +46,7 @@ createRoot(document.getElementById('root')!).render(
             <Route path="/attachments/:id/upload" element={<UploadVersionView />} />
             <Route path="/attachments/:id/versions/:versionNo" element={<VersionDetailView />} />
             <Route path="*" element={<Navigate replace to="/shell-home" />} />
+            <Route path="/picker" element={<GoogleDrivePicker />} />
           </Routes>
         </HashRouter>
       </QueryProvider>

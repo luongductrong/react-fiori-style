@@ -11,6 +11,7 @@
     "deploy": "npm run build && fiori deploy --config ui5-deploy.yaml"
   },
   "dependencies": {
+    "@googleworkspace/drive-picker-react": "^0.2.0",
     "@tanstack/react-query": "^5.91.2",
     "@ui5/webcomponents": "^2.20.1",
     "@ui5/webcomponents-fiori": "^2.20.1",

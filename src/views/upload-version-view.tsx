@@ -100,7 +100,7 @@ export function UploadVersionView() {
               <Toolbar design="Transparent" style={{ height: 'auto' }}>
                 <ToolbarButton
                   design="Emphasized"
-                  text="Upload"
+                  text="Save"
                   onClick={() => {
                     if (fileData) {
                       handleUpload(fileData);
