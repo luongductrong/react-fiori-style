@@ -49,3 +49,5 @@ Common commands:
 ## Repository Intent
 
 This repo is meant to serve as the working frontend foundation for the thesis/project, with room to continue improving UX, business flows, and domain structure over time.
+
+test commit
