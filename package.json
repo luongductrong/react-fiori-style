@@ -8,7 +8,8 @@
     "build": "tsc -b && vite build",
     "lint": "node scripts/check-eslint-disable.js && eslint .",
     "preview": "vite preview",
-    "deploy": "npm run build && fiori deploy --config ui5-deploy.yaml"
+    "deploy": "npm run build && fiori deploy --config ui5-deploy.yaml",
+    "deploy:ci": "fiori deploy --config ui5-deploy.yaml --yes --username SAP_USERNAME --password SAP_PASSWORD"
   },
   "dependencies": {
     "@googleworkspace/drive-picker-react": "^0.2.0",

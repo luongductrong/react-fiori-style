@@ -37,4 +37,4 @@ jobs:
         env:
           SAP_USERNAME: ${{ secrets.SAP_USERNAME }}
           SAP_PASSWORD: ${{ secrets.SAP_PASSWORD }}
-        run: npm exec fiori deploy --config ui5-deploy.yaml --yes --username SAP_USERNAME --password SAP_PASSWORD
+        run: npm run deploy:ci
