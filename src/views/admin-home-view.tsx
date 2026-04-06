@@ -1,12 +1,10 @@
 import { useNavigate } from 'react-router';
-import { Tab } from '@ui5/webcomponents-react/Tab';
-import { TabContainer } from '@ui5/webcomponents-react/TabContainer';
+import { Tab, TabContainer, ToolbarButton } from '@ui5/webcomponents-react';
 import '@ui5/webcomponents-icons/person-placeholder.js';
 import '@ui5/webcomponents-icons/document.js';
 import '@ui5/webcomponents-icons/log.js';
 import { UserListView } from './user-list';
 import { ConfigFileView } from './config-file-view';
-import { ToolbarButton } from '@ui5/webcomponents-react';
 
 export function AdminHomeView() {
   const navigate = useNavigate();

@@ -9,7 +9,7 @@ export { AttachmentsDetailView } from './attachments-detail-view';
 export { BoView } from './bo-view';
 export { BoDetailView } from './bo-detail';
 export { BoCreateView } from './bo-create';
-export { BoWListAttchmentView } from './bo-link-to-attachment';
+export { default as BoWListAttachmentView } from './bo-link-to-attachment';
 export { UserListView } from './user-list';
 export { UserCreateView } from './user-create';
 export { ConfigFileView } from './config-file-view';

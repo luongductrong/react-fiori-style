@@ -41,7 +41,6 @@ export function ConfigFileSearchHelpBar({ onFilterChange }: ConfigFileSearchHelp
           key={`file-ext-${resetKey}`}
           label="File Ext"
           field="FileExt"
-          placeholder="Search by file extension"
           options={['equal to', 'contains', 'starts with', 'ends with']}
           afterFilterStringBuild={setFileExtFilterString}
         />
@@ -49,14 +48,12 @@ export function ConfigFileSearchHelpBar({ onFilterChange }: ConfigFileSearchHelp
           key={`mime-type-${resetKey}`}
           label="Mime Type"
           field="MimeType"
-          placeholder="Search by mime type"
           afterFilterStringBuild={setMimeTypeFilterString}
         />
         <SearchHelpDialog
           key={`description-${resetKey}`}
           label="Description"
           field="Description"
-          placeholder="Search by description"
           afterFilterStringBuild={setDescriptionFilterString}
         />
       </div>

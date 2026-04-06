@@ -56,10 +56,9 @@ export function BizObjectFilterBar({ onFilterChange, onSearchChange }: BizObject
       onToggleFilters={function fQ() {}}
       search={<Input className="h-6.5" placeholder="Search business objects" onChange={(e) => onSearchChange(e.target.value)} />}
     >
-       <FilterGroupItem filterKey="Bo ID" label="BO ID" hiddenInFilterBar={!filterKeys.includes('BoId')}>
-        <SearchHelpDialog key={count} label="BO ID" field="BoId" afterFilterStringBuild={setBoIdFilterString} />
+      <FilterGroupItem filterKey="BoId" label="BO ID" hiddenInFilterBar={!filterKeys.includes('BoId')}>
+        <SearchHelpDialog key={count} label="BO ID" field="BoId" options={['equal to']} afterFilterStringBuild={setBoIdFilterString} />
       </FilterGroupItem>
-      
       <FilterGroupItem filterKey="BoType" label="Type" hiddenInFilterBar={!filterKeys.includes('BoType')}>
         <SearchHelpDialog key={count} label="Type" field="BoType" afterFilterStringBuild={setBoTypeFilterString} />
       </FilterGroupItem>

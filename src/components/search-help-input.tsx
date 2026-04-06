@@ -11,12 +11,11 @@ import { Select, type SelectPropTypes } from '@ui5/webcomponents-react/Select';
 interface SearchHelpInputProps {
   value: SearchHelpToken;
   options: SearchHelpToken['key'][];
-  placeholder?: string;
   onChange: (value: SearchHelpToken) => void;
   onDelete: (tokenIds: SearchHelpToken['id'][]) => void;
 }
 
-export function SearchHelpInput({ value, options, placeholder = 'Value', onChange, onDelete }: SearchHelpInputProps) {
+export function SearchHelpInput({ value, options, onChange, onDelete }: SearchHelpInputProps) {
   const selectedOption = value.sign === 'negative' ? `!(${value.key})` : value.key;
 
   if (options.length === 0) {
@@ -59,7 +58,7 @@ export function SearchHelpInput({ value, options, placeholder = 'Value', onChang
           </Option>
         ))}
       </Select>
-      <Input className="h-6.5 flex-1" placeholder={placeholder} value={value.text} onChange={handleTextValueChange} />
+      <Input className="h-6.5 flex-1" placeholder="Value" value={value.text} onChange={handleTextValueChange} />
       <Button icon="decline" className="h-6.5" tooltip="Remove Condition" onClick={() => onDelete([value.id])} />
     </FlexBox>
   );

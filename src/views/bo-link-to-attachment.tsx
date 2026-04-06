@@ -85,7 +85,7 @@ function formatDate(date?: string | null, time?: string | null) {
   return `${date} ${time}`;
 }
 
-export function BoWListAttchmentView() {
+export function BoWListAttachmentView() {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const params = useParams<{ boId: string }>();
@@ -431,3 +431,5 @@ export function BoWListAttchmentView() {
     </DynamicPage>
   );
 }
+
+export default BoWListAttachmentView;

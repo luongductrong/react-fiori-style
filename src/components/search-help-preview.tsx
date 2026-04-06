@@ -13,7 +13,6 @@ interface SearchHelpPreviewProps extends React.ComponentProps<typeof FlexBox> {
   onTokensDelete: (tokenIds: SearchHelpToken['id'][]) => void;
   insideDialog?: boolean;
   icon?: MultiInputPropTypes['icon'];
-  placeholder?: string;
   onValueHelpTrigger?: () => void;
 }
 
@@ -39,7 +38,7 @@ function tokenStandardization(token: SearchHelpToken): string {
   return result;
 }
 
-export function SearchHelpPreview({ tokens, onTokensDelete, insideDialog, icon, placeholder, ...props }: SearchHelpPreviewProps) {
+export function SearchHelpPreview({ tokens, onTokensDelete, insideDialog, icon, ...props }: SearchHelpPreviewProps) {
   const handleTokenDelete: MultiInputPropTypes['onTokenDelete'] = function (e) {
     const tokenIds = e.detail.tokens
       .map((token) => token.dataset.id)
@@ -85,7 +84,6 @@ export function SearchHelpPreview({ tokens, onTokensDelete, insideDialog, icon, 
       className="w-full h-6.5"
       type="Text"
       icon={icon}
-      placeholder={placeholder}
       tokens={tokens.map((token) => (
         <Token
           key={token.id}

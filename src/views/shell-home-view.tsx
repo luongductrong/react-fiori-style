@@ -69,7 +69,7 @@ export function ShellHomeView() {
                 interactive
                 onClick={() => navigate('/admin')}
                 avatar={<Icon name="person-placeholder" />}
-                subtitleText="Users Management and Configuration File"
+                subtitleText="Users Management and Configuration Files"
                 titleText="Admin"
               />
             }

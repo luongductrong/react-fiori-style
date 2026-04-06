@@ -10,7 +10,7 @@ import { HashRouter, Navigate, Route, Routes } from 'react-router';
 import { ThemeProvider } from '@ui5/webcomponents-react/ThemeProvider';
 import { AttachmentNewView, AttachmentsDetailView, ShellHomeView, AdminHomeView } from '@/views';
 import { AttachmentsView, VersionDetailView, UploadVersionView, HomeView } from '@/views';
-import { BoCreateView, BoDetailView, BoView, BoWListAttchmentView, UserCreateView, UserListView } from '@/views';
+import { BoCreateView, BoDetailView, BoView, BoWListAttachmentView, UserCreateView, UserListView } from '@/views';
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
@@ -28,7 +28,7 @@ createRoot(document.getElementById('root')!).render(
             <Route path="/BO" element={<Navigate replace to="/business-objects" />} />
             <Route path="/BizObject" element={<Navigate replace to="/business-objects" />} />
             <Route path="/business-objects/:boId" element={<BoDetailView />} />
-            <Route path="/business-objects/:boId/attachments" element={<BoWListAttchmentView />} />
+            <Route path="/business-objects/:boId/attachments" element={<BoWListAttachmentView />} />
             <Route
               path="/BO/:boId/Attachments"
               element={<Navigate replace to="/business-objects/:boId/attachments" />}

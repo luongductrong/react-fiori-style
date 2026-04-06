@@ -372,7 +372,7 @@ export function BoDetailView() {
       </ObjectPage>
 
       {selectedBo ? (
-        <div className="fixed bottom-4 right-18 z-30">
+        <div className="fixed bottom-4 right-8 z-30">
           <Button
             design="Emphasized"
             disabled={!canSave || isUpdating}

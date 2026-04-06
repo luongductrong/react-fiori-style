@@ -75,12 +75,16 @@ export function ConfigFileView({ embedded = false }: ConfigFileViewProps = {}) {
   const [filterString, setFilterString] = React.useState('');
   const [currentPage, setCurrentPage] = React.useState(1);
   const rowsPerPage = 10;
+  const configFileListParams = React.useMemo(
+    () => ({
+      'sap-client': 324,
+      $filter: filterString || undefined,
+    }),
+    [filterString],
+  );
 
   const { data, isLoading, isFetching, error, refetch } = useQuery(
-    getConfigFilesQueryOptions({
-      'sap-client': 324,
-      ...(filterString ? { $filter: filterString } : {}),
-    }),
+    getConfigFilesQueryOptions(configFileListParams),
   );
 
   const configFiles = React.useMemo(() => data?.value ?? [], [data]);
@@ -179,7 +183,7 @@ export function ConfigFileView({ embedded = false }: ConfigFileViewProps = {}) {
                     FileExt: item.FileExt,
                     MimeType: item.MimeType,
                     MaxBytes: String(item.MaxBytes),
-                    IsActive: item.IsActive || 'X',
+                    IsActive: item.IsActive ?? 'X',
                     Description: item.Description || '',
                   });
                   setDialogOpen(true);
@@ -254,9 +258,6 @@ export function ConfigFileView({ embedded = false }: ConfigFileViewProps = {}) {
 
         <ConfigFileSearchHelpBar onFilterChange={setFilterString} />
       </div>
-
-      {error ? null : null}
-
       <div className="overflow-hidden rounded-2xl border border-slate-200/80 bg-white shadow-sm">
         <AnalyticalTable
           data={pagedRows}
