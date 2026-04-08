@@ -10,18 +10,8 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout
-        uses: actions/checkout@v5
-        with:
-          fetch-depth: 0
-          persist-credentials: false
-
-      - name: Push mirror
+      - name: Mirror repo
         run: |
-          git config --global user.name "github-actions[bot]"
-          git config --global user.email "github-actions[bot]@users.noreply.github.com"
-
-          git remote set-url mirror https://x-access-token:${{ secrets.ORG_REPO_TOKEN }}@${{ vars.ORG_REPO_URL }} \
-          || git remote add mirror https://x-access-token:${{ secrets.ORG_REPO_TOKEN }}@${{ vars.ORG_REPO_URL }}
-
-          git push mirror --mirror
+          git clone --mirror https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git tmp
+          cd tmp
+          git push --mirror https://x-access-token:${{ secrets.ORG_REPO_TOKEN }}@${{ vars.ORG_REPO_URL }}
