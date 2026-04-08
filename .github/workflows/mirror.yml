@@ -20,7 +20,7 @@ jobs:
           git config --global user.name "github-actions[bot]"
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
 
-          git remote set-url mirror https://x-access-token:${{ secrets.ORG_REPO_TOKEN }}@github.com/gsp26sap20/attachments-frontend.git \
-          || git remote add mirror https://x-access-token:${{ secrets.ORG_REPO_TOKEN }}@github.com/gsp26sap20/attachments-frontend.git
+          git remote set-url mirror https://x-access-token:${{ secrets.ORG_REPO_TOKEN }}@${{ vars.ORG_REPO_URL }} \
+          || git remote add mirror https://x-access-token:${{ secrets.ORG_REPO_TOKEN }}@${{ vars.ORG_REPO_URL }}
 
           git push mirror main --force
