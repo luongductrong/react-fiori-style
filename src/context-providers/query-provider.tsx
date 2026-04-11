@@ -11,7 +11,20 @@ const Devtools = IS_DEV
   : () => null;
 
 export function QueryProvider({ children }: Readonly<{ children: React.ReactNode }>) {
-  const [queryClient] = React.useState(() => new QueryClient());
+  const [queryClient] = React.useState(
+    () =>
+      new QueryClient({
+        defaultOptions: {
+          queries: {
+            retry: 1,
+            refetchOnWindowFocus: false,
+          },
+          mutations: {
+            retry: 0,
+          },
+        },
+      }),
+  );
 
   return (
     <QueryClientProvider client={queryClient}>

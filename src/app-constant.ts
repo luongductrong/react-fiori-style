@@ -39,11 +39,8 @@ export const FALLBACK_EXTENSION = 'bin' as const;
 
 export const EXTENSION_GROUPS = {
   IMAGE: ['jpg', 'jpeg', 'png', 'gif'],
-  DOCUMENT: ['doc', 'docx', 'xls', 'xlsx', 'ppt', 'pptx'],
-  PDF: ['pdf'],
-  TEXT: ['txt', 'json', 'xml'],
-  TEXT_DATA: ['csv'],
-} as const satisfies Record<string, readonly Extension[]>; // 5 groups, 15 extensions
+  DOCUMENT: ['doc', 'docx', 'xls', 'xlsx', 'ppt', 'pptx', 'pdf', 'txt', 'json', 'xml', 'csv'],
+} as const satisfies Record<'IMAGE' | 'DOCUMENT', readonly Extension[]>; // 2 groups, 15 extensions
 
 type Extension = (typeof EXTENSIONS)[number];
 type MimeType = (typeof MIME_TYPES)[number];

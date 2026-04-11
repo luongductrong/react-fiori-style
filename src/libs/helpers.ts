@@ -12,3 +12,4 @@ export function fetchCsrfToken(serviceRoot: string = ODATA_SERVICE.ATTACHMENT) {
     },
   });
 }
+// TODO: remove default service root

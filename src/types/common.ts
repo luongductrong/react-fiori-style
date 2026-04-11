@@ -6,6 +6,9 @@ export type SearchHelpSign = 'positive' | 'negative';
 export type ApiError = {
   error?: {
     message?: string;
+    details?: {
+      message?: string;
+    }[];
   };
 };
 

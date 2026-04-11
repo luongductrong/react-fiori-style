@@ -1,395 +1,292 @@
 import * as React from 'react';
-import { useNavigate, useParams } from 'react-router';
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { ObjectPage } from '@ui5/webcomponents-react/ObjectPage';
-import { ObjectPageTitle } from '@ui5/webcomponents-react/ObjectPageTitle';
-import { Breadcrumbs } from '@ui5/webcomponents-react/Breadcrumbs';
-import { BreadcrumbsItem } from '@ui5/webcomponents-react/BreadcrumbsItem';
-import { BusyIndicator } from '@ui5/webcomponents-react/BusyIndicator';
-import { Button } from '@ui5/webcomponents-react/Button';
-import { FlexBox } from '@ui5/webcomponents-react/FlexBox';
-import { Icon } from '@ui5/webcomponents-react/Icon';
-import { Input } from '@ui5/webcomponents-react/Input';
-import { Label } from '@ui5/webcomponents-react/Label';
-import { AnalyticalTable } from '@ui5/webcomponents-react/AnalyticalTable';
-import { Text } from '@ui5/webcomponents-react/Text';
-import { Toast } from '@ui5/webcomponents-react/Toast';
-import { Toolbar } from '@ui5/webcomponents-react/Toolbar';
-import { ToolbarButton } from '@ui5/webcomponents-react/ToolbarButton';
-import { ToolbarSpacer } from '@ui5/webcomponents-react/ToolbarSpacer';
-import { MessageBox } from '@ui5/webcomponents-react/MessageBox';
-import { ObjectPageSection } from '@ui5/webcomponents-react/ObjectPageSection';
-import '@ui5/webcomponents-icons/decline.js';
-import '@ui5/webcomponents-icons/document.js';
-import '@ui5/webcomponents-icons/edit.js';
-import '@ui5/webcomponents-icons/delete.js';
-import '@ui5/webcomponents-icons/list.js';
+import { toast } from '@/libs/toast';
 import '@ui5/webcomponents-icons/refresh.js';
-import { getBizObjectLinkedAttachmentsQueryOptions, getBizObjectsQueryOptions } from '@/features/biz-object/options/query';
-import { deleteBizObjectMutationOptions, updateBizObjectMutationOptions } from '@/features/biz-object/options/mutation';
-import type { AnalyticalTableCellInstance, AnalyticalTableColumnDefinition } from '@ui5/webcomponents-react/AnalyticalTable';
-import { getBackendErrorMessage } from '@/libs/error-message';
-
-type LinkedAttachmentRow = {
-  FileId: string;
-  Title: string;
-  CurrentVersion: string;
-  IsActive: boolean;
-  LinkedOn: string;
-  LinkedBy: string;
-};
-
-const linkedAttachmentColumns: AnalyticalTableColumnDefinition[] = [
-  {
-    Header: 'File ID',
-    accessor: 'FileId',
-    width: 240,
-  },
-  {
-    Header: 'Title',
-    accessor: 'Title',
-    width: 320,
-  },
-  {
-    Header: 'Version',
-    accessor: 'CurrentVersion',
-    width: 110,
-  },
-  {
-    Header: 'Status',
-    accessor: 'IsActive',
-    width: 120,
-    Cell: ({ row }: AnalyticalTableCellInstance) => {
-      const value = row.original as LinkedAttachmentRow;
-      return value.IsActive ? 'Active' : 'Inactive';
-    },
-  },
-  {
-    Header: 'Linked On',
-    accessor: 'LinkedOn',
-    width: 180,
-  },
-  {
-    Header: 'Linked By',
-    accessor: 'LinkedBy',
-    width: 140,
-  },
-];
-
-type BizObjectFormState = {
-  BoType: string;
-  BoTitle: string;
-  Status: string;
-};
-
-const DEFAULT_FORM: BizObjectFormState = {
-  BoType: '',
-  BoTitle: '',
-  Status: '',
-};
-
-const BO_TYPE_MAX_LENGTH = 10;
-const STATUS_OPTIONS = ['NEW', 'APPROVED', 'ACTIVE', 'REJECTED', 'ERROR'];
-
-function formatDateTime(date?: string | null, time?: string | null) {
-  if (!date && !time) return '-';
-  if (!date) return time || '-';
-  if (!time) return date;
-  return `${date} ${time}`;
-}
-
-function getBooleanTone(value: boolean) {
-  return value
-    ? 'bg-emerald-500/15 text-emerald-700 border-emerald-500/25'
-    : 'bg-slate-500/15 text-slate-700 border-slate-500/25';
-}
-
-function formatLinkedDate(date?: string | null, time?: string | null) {
-  if (!date && !time) return '-';
-  if (!date) return time || '-';
-  if (!time) return date;
-
-  return `${date} ${time}`;
-}
+import '@ui5/webcomponents-icons/decline.js';
+import { getError } from '@/libs/error-message';
+import { Text } from '@ui5/webcomponents-react/Text';
+import { Icon } from '@ui5/webcomponents-react/Icon';
+import { useNavigate, useParams } from 'react-router';
+import { Title } from '@ui5/webcomponents-react/Title';
+import { Label } from '@ui5/webcomponents-react/Label';
+import { MutationBar } from '@/components/mutation-bar';
+import { Button } from '@ui5/webcomponents-react/Button';
+import { Toolbar } from '@ui5/webcomponents-react/Toolbar';
+import { BusyIndicator } from '@/components/busy-indicator';
+import '@ui5/webcomponents-icons/business-objects-mobile.js';
+import { MessageBox } from '@ui5/webcomponents-react/MessageBox';
+import { ObjectPage } from '@ui5/webcomponents-react/ObjectPage';
+import { Breadcrumbs } from '@ui5/webcomponents-react/Breadcrumbs';
+import { ToolbarButton } from '@ui5/webcomponents-react/ToolbarButton';
+import { NotFoundIllustrated } from '@/components/not-found-illustrated';
+import { BreadcrumbsItem } from '@ui5/webcomponents-react/BreadcrumbsItem';
+import { ObjectPageTitle } from '@ui5/webcomponents-react/ObjectPageTitle';
+import { useQuery, useQueryClient, useMutation } from '@tanstack/react-query';
+import { ObjectPageSection } from '@ui5/webcomponents-react/ObjectPageSection';
+import { BizObjectLinkedAttachments } from '@/features/business-objects/components';
+import { displayBoStatus, displayBoType } from '@/features/business-objects/helpers';
+import { BizForm, type BizFormValues } from '@/features/business-objects/components';
+import { API, type BoType, type BoStatus } from '@/features/business-objects/constants';
+import { bizObjectDetailQueryOptions } from '@/features/business-objects/options/query';
+import { updateBizObjectMutationOptions } from '@/features/business-objects/options/mutation';
+import { deleteBizObjectMutationOptions } from '@/features/business-objects/options/mutation';
 
 export function BoDetailView() {
-  const { boId } = useParams();
-  const navigate = useNavigate();
+  const { id } = useParams();
   const queryClient = useQueryClient();
-  const [form, setForm] = React.useState<BizObjectFormState>(DEFAULT_FORM);
-  const [toastVisible, setToastVisible] = React.useState(false);
-  const [toastMessage, setToastMessage] = React.useState('');
-  const [navigateAfterToast, setNavigateAfterToast] = React.useState(false);
+  const navigate = useNavigate();
+  const [errorBoxOpen, setErrorBoxOpen] = React.useState(false);
   const [deleteDialogOpen, setDeleteDialogOpen] = React.useState(false);
+  const [errorBoxMessages, setErrorBoxMessages] = React.useState<string[]>([]);
+  const [editMode, setEditMode] = React.useState(false);
+  const [editValues, setEditValues] = React.useState<BizFormValues>({
+    title: '',
+    type: '',
+    status: '',
+  });
 
-  const { data, isLoading, error } = useQuery(
-    getBizObjectsQueryOptions({
+  const {
+    data: bizObject,
+    error: bizObjectError,
+    refetch,
+    isFetching: isBizObjectFetching,
+  } = useQuery(
+    bizObjectDetailQueryOptions(id!, {
       'sap-client': 324,
-      $select:
-        'BoId,BoType,BoTitle,Status,Erdat,Erzet,Ernam,Aedat,Aezet,Aenam,__EntityControl/Deletable,__EntityControl/Updatable,__OperationControl/link_attachment,SAP__Messages',
-      $top: 200,
+      $select: API.select,
     }),
   );
 
-  const selectedBo = React.useMemo(() => {
-    if (!boId) return null;
-    return data?.value.find((item) => item.BoId === boId) ?? null;
-  }, [boId, data]);
-
-  const { data: linkedAttachmentsData, isFetching: isLinkedAttachmentsLoading } = useQuery(
-    getBizObjectLinkedAttachmentsQueryOptions(boId || '', {
-      'sap-client': 324,
-      $expand: '_Links($expand=_Attach)',
-    }),
-  );
-
-  const linkedAttachments = React.useMemo<LinkedAttachmentRow[]>(() => {
-    return linkedAttachmentsData?._Links?.map((link) => ({
-      FileId: link._Attach.FileId,
-      Title: link._Attach.Title,
-      CurrentVersion: link._Attach.CurrentVersion,
-      IsActive: link._Attach.IsActive,
-      LinkedOn: formatLinkedDate(link.Erdat, link.Erzet),
-      LinkedBy: link.Ernam || '-',
-    })) ?? [];
-  }, [linkedAttachmentsData]);
-
-  const canSave = Boolean(selectedBo && form.BoType.trim() && form.BoTitle.trim() && form.Status.trim());
-  const linkedAttachmentsEnabled = Boolean(selectedBo?.__OperationControl?.link_attachment);
-
-  React.useEffect(() => {
-    if (!selectedBo) {
-      return;
-    }
-
-    setForm({
-      BoType: selectedBo.BoType || '',
-      BoTitle: selectedBo.BoTitle || '',
-      Status: selectedBo.Status || '',
+  const refetchBizObject = function () {
+    queryClient.invalidateQueries({
+      queryKey: ['biz-objects', id],
     });
-  }, [selectedBo]);
-
-  React.useEffect(() => {
-    if (!error) {
-      return;
-    }
-
-    setToastMessage(getBackendErrorMessage(error, 'Cannot load Business Object data.'));
-    setToastVisible(true);
-  }, [error]);
-
-  const { mutate: updateBizObject, isPending: isUpdating } = useMutation(
-    updateBizObjectMutationOptions({
-      boId: boId || '',
-      onSuccess: () => {
-        queryClient.invalidateQueries({ queryKey: ['biz-objects'] });
-        setToastMessage('Business Object updated successfully');
-        setToastVisible(true);
-      },
-      onError: (updateError) => {
-        setToastMessage(getBackendErrorMessage(updateError, 'Cannot update Business Object'));
-        setToastVisible(true);
-      },
-    }),
-  );
+  };
 
   const { mutate: deleteBizObject, isPending: isDeleting } = useMutation(
     deleteBizObjectMutationOptions({
-      boId: boId || '',
+      boId: id!,
       onSuccess: () => {
-        queryClient.invalidateQueries({ queryKey: ['biz-objects'] });
-        setToastMessage('Business Object deleted successfully');
-        setNavigateAfterToast(true);
-        setToastVisible(true);
+        queryClient.invalidateQueries({
+          queryKey: ['biz-objects'],
+        });
+        toast('Business object deleted successfully');
+        navigate('/business-objects');
       },
-      onError: (deleteError) => {
-        setToastMessage(getBackendErrorMessage(deleteError, 'Cannot delete Business Object'));
-        setToastVisible(true);
+      onError: (error) => {
+        const messages = getError(error);
+        setErrorBoxMessages((prev) => [...messages, ...prev]);
+        setErrorBoxOpen(true);
       },
     }),
   );
 
+  const { mutate: updateBizObject, isPending: isUpdating } = useMutation(
+    updateBizObjectMutationOptions({
+      boId: id!,
+      onSuccess: () => {
+        refetch();
+        toast('Business object updated successfully');
+        setEditMode(false);
+      },
+      onError: (error) => {
+        const messages = getError(error);
+        setErrorBoxMessages((prev) => [...messages, ...prev]);
+        setErrorBoxOpen(true);
+      },
+    }),
+  );
+
+  const handleEditModeOn = function () {
+    setEditMode(true);
+    setEditValues({
+      title: bizObject?.BoTitle || '',
+      type: bizObject?.BoType || '',
+      status: bizObject?.Status || '',
+    });
+  };
+
+  React.useEffect(() => {
+    if (bizObjectError) {
+      const messages = getError(bizObjectError);
+      setErrorBoxMessages((prev) => [...messages, ...prev]);
+      setErrorBoxOpen(true);
+    }
+  }, [bizObjectError]);
+
+  if (bizObjectError && bizObjectError.status === 404) {
+    return (
+      <NotFoundIllustrated
+        title="Business Object Not Found"
+        subtitle={getError(bizObjectError)[0]}
+        breadcrumbRoute="/business-objects"
+        breadcrumbText="Business Objects"
+      />
+    );
+  }
+
   return (
-    <div className="relative min-h-screen bg-slate-50">
+    <div className="relative">
       <ObjectPage
         mode="Default"
-        hidePinButton
-        onBeforeNavigate={() => undefined}
-        onSelectedSectionChange={() => undefined}
-        onToggleHeaderArea={() => undefined}
+        image={
+          <div className="border rounded-lg aspect-square flex! items-center justify-center p-2">
+            <Icon name="business-objects-mobile" className="w-full h-full text-primary" />
+          </div>
+        }
+        hidePinButton={true}
         titleArea={
           <ObjectPageTitle
             breadcrumbs={
-              <Breadcrumbs onItemClick={() => navigate('/business-objects')}>
-                <BreadcrumbsItem>Business Objects</BreadcrumbsItem>
-                <BreadcrumbsItem>{isLoading ? 'Loading...' : selectedBo?.BoTitle || 'Unnamed Business Object'}</BreadcrumbsItem>
+              <Breadcrumbs
+                onItemClick={(e) => {
+                  const route = e.detail.item.dataset.route;
+                  if (route) {
+                    navigate(route);
+                  }
+                }}
+              >
+                <BreadcrumbsItem data-route="/business-objects">Business Objects</BreadcrumbsItem>
+                <BreadcrumbsItem>
+                  {isBizObjectFetching ? 'Loading...' : bizObject?.BoTitle || 'Unnamed Object'}
+                </BreadcrumbsItem>
               </Breadcrumbs>
             }
             header={
-              <div className="flex flex-wrap items-center gap-3">
-                <span className="inline-flex h-11 w-11 items-center justify-center rounded-2xl bg-sky-600/10 text-sky-700">
-                  <Icon name="document" />
-                </span>
-                <div className="min-w-0">
-                  <div className="text-lg font-semibold text-slate-900">
-                    {isLoading ? 'Loading...' : selectedBo?.BoTitle || 'Unnamed Business Object'}
-                  </div>
-                  <div className="text-sm text-slate-500">BO ID {selectedBo?.BoId || '-'}</div>
-                </div>
-              </div>
+              <Title level="H2">{isBizObjectFetching ? 'Loading...' : bizObject?.BoTitle || 'Unnamed Object'}</Title>
             }
+            subHeader={isBizObjectFetching ? 'Loading...' : bizObject?.BoId || '–'}
             actionsBar={
-              <Toolbar design="Transparent" style={{ height: 'auto' }}>
-                <ToolbarButton
-                  design="Transparent"
-                  icon="refresh"
-                  text="Refresh"
-                  onClick={() => queryClient.invalidateQueries({ queryKey: ['biz-objects'] })}
-                />
-              
-                <ToolbarButton
-                  design="Transparent"
-                  icon="delete"
-                  text="Delete"
-                  onClick={() => setDeleteDialogOpen(true)}
-                  disabled={!selectedBo?.__EntityControl?.Deletable || isDeleting}
-                />
-              </Toolbar>
+              !editMode ? (
+                <Toolbar design="Transparent" style={{ height: 'auto' }}>
+                  <ToolbarButton
+                    design="Emphasized"
+                    text="Edit"
+                    onClick={() => handleEditModeOn()}
+                    disabled={!bizObject?.__EntityControl.Updatable}
+                  />
+                  <ToolbarButton
+                    design="Default"
+                    text="Delete"
+                    onClick={() => setDeleteDialogOpen(true)}
+                    disabled={!bizObject?.__EntityControl.Deletable || isDeleting}
+                  />
+                  <ToolbarButton design="Default" icon="refresh" text="Refresh" onClick={() => refetchBizObject()} />
+                </Toolbar>
+              ) : undefined
             }
             navigationBar={
-              <Button accessibleName="Back" design="Transparent" icon="decline" tooltip="Back" onClick={() => navigate('/business-objects')} />
+              <Button
+                accessibleName="Close"
+                design="Transparent"
+                icon="decline"
+                tooltip="Close"
+                onClick={() => navigate(-1)}
+              />
             }
           />
         }
       >
-        {isLoading ? (
-          <FlexBox alignItems="Center" justifyContent="Center" style={{ padding: '1rem', minHeight: '50dvh' }}>
-            <BusyIndicator delay={0} active size="L" />
-          </FlexBox>
-        ) : selectedBo ? (
-          <div className="space-y-4 p-2">
-            <ObjectPageSection id="overview" titleText="Overview" aria-label="Overview">
-              <div className="grid gap-4 p-2 lg:grid-cols-2">
+        {isBizObjectFetching && <BusyIndicator type="loading" />}
+        <ObjectPageSection
+          aria-label="General Information"
+          id="general"
+          titleText="General Information"
+          hideTitleText={true}
+          style={{ display: isBizObjectFetching ? 'none' : 'block' }}
+        >
+          <div className="md:grid md:grid-cols-3 gap-3">
+            <div className="space-y-3">
+              <Title level="H3">Basic Data</Title>
+              {editMode ? (
+                <BizForm value={editValues} onChange={setEditValues} />
+              ) : (
+                <React.Fragment>
+                  <div className="flex flex-col">
+                    <Label showColon>Title</Label>
+                    <Text>{bizObject?.BoTitle || '–'}</Text>
+                  </div>
+                  <div className="flex flex-col">
+                    <Label showColon>Type</Label>
+                    <Text>{displayBoType(bizObject?.BoType as BoType) || '–'}</Text>
+                  </div>
+                  <div className="flex flex-col">
+                    <Label showColon>Status</Label>
+                    <Text>{displayBoStatus(bizObject?.Status as BoStatus) || '–'}</Text>
+                  </div>
+                </React.Fragment>
+              )}
+            </div>
+            <div className="space-y-3 md:col-span-2">
+              <Title level="H3">Audit Information</Title>
+              <div className="md:grid md:grid-cols-2 gap-3">
                 <div className="space-y-3">
-                  <div>
-                    <Label>BO Type</Label>
-                    <Input
-                      value={form.BoType}
-                      placeholder={selectedBo.BoType || 'Enter BO type'}
-                      maxlength={BO_TYPE_MAX_LENGTH}
-                      onInput={(event) => setForm((prev) => ({ ...prev, BoType: event.target.value }))}
-                    />
+                  <div className="flex flex-col">
+                    <Label showColon>Created By</Label>
+                    <Text>{bizObject?.Ernam || '–'}</Text>
                   </div>
-                  <div>
-                    <Label>Status</Label>
-                    <select
-                      className="h-[2.625rem] w-full rounded-[0.55rem] border border-slate-300 bg-white px-3 text-sm text-slate-900 outline-none transition focus:border-sky-500"
-                      value={form.Status}
-                      onChange={(event) => setForm((prev) => ({ ...prev, Status: event.target.value }))}
-                    >
-                      <option value="" disabled>
-                        Select status
-                      </option>
-                      {STATUS_OPTIONS.map((status) => (
-                        <option key={status} value={status}>
-                          {status}
-                        </option>
-                      ))}
-                    </select>
+                  <div className="flex flex-col">
+                    <Label showColon>Created On</Label>
+                    <Text>{bizObject?.Erdat || '–'}</Text>
                   </div>
-                  <div>
-                    <Label>Linked Attachments</Label>
-                    <div className="pt-2">
-                      <span className={`inline-flex rounded-full border px-3 py-1 text-xs font-semibold ${getBooleanTone(linkedAttachmentsEnabled)}`}>
-                        {linkedAttachmentsEnabled ? 'Enabled' : 'Disabled'}
-                      </span>
-                    </div>
+                  <div className="flex flex-col">
+                    <Label showColon>Created At</Label>
+                    <Text>{bizObject?.Erzet || '–'}</Text>
                   </div>
                 </div>
                 <div className="space-y-3">
-                  <div>
-                    <Label>Title</Label>
-                    <Input
-                      value={form.BoTitle}
-                      placeholder={selectedBo.BoTitle || 'Enter BO title'}
-                      onInput={(event) => setForm((prev) => ({ ...prev, BoTitle: event.target.value }))}
-                    />
+                  <div className="flex flex-col">
+                    <Label showColon>Last Changed By</Label>
+                    <Text>{bizObject?.Aenam || '–'}</Text>
                   </div>
-                  <div>
-                    <Label>Create on</Label>
-                    <Text>{formatDateTime(selectedBo.Erdat, selectedBo.Erzet)}</Text>
+                  <div className="flex flex-col">
+                    <Label showColon>Last Changed On</Label>
+                    <Text>{bizObject?.Aedat || '–'}</Text>
                   </div>
-                  <div>
-                    <Label>Created By</Label>
-                    <Text>{selectedBo.Ernam || '-'}</Text>
-                  </div>
-                  <div>
-                    <Label>Last Changed</Label>
-                    <Text>{formatDateTime(selectedBo.Aedat, selectedBo.Aezet)}</Text>
+                  <div className="flex flex-col">
+                    <Label showColon>Last Changed At</Label>
+                    <Text>{bizObject?.Aezet || '–'}</Text>
                   </div>
                 </div>
               </div>
-            </ObjectPageSection>
-
-            <ObjectPageSection id="linked-attachments" titleText="Linked Attachments" aria-label="Linked Attachments">
-              <AnalyticalTable
-                data={linkedAttachments}
-                columns={linkedAttachmentColumns}
-                loading={isLinkedAttachmentsLoading}
-                selectionMode="None"
-                rowHeight={44}
-                visibleRows={8}
-                sortable={false}
-                groupable={false}
-                scaleWidthMode="Smart"
-                header={
-                  <Toolbar design="Transparent" style={{ height: 'auto' }}>
-                    <Text className="text-sm font-medium text-slate-900">
-                      Linked Attachments {linkedAttachments.length ? `(${linkedAttachments.length})` : ''}
-                    </Text>
-                    <ToolbarSpacer />
-                    <Button
-                      design="Transparent"
-                      icon="list"
-                      onClick={() => navigate(`/business-objects/${boId}/attachments`)}
-                      disabled={!boId}
-                    >
-                      Manage Links
-                    </Button>
-                  </Toolbar>
-                }
-                onRowClick={(event) => {
-                  const item = event.detail.row.original as LinkedAttachmentRow;
-                  if (!item?.FileId) return;
-                  navigate(`/attachments/${item.FileId}`);
-                }}
-              />
-            </ObjectPageSection>
+            </div>
           </div>
-        ) : (
-          <div className="p-6 text-sm text-slate-500">No business object is selected.</div>
-        )}
-      </ObjectPage>
-
-      {selectedBo ? (
-        <div className="fixed bottom-4 right-8 z-30">
-          <Button
-            design="Emphasized"
-            disabled={!canSave || isUpdating}
-            onClick={() => {
-              if (!selectedBo) return;
+        </ObjectPageSection>
+        <ObjectPageSection
+          aria-label="Linked Attachments"
+          id="linked-attachments"
+          titleText="Linked Attachments"
+          style={{ display: isBizObjectFetching ? 'none' : 'block' }}
+        >
+          <BizObjectLinkedAttachments
+            boId={id!}
+            disabled={!bizObject || !bizObject?.__OperationControl.link_attachment}
+          />
+        </ObjectPageSection>
+        {editMode && (
+          <MutationBar
+            okText="Save"
+            cancelText="Discard"
+            onOk={() => {
               updateBizObject({
-                BoType: form.BoType.trim(),
-                BoTitle: form.BoTitle.trim(),
-                Status: form.Status.trim(),
+                BoTitle: editValues.title,
+                BoType: editValues.type,
+                Status: editValues.status,
               });
             }}
-          >
-            Save
-          </Button>
-        </div>
-      ) : null}
-
+            onCancel={() => {
+              setEditMode(false);
+            }}
+            disabledOk={
+              !editValues.title.trim() ||
+              !editValues.type.trim() ||
+              !editValues.status.trim() ||
+              (editValues.title === bizObject?.BoTitle &&
+                editValues.type === bizObject?.BoType &&
+                editValues.status === bizObject?.Status)
+            }
+          />
+        )}
+      </ObjectPage>
       <MessageBox
         open={deleteDialogOpen}
         type="Confirm"
@@ -397,29 +294,32 @@ export function BoDetailView() {
         actions={['Cancel', 'OK']}
         onClose={(action) => {
           setDeleteDialogOpen(false);
-          if (action === 'OK' && selectedBo?.BoId) {
+          if (action === 'OK' && id) {
             deleteBizObject();
           }
         }}
       >
-        <div className="p-2 text-sm text-slate-600">
-          Are you sure you want to delete this Business Object? This action cannot be undone.
-        </div>
+        Are you sure you want to delete this business object? This action cannot be undone.
       </MessageBox>
-
-      <Toast
-        open={toastVisible}
-        duration={2200}
-        onClose={() => {
-          setToastVisible(false);
-          if (navigateAfterToast) {
-            setNavigateAfterToast(false);
-            navigate('/business-objects', { replace: true });
-          }
-        }}
-      >
-        {toastMessage}
-      </Toast>
+      {(isDeleting || isUpdating) && <BusyIndicator type="pending" />}
+      {errorBoxOpen && errorBoxMessages.length > 0 && (
+        <MessageBox
+          open
+          title="Error"
+          type="Error"
+          onClose={() => {
+            setErrorBoxOpen(false);
+            setErrorBoxMessages([]);
+          }}
+        >
+          <ul className="list-disc list-inside">
+            {errorBoxMessages.map((message, index) => (
+              <li key={index}>{message}</li>
+            ))}
+          </ul>
+        </MessageBox>
+      )}
+      {/* TODO: Handle time zone display */}
     </div>
   );
 }

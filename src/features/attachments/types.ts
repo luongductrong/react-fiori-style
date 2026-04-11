@@ -4,6 +4,7 @@ export type AttachmentListItem = {
   CurrentVersion: string;
   IsActive: boolean;
   Erdat: string;
+  Erzet?: string;
   Ernam: string;
   __EntityControl: {
     Deletable: boolean;
@@ -15,7 +16,7 @@ export type AttachmentSearchParams = AttachmentListParams;
 
 export type AttachmentListResponse = {
   value: AttachmentListItem[];
-  '@odata.count': string;
+  '@odata.count': number;
 };
 
 export type AttachmentListParams = {
@@ -66,7 +67,7 @@ export type AttachmentVersionItem = {
 
 export type AttachmentVersionsResponse = {
   value: AttachmentVersionItem[];
-  '@odata.count': string;
+  '@odata.count': number;
 };
 
 export type AttachmentVersionsParams = {
@@ -88,7 +89,7 @@ export type AttachmentAuditItem = {
 };
 
 export type AttachmentAuditsResponse = {
-  '@odata.count': string;
+  '@odata.count': number;
   value: AttachmentAuditItem[];
 };
 
@@ -181,7 +182,7 @@ type AttachmentBizObject = {
 
 export type AttachmentBizObjectsResponse = {
   value: AttachmentBizObject[];
-  '@odata.count': string;
+  '@odata.count': number;
 };
 
 export type AttachmentBizObjectsParams = {
@@ -205,3 +206,5 @@ export type GooglePickerDocument = {
   sizeBytes: number;
   parentId: string;
 };
+
+export type LinkedAttachment = AttachmentListItem;

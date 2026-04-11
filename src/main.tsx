@@ -8,9 +8,9 @@ import '@ui5/webcomponents-react/dist/json-imports/i18n.js';
 import { QueryProvider } from '@/context-providers/query-provider';
 import { HashRouter, Navigate, Route, Routes } from 'react-router';
 import { ThemeProvider } from '@ui5/webcomponents-react/ThemeProvider';
-import { AttachmentsView, VersionDetailView, UploadVersionView, HomeView } from '@/views';
+import { AttachmentsView, VersionDetailView, UploadVersionView } from '@/views';
+import { BoDetailView, BoListView, UserCreateView, UserListView } from '@/views';
 import { AttachmentNewView, AttachmentsDetailView, ShellHomeView, AdminHomeView } from '@/views';
-import { BoCreateView, BoDetailView, BoView, BoWListAttachmentView, UserCreateView, UserListView } from '@/views';
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
@@ -19,22 +19,12 @@ createRoot(document.getElementById('root')!).render(
         <Toaster />
         <HashRouter>
           <Routes>
-            <Route path="/demo" element={<ToastDemoView />} />
-            <Route path="/login" element={<HomeView />} />
+            <Route path="/demo" element={<ToastDemoView />} /> {/* TODO: Remove */}
             <Route path="/shell-home" element={<ShellHomeView />} />
             <Route path="/admin" element={<AdminHomeView />} />
             {/*  */}
-            <Route path="/business-objects" element={<BoView />} />
-            <Route path="/BO" element={<Navigate replace to="/business-objects" />} />
-            <Route path="/BizObject" element={<Navigate replace to="/business-objects" />} />
-            <Route path="/business-objects/:boId" element={<BoDetailView />} />
-            <Route path="/business-objects/:boId/attachments" element={<BoWListAttachmentView />} />
-            <Route
-              path="/BO/:boId/Attachments"
-              element={<Navigate replace to="/business-objects/:boId/attachments" />}
-            />
-            <Route path="/business-objects/create" element={<BoCreateView />} />
-            <Route path="/BO/Create" element={<Navigate replace to="/business-objects/create" />} />
+            <Route path="/business-objects" element={<BoListView />} />
+            <Route path="/business-objects/:id" element={<BoDetailView />} />
             {/*  */}
             <Route path="/users" element={<UserListView />} />
             <Route path="/UserList" element={<Navigate replace to="/users" />} />
@@ -49,6 +39,7 @@ createRoot(document.getElementById('root')!).render(
             <Route path="/attachments/:id/upload" element={<UploadVersionView />} />
             <Route path="/attachments/:id/versions/:versionNo" element={<VersionDetailView />} />
             <Route path="*" element={<Navigate replace to="/shell-home" />} />
+            {/* TODO: Handle 404 page */}
           </Routes>
         </HashRouter>
       </QueryProvider>

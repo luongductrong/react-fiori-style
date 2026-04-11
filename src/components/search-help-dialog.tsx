@@ -14,6 +14,7 @@ interface SearchHelpDialogProps {
   options?: SearchHelpToken['key'][];
   field: string;
   label: string;
+  useApostrophe?: boolean;
   afterFilterStringBuild: (s: string) => void;
 }
 
@@ -25,11 +26,10 @@ function createToken(defaultKey: SearchHelpToken['key']): SearchHelpToken {
     sign: 'positive',
   };
 }
-
 const defaultOptions: SearchHelpToken['key'][] = ['contains', 'equal to', 'starts with', 'ends with'];
 
 export function SearchHelpDialog({ options = defaultOptions, field, label, ...props }: SearchHelpDialogProps) {
-  const { afterFilterStringBuild } = props;
+  const { afterFilterStringBuild, useApostrophe = true } = props;
   const [open, setOpen] = React.useState(false);
   const [tokens, setTokens] = React.useState<SearchHelpToken[]>(() => [createToken(options[0])]);
   const cleanTokens = React.useMemo(() => tokens.filter((token) => token.text.trim() !== ''), [tokens]);
@@ -79,16 +79,17 @@ export function SearchHelpDialog({ options = defaultOptions, field, label, ...pr
 
       const buildExpression = function (token: SearchHelpToken) {
         const escapedText = escapeValue(token.text);
+        const text = useApostrophe ? `'${escapedText}'` : escapedText;
 
         switch (token.key) {
           case 'contains':
-            return `contains(${field},'${escapedText}')`;
+            return `contains(${field},${text})`;
           case 'equal to':
-            return field === 'FileId' ? `${field} eq ${escapedText}` : `${field} eq '${escapedText}'`;
+            return `${field} eq ${text}`;
           case 'starts with':
-            return `startswith(${field},'${escapedText}')`;
+            return `startswith(${field},${text})`;
           case 'ends with':
-            return `endswith(${field},'${escapedText}')`;
+            return `endswith(${field},${text})`;
         }
       };
 
@@ -111,7 +112,7 @@ export function SearchHelpDialog({ options = defaultOptions, field, label, ...pr
         .join(' and ');
     };
     afterFilterStringBuild(buildFilterString());
-  }, [cleanTokens, afterFilterStringBuild, field]);
+  }, [cleanTokens, afterFilterStringBuild, field, useApostrophe]);
 
   return (
     <React.Fragment>

@@ -20,3 +20,21 @@
     @apply bg-background text-foreground;
   }
 }
+
+@layer base {
+  ui5-button,
+  ui5-tokenizer,
+  /* ui5-icon, */ /* TODO: Fix it */
+  ui5-title,
+  ui5-multi-input,
+  ui5-label,
+  ui5-bar,
+  ui5-dynamic-page,
+  ui5-dynamic-page-header,
+  ui5-toolbar,
+  ui5-popover,
+  ui5-toolbar-spacer,
+  ui5-toolbar-button {
+    all: revert-layer;
+  }
+}
