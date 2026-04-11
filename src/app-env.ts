@@ -20,5 +20,5 @@ if (!GOOGLE_CLIENT_ID) {
   throw new Error('VITE_GOOGLE_CLIENT_ID is not defined in .env file');
 }
 
-export const ODATA_BASE_URL = '/api';
+export const ODATA_BASE_URL = IS_DEV ? '/api' : ODATA_ORIGIN;
 export { GOOGLE_APP_ID, GOOGLE_CLIENT_ID };
