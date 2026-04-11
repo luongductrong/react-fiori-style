@@ -82,3 +82,8 @@ export type LinkAttachmentPayload = {
   file_id: string;
   // TODO: change "file_id" to "FileId" PascalCase
 };
+
+export type UnlinkAttachmentPayload = {
+  file_id: string;
+  // TODO: change "file_id" to "FileId" PascalCase
+};

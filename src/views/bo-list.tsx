@@ -1,9 +1,9 @@
 import * as React from 'react';
-import { toast } from '@/libs/toast';
 import '@ui5/webcomponents-icons/home.js';
 import { useNavigate } from 'react-router';
 import '@ui5/webcomponents-icons/refresh.js';
 import '@ui5/webcomponents-icons/document.js';
+import { getError } from '@/libs/error-message';
 import { Bar } from '@ui5/webcomponents-react/Bar';
 import { Icon } from '@ui5/webcomponents-react/Icon';
 import { Title } from '@ui5/webcomponents-react/Title';
@@ -13,7 +13,7 @@ import { FlexBox } from '@ui5/webcomponents-react/FlexBox';
 import { Toolbar } from '@ui5/webcomponents-react/Toolbar';
 import { API } from '@/features/business-objects/constants';
 import '@ui5/webcomponents-icons/navigation-right-arrow.js';
-import { getBackendErrorMessage } from '@/libs/error-message';
+import { MessageBox } from '@ui5/webcomponents-react/MessageBox';
 import { DynamicPage } from '@ui5/webcomponents-react/DynamicPage';
 import { ToolbarSpacer } from '@ui5/webcomponents-react/ToolbarSpacer';
 import { ToolbarButton } from '@ui5/webcomponents-react/ToolbarButton';
@@ -38,6 +38,8 @@ export function BoListView() {
   const navigate = useNavigate();
   const [search, setSearch] = React.useState('');
   const [filter, setFilter] = React.useState('');
+  const [errorBoxOpen, setErrorBoxOpen] = React.useState(false);
+  const [errorBoxMessages, setErrorBoxMessages] = React.useState<string[]>([]);
 
   const { data, isFetching, isFetchingNextPage, error, refetch, hasNextPage, fetchNextPage } = useInfiniteQuery(
     bizObjectsQueryOptions({
@@ -58,8 +60,9 @@ export function BoListView() {
     if (!error) {
       return;
     }
-    toast(getBackendErrorMessage(error, 'Cannot load Business Objects data.'));
-    // TODO: Handle the error
+    const messages = getError(error);
+    setErrorBoxMessages((prev) => [...messages, ...prev]);
+    setErrorBoxOpen(true);
   }, [error]);
 
   const columns = React.useMemo(
@@ -153,6 +156,23 @@ export function BoListView() {
             More [{bizObjects.length}/{totalCount}]
           </Button>
         </Bar>
+      )}
+      {errorBoxOpen && errorBoxMessages.length > 0 && (
+        <MessageBox
+          open
+          title="Error"
+          type="Error"
+          onClose={() => {
+            setErrorBoxOpen(false);
+            setErrorBoxMessages([]);
+          }}
+        >
+          <ul className="list-disc list-inside">
+            {errorBoxMessages.map((message, index) => (
+              <li key={index}>{message}</li>
+            ))}
+          </ul>
+        </MessageBox>
       )}
     </DynamicPage>
   );
