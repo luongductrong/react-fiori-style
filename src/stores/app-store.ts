@@ -25,12 +25,14 @@ export type ToastState = {
 export type AppState = {
   viewMode: 'table' | 'grid';
   toast: ToastState;
+  errors: string[];
 };
 
 export type AppAction = {
   setViewMode: (viewMode: AppState['viewMode']) => void;
   showToast: (text: string, options?: ToastState['options']) => void;
   clearToast: () => void;
+  setErrors: (updater: (prev: string[]) => string[]) => void;
 };
 
 export type AppStore = AppState & AppAction;
@@ -61,5 +63,11 @@ export const useAppStore = create<AppStore>()(
           options: undefined,
         },
       })),
+
+    errors: [],
+    setErrors: (updater: (prev: string[]) => string[]) =>
+      set((state) => ({
+        errors: updater(state.errors),
+      })), // function updater
   })),
 );

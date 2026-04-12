@@ -1,19 +1,19 @@
 import * as React from 'react';
 import { useNavigate } from 'react-router';
 import '@ui5/webcomponents-icons/decline.js';
+import { pushErrorMessages } from '@/libs/errors';
 import { Input } from '@ui5/webcomponents-react/Input';
-import { Toast } from '@ui5/webcomponents-react/Toast';
 import { Title } from '@ui5/webcomponents-react/Title';
 import { Label } from '@ui5/webcomponents-react/Label';
 import { Button } from '@ui5/webcomponents-react/Button';
 import { FlexBox } from '@ui5/webcomponents-react/FlexBox';
 import { Toolbar } from '@ui5/webcomponents-react/Toolbar';
+import { BusyIndicator } from '@/components/busy-indicator';
 import { CheckBox } from '@ui5/webcomponents-react/CheckBox';
 import { ObjectPage } from '@ui5/webcomponents-react/ObjectPage';
 import { Breadcrumbs } from '@ui5/webcomponents-react/Breadcrumbs';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { ToolbarButton } from '@ui5/webcomponents-react/ToolbarButton';
-import { BusyIndicator } from '@ui5/webcomponents-react/BusyIndicator';
 import { BreadcrumbsItem } from '@ui5/webcomponents-react/BreadcrumbsItem';
 import { ObjectPageTitle } from '@ui5/webcomponents-react/ObjectPageTitle';
 import type { CreateAttachmentPayload } from '@/features/attachments/types';
@@ -27,9 +27,6 @@ export function AttachmentNewView() {
     Title: '',
     EditLock: false,
   });
-  const [toastVisible, setToastVisible] = React.useState(false);
-  const [toastMessage, setToastMessage] = React.useState('');
-
   const { mutate: createAttachment, isPending: isCreating } = useMutation(
     createAttachmentMutationOptions({
       onSuccess: (data) => {
@@ -38,10 +35,6 @@ export function AttachmentNewView() {
         });
         navigate(`/attachments/${data.FileId}`);
       },
-      onError: (error) => {
-        setToastMessage(error?.response?.data?.error?.message || error.message);
-        setToastVisible(true);
-      },
     }),
   );
 
@@ -49,8 +42,7 @@ export function AttachmentNewView() {
     const trimmedTitle = formData.Title.trim();
 
     if (!trimmedTitle) {
-      setToastMessage('Title cannot be empty');
-      setToastVisible(true);
+      pushErrorMessages(['Title cannot be empty']);
       return;
     }
 
@@ -138,23 +130,7 @@ export function AttachmentNewView() {
           />
         }
       />
-      <Toast open={toastVisible} onClose={() => setToastVisible(false)} duration={2000} className="py-1 px-2">
-        {toastMessage}
-      </Toast>
-      {isCreating && (
-        <FlexBox
-          alignItems="Center"
-          justifyContent="Center"
-          style={{
-            padding: '1rem',
-            minHeight: '50dvh',
-            position: 'absolute',
-            inset: 0,
-          }}
-        >
-          <BusyIndicator delay={0} active size="L" />
-        </FlexBox>
-      )}
+      <BusyIndicator type="pending" show={isCreating} />
     </div>
   );
 }

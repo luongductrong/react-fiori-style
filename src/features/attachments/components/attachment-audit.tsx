@@ -1,4 +1,6 @@
+import * as React from 'react';
 import { Bar } from '@ui5/webcomponents-react/Bar';
+import { pushApiErrorMessages } from '@/libs/errors';
 import { Title } from '@ui5/webcomponents-react/Title';
 import { Button } from '@ui5/webcomponents-react/Button';
 import { useInfiniteQuery } from '@tanstack/react-query';
@@ -37,6 +39,7 @@ export function AttachmentAudit({ fileId }: { fileId: string }) {
     fetchNextPage,
     hasNextPage,
     isFetchingNextPage,
+    error,
   } = useInfiniteQuery(
     attachmentAuditsQueryOptions(fileId, {
       'sap-client': 324,
@@ -49,6 +52,12 @@ export function AttachmentAudit({ fileId }: { fileId: string }) {
 
   const audits = auditsData?.pages.flatMap((page) => page.value) ?? [];
   const totalCount = auditsData?.pages[0]['@odata.count'] ?? 0;
+
+  React.useEffect(() => {
+    if (error) {
+      pushApiErrorMessages(error);
+    }
+  }, [error]);
 
   return (
     <>

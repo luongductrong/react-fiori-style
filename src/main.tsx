@@ -5,6 +5,7 @@ import { Toaster } from '@/components/toast';
 import { createRoot } from 'react-dom/client';
 import { ToastDemoView } from '@/views/toast-demo';
 import '@ui5/webcomponents-react/dist/json-imports/i18n.js';
+import { ErrorsMessageBox } from '@/components/errors-message-box';
 import { QueryProvider } from '@/context-providers/query-provider';
 import { HashRouter, Navigate, Route, Routes } from 'react-router';
 import { ThemeProvider } from '@ui5/webcomponents-react/ThemeProvider';
@@ -17,6 +18,8 @@ createRoot(document.getElementById('root')!).render(
     <ThemeProvider>
       <QueryProvider>
         <Toaster />
+        <ErrorsMessageBox />
+        {/* TODO: Move to Layout */}
         <HashRouter>
           <Routes>
             <Route path="/demo" element={<ToastDemoView />} /> {/* TODO: Remove */}

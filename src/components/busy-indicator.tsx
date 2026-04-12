@@ -1,7 +1,8 @@
 import { FlexBox } from '@ui5/webcomponents-react/FlexBox';
 import { BusyIndicator as UI5BusyIndicator } from '@ui5/webcomponents-react/BusyIndicator';
 
-export function BusyIndicator({ type }: { type: 'loading' | 'pending' }) {
+export function BusyIndicator({ type, show = true }: { type: 'loading' | 'pending'; show?: boolean }) {
+  if (!show) return null;
   return (
     <FlexBox
       alignItems="Center"

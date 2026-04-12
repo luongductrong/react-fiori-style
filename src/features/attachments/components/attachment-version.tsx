@@ -1,6 +1,8 @@
+import * as React from 'react';
 import '@ui5/webcomponents-icons/add.js';
 import { useNavigate } from 'react-router';
 import { Bar } from '@ui5/webcomponents-react/Bar';
+import { pushApiErrorMessages } from '@/libs/errors';
 import { Icon } from '@ui5/webcomponents-react/Icon';
 import { Title } from '@ui5/webcomponents-react/Title';
 import { useInfiniteQuery } from '@tanstack/react-query';
@@ -46,6 +48,7 @@ export function AttachmentVersion({ fileId, isActive }: { fileId: string; isActi
     fetchNextPage,
     hasNextPage,
     isFetchingNextPage,
+    error,
   } = useInfiniteQuery(
     attachmentVersionsQueryOptions(fileId, {
       'sap-client': 324,
@@ -58,6 +61,12 @@ export function AttachmentVersion({ fileId, isActive }: { fileId: string; isActi
 
   const versions = versionsData?.pages.flatMap((page) => page.value) ?? [];
   const totalCount = versionsData?.pages[0]['@odata.count'] ?? 0;
+
+  React.useEffect(() => {
+    if (error) {
+      pushApiErrorMessages(error);
+    }
+  }, [error]);
 
   return (
     <>

@@ -1,22 +1,23 @@
 import * as React from 'react';
+import { toast } from '@/libs/toast';
 import '@ui5/webcomponents-icons/share.js';
 import '@ui5/webcomponents-icons/decline.js';
-import '@ui5/webcomponents-icons/arrow-bottom.js';
+import '@ui5/webcomponents-icons/refresh.js';
 import { Text } from '@ui5/webcomponents-react/Text';
 import { useParams, useNavigate } from 'react-router';
 import { Label } from '@ui5/webcomponents-react/Label';
 import { Title } from '@ui5/webcomponents-react/Title';
-import { Toast } from '@ui5/webcomponents-react/Toast';
 import { Input } from '@ui5/webcomponents-react/Input';
 import { Button } from '@ui5/webcomponents-react/Button';
 import { Toolbar } from '@ui5/webcomponents-react/Toolbar';
 import { FlexBox } from '@ui5/webcomponents-react/FlexBox';
+import { BusyIndicator } from '@/components/busy-indicator';
 import { downloadFile } from '@/features/attachments/helpers';
 import { ObjectPage } from '@ui5/webcomponents-react/ObjectPage';
 import { MessageBox } from '@ui5/webcomponents-react/MessageBox';
 import { Breadcrumbs } from '@ui5/webcomponents-react/Breadcrumbs';
-import { BusyIndicator } from '@ui5/webcomponents-react/BusyIndicator';
 import { ToolbarButton } from '@ui5/webcomponents-react/ToolbarButton';
+import { pushErrorMessages, pushApiErrorMessages } from '@/libs/errors';
 import { AttachmentBizObjects } from '@/features/attachments/components';
 import { BreadcrumbsItem } from '@ui5/webcomponents-react/BreadcrumbsItem';
 import { ObjectPageTitle } from '@ui5/webcomponents-react/ObjectPageTitle';
@@ -34,10 +35,12 @@ export function AttachmentsDetailView() {
   const navigate = useNavigate();
   const [isEditMode, setIsEditMode] = React.useState(false);
   const [title, setTitle] = React.useState('');
-  const [toastVisible, setToastVisible] = React.useState(false);
-  const [toastMessage, setToastMessage] = React.useState('');
   const [deleteDialogOpen, setDeleteDialogOpen] = React.useState(false);
-  const { data: attachment, isLoading } = useQuery(
+  const {
+    data: attachment,
+    isFetching,
+    error,
+  } = useQuery(
     attachmentDetailQueryOptions(id!, {
       'sap-client': 324,
       $select: 'CurrentVersion,Erdat,Ernam,FileId,IsActive,Title,__EntityControl/Deletable,__EntityControl/Updatable',
@@ -52,11 +55,10 @@ export function AttachmentsDetailView() {
         queryClient.invalidateQueries({
           queryKey: ['attachments', id],
         });
-        alert('Title updated successfully');
+        toast('Title updated successfully');
         setIsEditMode(false);
-      },
-      onError: (error) => {
-        alert(error?.response?.data?.error?.message || error.message);
+        // TODO: Update EditLock
+        // TODO: Check if others can edit even with EditLock true
       },
     }),
   );
@@ -65,27 +67,36 @@ export function AttachmentsDetailView() {
     deleteAttachmentMutationOptions({
       fileId: id!,
       onSuccess: () => {
-        alert('Attachment deleted successfully');
+        toast('Attachment deleted successfully');
         queryClient.invalidateQueries({
           queryKey: ['attachments'],
         });
         navigate('/attachments');
       },
-      onError: (error) => {
-        setToastMessage(error?.response?.data?.error?.message || error.message);
-        setToastVisible(true);
-      },
     }),
   );
 
-  const handleSave = () => {
+  const refetchAttachment = function () {
+    queryClient.invalidateQueries({
+      queryKey: ['attachments', id],
+    });
+  };
+
+  const handleSave = function () {
     if (!title) {
-      alert('Title cannot be empty');
+      pushErrorMessages(['Title cannot be empty']);
       return;
     }
     updateAttachmentTitle({ Title: title });
   };
 
+  React.useEffect(() => {
+    if (error) {
+      pushApiErrorMessages(error);
+    }
+  }, [error]);
+
+  // TODO: 404 error handle
   return (
     <div className="relative">
       <ObjectPage
@@ -134,8 +145,22 @@ export function AttachmentsDetailView() {
                 {!isEditMode && (
                   <>
                     <ToolbarButton
-                      icon="arrow-bottom"
-                      tooltip="Download current version"
+                      design="Emphasized"
+                      text="Edit"
+                      onClick={() => setIsEditMode(true)}
+                      disabled={!attachment?.IsActive || !attachment?.__EntityControl?.Updatable}
+                    />
+                    {(!attachment || attachment?.IsActive) && (
+                      <ToolbarButton
+                        design="Default"
+                        text="Delete"
+                        onClick={() => setDeleteDialogOpen(true)}
+                        disabled={isDeleting || !attachment?.IsActive || !attachment?.__EntityControl?.Deletable}
+                      />
+                    )}
+                    <ToolbarButton
+                      design="Default"
+                      text="Download current version"
                       onClick={() => {
                         if (!attachment?._CurrentVersion) return;
                         const success = downloadFile(
@@ -144,26 +169,11 @@ export function AttachmentsDetailView() {
                           attachment._CurrentVersion.MimeType,
                         );
                         if (!success) {
-                          setToastMessage('Failed to download file.');
-                          setToastVisible(true);
+                          pushErrorMessages(['Failed to download file.']);
                         }
                       }}
                       disabled={!attachment?._CurrentVersion?.FileContent || !attachment?._CurrentVersion?.MimeType}
                     />
-                    <ToolbarButton
-                      design="Emphasized"
-                      text="Edit"
-                      onClick={() => setIsEditMode(true)}
-                      disabled={!attachment?.IsActive || !attachment?.__EntityControl?.Updatable}
-                    />
-                    {(!attachment || attachment?.IsActive) && (
-                      <ToolbarButton
-                        design="Transparent"
-                        text="Delete"
-                        onClick={() => setDeleteDialogOpen(true)}
-                        disabled={isDeleting || !attachment?.IsActive || !attachment?.__EntityControl?.Deletable}
-                      />
-                    )}
                     {attachment && !attachment?.IsActive && (
                       <ToolbarButton
                         design="Transparent"
@@ -173,6 +183,12 @@ export function AttachmentsDetailView() {
                         disabled={attachment?.IsActive}
                       />
                     )}
+                    <ToolbarButton
+                      design="Default"
+                      icon="refresh"
+                      tooltip="Refresh"
+                      onClick={() => refetchAttachment()}
+                    />
                   </>
                 )}
                 {isEditMode && (
@@ -186,7 +202,7 @@ export function AttachmentsDetailView() {
             breadcrumbs={
               <Breadcrumbs onItemClick={() => navigate('/attachments')}>
                 <BreadcrumbsItem>Attachments</BreadcrumbsItem>
-                <BreadcrumbsItem>{isLoading ? 'Loading...' : attachment?.Title || 'Unnamed Object'}</BreadcrumbsItem>
+                <BreadcrumbsItem>{isFetching ? 'Loading...' : attachment?.Title || 'Unnamed Object'}</BreadcrumbsItem>
               </Breadcrumbs>
             }
             header={
@@ -205,10 +221,10 @@ export function AttachmentsDetailView() {
                   onInput={(e) => setTitle(e.target.value)}
                 />
               ) : (
-                <Title level="H2">{isLoading ? 'Loading...' : attachment?.Title || 'Unnamed Object'}</Title>
+                <Title level="H2">{isFetching ? 'Loading...' : attachment?.Title || 'Unnamed Object'}</Title>
               )
             }
-            subHeader={isLoading ? 'Loading...' : attachment?.FileId || 'Unnamed Object'}
+            subHeader={isFetching ? 'Loading...' : attachment?.FileId || 'Unnamed Object'}
             navigationBar={
               <Button
                 accessibleName="Close"
@@ -221,16 +237,12 @@ export function AttachmentsDetailView() {
           />
         }
       >
-        {isLoading && (
-          <FlexBox alignItems="Center" justifyContent="Center" style={{ padding: '1rem', minHeight: '50dvh' }}>
-            <BusyIndicator delay={0} active size="L" />
-          </FlexBox>
-        )}
+        <BusyIndicator type="loading" show={isFetching} />
         <ObjectPageSection
           aria-label="File Preview"
           id="file-preview"
           titleText="File Preview"
-          style={{ display: isLoading ? 'none' : 'block' }}
+          style={{ display: isFetching ? 'none' : 'block' }}
         >
           <div className="p-2 rounded-lg bg-background">
             <FilePreview
@@ -244,7 +256,7 @@ export function AttachmentsDetailView() {
           aria-label="Versions"
           id="versions"
           titleText="Versions"
-          style={{ display: isLoading ? 'none' : 'block' }}
+          style={{ display: isFetching ? 'none' : 'block' }}
         >
           <AttachmentVersion fileId={id!} isActive={attachment?.IsActive || false} />
         </ObjectPageSection>
@@ -252,7 +264,7 @@ export function AttachmentsDetailView() {
           aria-label="Business Objects"
           id="business-objects"
           titleText="Business Objects"
-          style={{ display: isLoading ? 'none' : 'block' }}
+          style={{ display: isFetching ? 'none' : 'block' }}
         >
           <AttachmentBizObjects fileId={id!} isActive={attachment?.IsActive || false} />
         </ObjectPageSection>
@@ -260,13 +272,10 @@ export function AttachmentsDetailView() {
           aria-label="Audit"
           id="audit"
           titleText="Audit"
-          style={{ display: isLoading ? 'none' : 'block' }}
+          style={{ display: isFetching ? 'none' : 'block' }}
         >
           <AttachmentAudit fileId={id!} />
         </ObjectPageSection>
-        <Toast open={toastVisible} onClose={() => setToastVisible(false)} duration={2000} className="py-1 px-2">
-          {toastMessage}
-        </Toast>
       </ObjectPage>
       <MessageBox
         open={deleteDialogOpen}
@@ -282,20 +291,7 @@ export function AttachmentsDetailView() {
       >
         Are you sure you want to delete this attachment? This action cannot be undone.
       </MessageBox>
-      {(isUpdating || isDeleting) && (
-        <FlexBox
-          alignItems="Center"
-          justifyContent="Center"
-          style={{
-            padding: '1rem',
-            minHeight: '50dvh',
-            position: 'absolute',
-            inset: 0,
-          }}
-        >
-          <BusyIndicator delay={0} active size="L" />
-        </FlexBox>
-      )}
+      <BusyIndicator type="pending" show={isUpdating || isDeleting} />
     </div>
   );
 }

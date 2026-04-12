@@ -1,6 +1,6 @@
 import { MUTATION_API } from '../constants';
 import { ODATA_SERVICE } from '@/app-constant';
-import type { AxiosApiError } from '@/types/common';
+import { pushApiErrorMessages } from '@/libs/errors';
 import { axiosInstance } from '@/libs/axios-instance';
 import type { CreateAttachmentPayload } from '../types';
 import { mutationOptions } from '@tanstack/react-query';
@@ -11,12 +11,12 @@ import type { UploadVersionPayload, CreateAttachmentResponse } from '../types';
 type Params = {
   fileId: string;
   onSuccess?: () => void;
-  onError?: (_error: AxiosApiError) => void;
+  onError?: (_error: unknown) => void;
 };
 
 type CreateAttachmentParams = {
   onSuccess?: (data: CreateAttachmentResponse) => void;
-  onError?: (_error: AxiosApiError) => void;
+  onError?: (_error: unknown) => void;
 };
 
 export function rollbackVersionMutationOptions({ fileId, onSuccess, onError }: Params) {
@@ -42,7 +42,10 @@ export function rollbackVersionMutationOptions({ fileId, onSuccess, onError }: P
       return res;
     },
     onSuccess,
-    onError,
+    onError: (error) => {
+      pushApiErrorMessages(error);
+      onError?.(error);
+    },
   });
 }
 
@@ -68,7 +71,10 @@ export function deleteAttachmentMutationOptions({ fileId, onSuccess, onError }: 
       return res;
     },
     onSuccess,
-    onError,
+    onError: (error) => {
+      pushApiErrorMessages(error);
+      onError?.(error);
+    },
   });
 }
 
@@ -93,7 +99,10 @@ export function updateAttachmentTitleMutationOptions({ fileId, onSuccess, onErro
       return res;
     },
     onSuccess,
-    onError,
+    onError: (error) => {
+      pushApiErrorMessages(error);
+      onError?.(error);
+    },
   });
 }
 
@@ -125,7 +134,10 @@ export function uploadVersionMutationOptions({
       return res;
     },
     onSuccess,
-    onError,
+    onError: (error) => {
+      pushApiErrorMessages(error);
+      onError?.(error);
+    },
   });
 }
 
@@ -152,6 +164,9 @@ export function createAttachmentMutationOptions({ onSuccess, onError }: CreateAt
       return res;
     },
     onSuccess,
-    onError,
+    onError: (error) => {
+      pushApiErrorMessages(error);
+      onError?.(error);
+    },
   });
 }

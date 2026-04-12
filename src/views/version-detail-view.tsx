@@ -1,21 +1,22 @@
 import * as React from 'react';
+import { toast } from '@/libs/toast';
 import { useParams } from 'react-router';
 import '@ui5/webcomponents-icons/share.js';
 import { useNavigate } from 'react-router';
 import '@ui5/webcomponents-icons/decline.js';
-import '@ui5/webcomponents-icons/arrow-bottom.js';
+import '@ui5/webcomponents-icons/refresh.js';
 import { Text } from '@ui5/webcomponents-react/Text';
 import { Title } from '@ui5/webcomponents-react/Title';
 import { Label } from '@ui5/webcomponents-react/Label';
-import { Toast } from '@ui5/webcomponents-react/Toast';
 import { Button } from '@ui5/webcomponents-react/Button';
 import { FlexBox } from '@ui5/webcomponents-react/FlexBox';
 import { Toolbar } from '@ui5/webcomponents-react/Toolbar';
+import { BusyIndicator } from '@/components/busy-indicator';
 import { FilePreview } from '@/features/attachments/components';
 import { ObjectPage } from '@ui5/webcomponents-react/ObjectPage';
 import { Breadcrumbs } from '@ui5/webcomponents-react/Breadcrumbs';
 import { ToolbarButton } from '@ui5/webcomponents-react/ToolbarButton';
-import { BusyIndicator } from '@ui5/webcomponents-react/BusyIndicator';
+import { pushErrorMessages, pushApiErrorMessages } from '@/libs/errors';
 import { BreadcrumbsItem } from '@ui5/webcomponents-react/BreadcrumbsItem';
 import { ObjectPageTitle } from '@ui5/webcomponents-react/ObjectPageTitle';
 import { ObjectPageHeader } from '@ui5/webcomponents-react/ObjectPageHeader';
@@ -29,17 +30,24 @@ import { attachmentVersionDetailQueryOptions } from '@/features/attachments/opti
 export function VersionDetailView() {
   const { id, versionNo } = useParams();
   const queryClient = useQueryClient();
-  const [toastVisible, setToastVisible] = React.useState(false);
-  const [toastMessage, setToastMessage] = React.useState('');
   const navigate = useNavigate();
-  const { data: version, isLoading } = useQuery(
+  const {
+    data: version,
+    isFetching,
+    refetch: refetchData,
+    error: dataError,
+  } = useQuery(
     attachmentVersionDetailQueryOptions(id!, versionNo!, {
       'sap-client': 324,
       $select:
         'Ernam,FileContent,FileExtension,FileId,FileName,FileSize,MimeType,VersionNo,__EntityControl/Deletable,__EntityControl/Updatable',
     }),
   );
-  const { data: title } = useQuery(
+  const {
+    data: title,
+    refetch: refetchTitle,
+    error: titleError,
+  } = useQuery(
     attachmentTitleQueryOptions(id!, {
       'sap-client': 324,
     }),
@@ -51,24 +59,31 @@ export function VersionDetailView() {
         queryClient.invalidateQueries({
           queryKey: ['attachments', id],
         });
-        setToastMessage(`Version ${versionNo} is now current`);
-        setToastVisible(true);
-      },
-      onError: (error) => {
-        setToastMessage(error?.response?.data?.error?.message || error.message);
-        setToastVisible(true);
+        toast(`Version ${versionNo} is now current`);
       },
     }),
   );
 
+  React.useEffect(() => {
+    if (dataError) {
+      pushApiErrorMessages(dataError);
+    }
+    if (titleError) {
+      pushApiErrorMessages(titleError);
+    }
+  }, [dataError, titleError]);
+
+  // TODO: 404 error handle
+
   return (
     <div className="relative">
       <ObjectPage
+        hidePinButton={true}
         headerArea={
           <ObjectPageHeader>
             <FlexBox alignItems="Center" justifyContent="Start" wrap="Wrap" className="p-2">
               <FlexBox direction="Column" className="w-1/3">
-                <Label>Current Version</Label>
+                <Label>Version</Label>
                 <Text>{version?.VersionNo}</Text>
               </FlexBox>
               <FlexBox direction="Column" className="w-1/3">
@@ -93,16 +108,25 @@ export function VersionDetailView() {
           </ObjectPageHeader>
         }
         mode="Default"
-        onBeforeNavigate={function fQ() {}}
-        hidePinButton={true}
-        onSelectedSectionChange={function fQ() {}}
-        onToggleHeaderArea={function fQ() {}}
         titleArea={
           <ObjectPageTitle
             actionsBar={
               <Toolbar design="Transparent" style={{ height: 'auto' }}>
                 <ToolbarButton
-                  design="Transparent"
+                  design="Emphasized"
+                  text="Download"
+                  onClick={() => {
+                    if (!version) return;
+                    const success = downloadFile(version.FileContent, version.FileName, version.MimeType);
+                    if (!success) {
+                      pushErrorMessages(['Failed to download file.']);
+                    }
+                  }}
+                  disabled={!version?.FileContent || !version?.MimeType}
+                />
+                {/* Disable if version is current version */}
+                <ToolbarButton
+                  design="Default"
                   text="Set as Current Version"
                   onClick={() => {
                     if (!version) return;
@@ -114,17 +138,12 @@ export function VersionDetailView() {
                 />
                 <ToolbarButton
                   design="Default"
-                  icon="arrow-bottom"
-                  tooltip="Download"
+                  icon="refresh"
+                  text="Refresh"
                   onClick={() => {
-                    if (!version) return;
-                    const success = downloadFile(version.FileContent, version.FileName, version.MimeType);
-                    if (!success) {
-                      setToastVisible(true);
-                      setToastMessage('Failed to download file');
-                    }
+                    refetchData();
+                    refetchTitle();
                   }}
-                  disabled={!version?.FileContent || !version?.MimeType}
                 />
               </Toolbar>
             }
@@ -139,12 +158,12 @@ export function VersionDetailView() {
               >
                 <BreadcrumbsItem data-route="/attachments">Attachments</BreadcrumbsItem>
                 <BreadcrumbsItem data-route={`/attachments/${id}`}>
-                  {isLoading ? 'Loading...' : title?.value || 'Unnamed Object'}
+                  {isFetching ? 'Loading...' : title?.value || 'Unnamed Object'}
                 </BreadcrumbsItem>
-                <BreadcrumbsItem>{isLoading ? 'Loading...' : version?.FileName || 'Unnamed Object'}</BreadcrumbsItem>
+                <BreadcrumbsItem>{isFetching ? 'Loading...' : version?.FileName || 'Unnamed Object'}</BreadcrumbsItem>
               </Breadcrumbs>
             }
-            header={<Title level="H2">{isLoading ? 'Loading...' : version?.FileName || 'Unnamed Object'}</Title>}
+            header={<Title level="H2">{isFetching ? 'Loading...' : version?.FileName || 'Unnamed Object'}</Title>}
             navigationBar={
               <Button
                 accessibleName="Close"
@@ -157,39 +176,19 @@ export function VersionDetailView() {
           />
         }
       >
-        {isLoading && (
-          <FlexBox alignItems="Center" justifyContent="Center" style={{ padding: '1rem', minHeight: '50dvh' }}>
-            <BusyIndicator delay={0} active size="L" />
-          </FlexBox>
-        )}
+        <BusyIndicator type="loading" show={isFetching} />
         <ObjectPageSection
           aria-label="File Preview"
           id="file-preview"
           titleText="File Preview"
-          style={{ display: isLoading ? 'none' : 'block' }}
+          style={{ display: isFetching ? 'none' : 'block' }}
         >
           <div className="p-2 rounded-lg bg-background">
             <FilePreview mimeType={version?.MimeType} fileContent={version?.FileContent} fileName={version?.FileName} />
           </div>
         </ObjectPageSection>
       </ObjectPage>
-      <Toast open={toastVisible} onClose={() => setToastVisible(false)} duration={2000} className="py-1 px-2">
-        {toastMessage}
-      </Toast>
-      {isRollbacking && (
-        <FlexBox
-          alignItems="Center"
-          justifyContent="Center"
-          style={{
-            padding: '1rem',
-            minHeight: '50dvh',
-            position: 'absolute',
-            inset: 0,
-          }}
-        >
-          <BusyIndicator delay={0} active size="L" />
-        </FlexBox>
-      )}
+      <BusyIndicator type="pending" show={isRollbacking} />
     </div>
   );
 }

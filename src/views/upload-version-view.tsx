@@ -1,4 +1,5 @@
 import * as React from 'react';
+import { toast } from '@/libs/toast';
 import { useParams } from 'react-router';
 import { useNavigate } from 'react-router';
 import '@ui5/webcomponents-icons/share.js';
@@ -7,17 +8,17 @@ import '@ui5/webcomponents-icons/arrow-bottom.js';
 import { Text } from '@ui5/webcomponents-react/Text';
 import { Title } from '@ui5/webcomponents-react/Title';
 import { Label } from '@ui5/webcomponents-react/Label';
-import { Toast } from '@ui5/webcomponents-react/Toast';
 import { Button } from '@ui5/webcomponents-react/Button';
 import { FlexBox } from '@ui5/webcomponents-react/FlexBox';
 import { Toolbar } from '@ui5/webcomponents-react/Toolbar';
+import { BusyIndicator } from '@/components/busy-indicator';
 import { formatFileSize } from '@/features/attachments/helpers';
 import { ObjectPage } from '@ui5/webcomponents-react/ObjectPage';
 import { UploadVersion } from '@/features/attachments/components';
 import { Breadcrumbs } from '@ui5/webcomponents-react/Breadcrumbs';
 import type { UploadedFileData } from '@/features/attachments/types';
 import { ToolbarButton } from '@ui5/webcomponents-react/ToolbarButton';
-import { BusyIndicator } from '@ui5/webcomponents-react/BusyIndicator';
+import { pushErrorMessages, pushApiErrorMessages } from '@/libs/errors';
 import { BreadcrumbsItem } from '@ui5/webcomponents-react/BreadcrumbsItem';
 import { ObjectPageTitle } from '@ui5/webcomponents-react/ObjectPageTitle';
 import { ObjectPageHeader } from '@ui5/webcomponents-react/ObjectPageHeader';
@@ -30,11 +31,12 @@ export function UploadVersionView() {
   const { id } = useParams();
   const queryClient = useQueryClient();
   const [fileData, setFileData] = React.useState<UploadedFileData | null>(null);
-
-  const [toastVisible, setToastVisible] = React.useState(false);
-  const [toastMessage, setToastMessage] = React.useState('');
   const navigate = useNavigate();
-  const { data: title, isLoading: isTitleLoading } = useQuery(
+  const {
+    data: title,
+    isLoading: isTitleLoading,
+    error,
+  } = useQuery(
     attachmentTitleQueryOptions(id!, {
       'sap-client': 324,
     }),
@@ -45,13 +47,8 @@ export function UploadVersionView() {
         queryClient.invalidateQueries({
           queryKey: ['attachments', id],
         });
-        setToastMessage('Version uploaded successfully');
-        setToastVisible(true);
+        toast('Version uploaded successfully');
         navigate(`/attachments/${data.FileId}`);
-      },
-      onError: (error) => {
-        setToastMessage(error?.response?.data?.error?.message || error.message);
-        setToastVisible(true);
       },
     }),
   );
@@ -67,6 +64,14 @@ export function UploadVersionView() {
       FileSize: fileData.FileSize,
     });
   };
+
+  React.useEffect(() => {
+    if (error) {
+      pushApiErrorMessages(error);
+    }
+  }, [error]);
+
+  // TODO: 404 error handle
 
   return (
     <div className="relative">
@@ -105,8 +110,7 @@ export function UploadVersionView() {
                     if (fileData) {
                       handleUpload(fileData);
                     } else {
-                      setToastMessage('Please select a file to upload');
-                      setToastVisible(true);
+                      pushErrorMessages(['Please select a file to upload']);
                     }
                   }}
                   disabled={isUploading || !fileData}
@@ -142,11 +146,7 @@ export function UploadVersionView() {
           />
         }
       >
-        {isTitleLoading && (
-          <FlexBox alignItems="Center" justifyContent="Center" style={{ padding: '1rem', minHeight: '50dvh' }}>
-            <BusyIndicator delay={0} active size="L" />
-          </FlexBox>
-        )}
+        <BusyIndicator type="loading" show={isTitleLoading} />
         <ObjectPageSection
           aria-label="Upload new version"
           id="upload-new-version"
@@ -163,23 +163,7 @@ export function UploadVersionView() {
           />
         </ObjectPageSection>
       </ObjectPage>
-      <Toast open={toastVisible} onClose={() => setToastVisible(false)} duration={2000} className="py-1 px-2">
-        {toastMessage}
-      </Toast>
-      {isUploading && (
-        <FlexBox
-          alignItems="Center"
-          justifyContent="Center"
-          style={{
-            padding: '1rem',
-            minHeight: '50dvh',
-            position: 'absolute',
-            inset: 0,
-          }}
-        >
-          <BusyIndicator delay={0} active size="L" />
-        </FlexBox>
-      )}
+      <BusyIndicator type="pending" show={isUploading} />
     </div>
   );
 }
