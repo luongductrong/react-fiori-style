@@ -1,15 +1,19 @@
-import { ODATA_SERVICE } from '@/app-constant';
 import { axiosInstance } from './axios-instance';
+import { useAuthStore } from '@/stores/auth-store';
 
 export function getCsrfToken() {
-  return sessionStorage.getItem('x-csrf-token');
+  return useAuthStore.getState().csrfToken;
 }
 
-export function fetchCsrfToken(serviceRoot: string = ODATA_SERVICE.ATTACHMENT) {
+export function setCsrfToken(csrfToken: string) {
+  useAuthStore.getState().setCsrfToken(csrfToken);
+}
+
+export function fetchCsrfToken(serviceRoot: string) {
   return axiosInstance.get(`${serviceRoot}/$metadata`, {
     headers: {
       'x-csrf-token': 'Fetch',
     },
   });
 }
-// TODO: remove default service root
+// TODO: rename this file

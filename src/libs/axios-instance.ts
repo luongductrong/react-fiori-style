@@ -1,4 +1,5 @@
 import qs from 'qs';
+import { setCsrfToken } from './helpers';
 import { ODATA_BASE_URL } from '@/app-constant';
 import axios, { type AxiosRequestConfig } from 'axios';
 
@@ -18,6 +19,7 @@ const api = axios.create({
 });
 
 api.interceptors.request.use(
+  // TODO: add sap-client param to all requests
   (config) => {
     config.headers = config.headers ?? {};
     if (!config.headers['Content-Type'] && config.data && !(config.data instanceof FormData)) {
@@ -34,13 +36,14 @@ api.interceptors.response.use(
   (response) => {
     const token = response?.headers?.['x-csrf-token'];
     if (token) {
-      sessionStorage.setItem('x-csrf-token', token);
+      setCsrfToken(token);
     }
     return response.data;
   },
   async (error) => {
     if (error.response && error.response.status === 401) {
       console.warn('Token was expired or invalid!');
+      // TODO: Notify user and handle error
     }
     return Promise.reject(error);
   },

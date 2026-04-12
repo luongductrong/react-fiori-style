@@ -42,7 +42,7 @@ export function createBizObjectMutationOptions({ onSuccess, onError }: CreateBiz
       let token = getCsrfToken();
 
       if (!token) {
-        await fetchCsrfToken();
+        await fetchCsrfToken(ODATA_SERVICE.BIZ);
         token = getCsrfToken();
       }
 

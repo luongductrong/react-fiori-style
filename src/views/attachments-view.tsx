@@ -4,7 +4,7 @@ import '@ui5/webcomponents-icons/list.js';
 import '@ui5/webcomponents-icons/home.js';
 import { useNavigate } from 'react-router';
 import '@ui5/webcomponents-icons/table-view.js';
-import { useAppStore } from '@/stores/app-stores';
+import { useAppStore } from '@/stores/app-store';
 import { Bar } from '@ui5/webcomponents-react/Bar';
 import { Grid } from '@ui5/webcomponents-react/Grid';
 import { Icon } from '@ui5/webcomponents-react/Icon';

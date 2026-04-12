@@ -12,8 +12,8 @@ import { ToolbarButton } from '@ui5/webcomponents-react/ToolbarButton';
 import { ToolbarSpacer } from '@ui5/webcomponents-react/ToolbarSpacer';
 import { linkAttachmentToBoMutationOptions } from '../options/mutation';
 import { attachmentsQueryOptions } from '@/features/attachments/options/query';
-import { AttachmentsFilterBar } from '@/features/attachments/components/attachments-filter-bar';
 import { useInfiniteQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { AttachmentsFilterBar } from '@/features/attachments/components/attachments-filter-bar';
 import { AnalyticalTable, type AnalyticalTableCellInstance } from '@ui5/webcomponents-react/AnalyticalTable';
 
 interface BizAttachmentLinkCreateProps {

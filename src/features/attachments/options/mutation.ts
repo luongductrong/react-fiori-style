@@ -25,7 +25,7 @@ export function rollbackVersionMutationOptions({ fileId, onSuccess, onError }: P
       let token = getCsrfToken();
 
       if (!token) {
-        await fetchCsrfToken();
+        await fetchCsrfToken(ODATA_SERVICE.ATTACHMENT);
         token = getCsrfToken();
       }
 
@@ -52,7 +52,7 @@ export function deleteAttachmentMutationOptions({ fileId, onSuccess, onError }: 
       let token = getCsrfToken();
 
       if (!token) {
-        await fetchCsrfToken();
+        await fetchCsrfToken(ODATA_SERVICE.ATTACHMENT);
         token = getCsrfToken();
       }
 
@@ -77,7 +77,7 @@ export function updateAttachmentTitleMutationOptions({ fileId, onSuccess, onErro
     mutationFn: async (payload: { Title: string }) => {
       let token = getCsrfToken();
       if (!token) {
-        await fetchCsrfToken();
+        await fetchCsrfToken(ODATA_SERVICE.ATTACHMENT);
         token = getCsrfToken();
       }
       const res = await axiosInstance.put<unknown>(
@@ -108,7 +108,7 @@ export function uploadVersionMutationOptions({
       let token = getCsrfToken();
 
       if (!token) {
-        await fetchCsrfToken();
+        await fetchCsrfToken(ODATA_SERVICE.ATTACHMENT);
         token = getCsrfToken();
       }
 
@@ -135,7 +135,7 @@ export function createAttachmentMutationOptions({ onSuccess, onError }: CreateAt
       let token = getCsrfToken();
 
       if (!token) {
-        await fetchCsrfToken();
+        await fetchCsrfToken(ODATA_SERVICE.ATTACHMENT);
         token = getCsrfToken();
       }
 

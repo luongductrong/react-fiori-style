@@ -1,4 +1,4 @@
-import { useAppStore } from '@/stores/app-stores';
+import { useAppStore } from '@/stores/app-store';
 import { Toast } from '@ui5/webcomponents-react/Toast';
 
 export const Toaster = () => {
