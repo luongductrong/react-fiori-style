@@ -1,9 +1,10 @@
 import * as React from 'react';
 import { toast } from '@/libs/toast';
 import { useNavigate } from 'react-router';
+import { FilePicker } from './file-picker';
 import { formatFileSize } from '../helpers';
+import { FilePreview } from './file-preview';
 import { validateFileName } from '../validate';
-import { UploadVersion } from './upload-version';
 import type { UploadedFileData } from '../types';
 import { pushErrorMessages } from '@/libs/errors';
 import { Bar } from '@ui5/webcomponents-react/Bar';
@@ -12,6 +13,7 @@ import { Input } from '@ui5/webcomponents-react/Input';
 import { Label } from '@ui5/webcomponents-react/Label';
 import { Dialog } from '@ui5/webcomponents-react/Dialog';
 import { Button } from '@ui5/webcomponents-react/Button';
+import { GoogleDrivePicker } from './google-drive-picker';
 import { FlexBox } from '@ui5/webcomponents-react/FlexBox';
 import { BusyIndicator } from '@/components/busy-indicator';
 import { buildFileName, getEditableFileName } from '../helpers';
@@ -31,7 +33,8 @@ export function FileUpload(props: FileUploadProps) {
 function FileUploadImpl({ fileId, disabled }: FileUploadProps) {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
-  const [open, setOpen] = React.useState(false);
+  const [driveLoading, setDriveLoading] = React.useState(false);
+  const [open, setOpen] = React.useState<'local' | 'drive' | null>(null);
   const [fileData, setFileData] = React.useState<UploadedFileData | null>(null);
   const [fileNameDraft, setFileNameDraft] = React.useState('');
   const [fileNameError, setFileNameError] = React.useState('');
@@ -43,7 +46,7 @@ function FileUploadImpl({ fileId, disabled }: FileUploadProps) {
         setFileData(null);
         setFileNameDraft('');
         setFileNameError('');
-        setOpen(false);
+        setOpen(null);
         queryClient.invalidateQueries({
           queryKey: ['attachments', fileId],
         });
@@ -84,7 +87,7 @@ function FileUploadImpl({ fileId, disabled }: FileUploadProps) {
     setFileData(null);
     setFileNameDraft('');
     setFileNameError('');
-    setOpen(false);
+    setOpen(null);
   };
 
   const handleFileNameInput = function (value: string) {
@@ -92,17 +95,10 @@ function FileUploadImpl({ fileId, disabled }: FileUploadProps) {
     setFileNameError(fileData ? validateFileName(buildFileName(value, fileData.FileExtension)) : '');
   };
 
-  return (
-    <React.Fragment>
-      <ToolbarButton
-        design="Transparent"
-        text="Upload"
-        onClick={() => setOpen(true)}
-        disabled={disabled || !fileId}
-        className="h-8"
-      />
+  if (fileData) {
+    return (
       <Dialog
-        open={open}
+        open={true}
         resizable
         draggable
         headerText="Upload New File"
@@ -129,37 +125,100 @@ function FileUploadImpl({ fileId, disabled }: FileUploadProps) {
         }
         onClose={handleClose}
       >
-        {fileData && (
-          <React.Fragment>
-            <FlexBox direction="Column" className="gap-1 mb-4">
-              <Label showColon>File Name</Label>
-              <FlexBox alignItems="Center" className="gap-1 w-full">
-                <Input
-                  className="w-4/5 md:w-lg h-8"
-                  value={fileNameDraft}
-                  placeholder="Enter file name"
-                  valueState={fileNameError ? 'Negative' : 'None'}
-                  valueStateMessage={fileNameError ? <Text>{fileNameError}</Text> : undefined}
-                  onInput={(event) => handleFileNameInput(event.target.value)}
-                />
-                <Text className="font-semibold">{fileData?.FileExtension ? `.${fileData.FileExtension}` : ''}</Text>
-              </FlexBox>
-            </FlexBox>
-            <FlexBox alignItems="Start" justifyContent="Start" wrap="Wrap" className="gap-8 mb-6">
-              <FlexBox direction="Column">
-                <Label showColon>File Size</Label>
-                <Text>{fileData?.FileSize ? formatFileSize(fileData.FileSize) : '-'}</Text>
-              </FlexBox>
-              <FlexBox direction="Column">
-                <Label showColon>Mime Type</Label>
-                <Text>{fileData?.MimeType || '-'}</Text>
-              </FlexBox>
-            </FlexBox>
-          </React.Fragment>
-        )}
-        <UploadVersion
-          fileData={fileData}
-          onFileDataChange={(nextFileData) => {
+        <FlexBox direction="Column" className="gap-1 mb-4">
+          <Label showColon>File Name</Label>
+          <FlexBox alignItems="Center" className="gap-1 w-full">
+            <Input
+              className="w-4/5 md:w-lg h-8"
+              value={fileNameDraft}
+              placeholder="Enter file name"
+              valueState={fileNameError ? 'Negative' : 'None'}
+              valueStateMessage={fileNameError ? <Text>{fileNameError}</Text> : undefined}
+              onInput={(event) => handleFileNameInput(event.target.value)}
+            />
+            <Text className="font-semibold">{fileData?.FileExtension ? `.${fileData.FileExtension}` : ''}</Text>
+          </FlexBox>
+        </FlexBox>
+        <FlexBox alignItems="Start" justifyContent="Start" wrap="Wrap" className="gap-8 mb-6">
+          <FlexBox direction="Column">
+            <Label showColon>File Size</Label>
+            <Text>{fileData?.FileSize ? formatFileSize(fileData.FileSize) : '-'}</Text>
+          </FlexBox>
+          <FlexBox direction="Column">
+            <Label showColon>Mime Type</Label>
+            <Text>{fileData?.MimeType || '-'}</Text>
+          </FlexBox>
+        </FlexBox>
+        <FilePreview
+          mimeType={fileData.MimeType}
+          fileContent={fileData.FileContent}
+          fileName={fileData.FileName}
+          className="p-2"
+        />
+        <BusyIndicator type="pending" show={isPending} />
+      </Dialog>
+    );
+  }
+
+  if (open === 'drive' && !driveLoading) {
+    return (
+      <GoogleDrivePicker
+        onLoadingChange={(loading) => {
+          setDriveLoading(loading);
+        }}
+        onPick={(nextFileData) => {
+          setFileData(nextFileData);
+          if (nextFileData) {
+            setFileNameDraft(getEditableFileName(nextFileData.FileName, nextFileData.FileExtension));
+            setFileNameError(validateFileName(nextFileData.FileName));
+          }
+        }}
+        onPickCancel={() => setOpen('local')}
+      />
+    );
+  }
+
+  return (
+    <React.Fragment>
+      <ToolbarButton
+        design="Transparent"
+        text="Upload"
+        onClick={() => setOpen('local')}
+        disabled={disabled || !fileId}
+        className="h-8"
+      />
+      <Dialog
+        open={open === 'local' || driveLoading}
+        resizable
+        draggable
+        headerText="Upload New File"
+        className="md:min-w-4xl relative"
+        footer={
+          <Bar
+            design="Footer"
+            endContent={
+              <React.Fragment>
+                <Button
+                  design="Emphasized"
+                  onClick={handleSubmit}
+                  disabled={driveLoading || isPending || !fileData || !!fileNameError}
+                  className="h-8"
+                >
+                  Save
+                </Button>
+                <Button design="Transparent" onClick={handleClose} disabled={driveLoading || isPending} className="h-8">
+                  Cancel
+                </Button>
+              </React.Fragment>
+            }
+          />
+        }
+        onClose={handleClose}
+      >
+        <FilePicker
+          disabled={driveLoading}
+          onGoogleBtnClick={() => setOpen('drive')}
+          onPick={(nextFileData) => {
             setFileData(nextFileData);
             if (nextFileData) {
               setFileNameDraft(getEditableFileName(nextFileData.FileName, nextFileData.FileExtension));
@@ -167,7 +226,7 @@ function FileUploadImpl({ fileId, disabled }: FileUploadProps) {
             }
           }}
         />
-        <BusyIndicator type="pending" show={isPending} />
+        <BusyIndicator type="pending" show={driveLoading || isPending} />
       </Dialog>
     </React.Fragment>
   );
