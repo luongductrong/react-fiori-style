@@ -1,3 +1,10 @@
+export type CurrentUser = {
+  value: {
+    Uname: string;
+    Role: string;
+  }[];
+};
+
 export type AuthUserItem = {
   Uname: string;
   Role: string;
@@ -7,16 +14,9 @@ export type AuthUserItem = {
     Deletable: boolean;
     Updatable: boolean;
   };
-  SAP__Messages: Array<{
-    code?: string;
-    message?: string;
-    target?: string;
-  }>;
 };
 
 export type AuthUserListResponse = {
-  '@odata.context': string;
-  '@odata.metadataEtag'?: string;
   '@odata.count'?: string;
   value: AuthUserItem[];
 };
@@ -45,4 +45,3 @@ export type UpdateAuthUserPayload = {
 export type UpdateAuthUserResponse = AuthUserItem;
 
 export type DeleteAuthUserResponse = unknown;
-

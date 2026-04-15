@@ -3,7 +3,10 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useNavigate } from 'react-router';
 import { DynamicPage } from '@ui5/webcomponents-react/DynamicPage';
 import { AnalyticalTable } from '@ui5/webcomponents-react/AnalyticalTable';
-import type { AnalyticalTableCellInstance, AnalyticalTableColumnDefinition } from '@ui5/webcomponents-react/AnalyticalTable';
+import type {
+  AnalyticalTableCellInstance,
+  AnalyticalTableColumnDefinition,
+} from '@ui5/webcomponents-react/AnalyticalTable';
 import { BusyIndicator } from '@ui5/webcomponents-react/BusyIndicator';
 import { Bar } from '@ui5/webcomponents-react/Bar';
 import { Button } from '@ui5/webcomponents-react/Button';
@@ -54,14 +57,17 @@ function getRoleTone(role?: string) {
   const normalized = (role || '').toUpperCase();
 
   if (normalized === 'ADMIN') return 'bg-sky-500/15 text-sky-700 border-sky-500/25';
-  if (normalized === 'POWERUSER' || normalized === 'SUPPORT') return 'bg-amber-500/15 text-amber-800 border-amber-500/25';
+  if (normalized === 'POWERUSER' || normalized === 'SUPPORT')
+    return 'bg-amber-500/15 text-amber-800 border-amber-500/25';
   if (normalized === 'USER') return 'bg-emerald-500/15 text-emerald-700 border-emerald-500/25';
 
   return 'bg-slate-500/15 text-slate-700 border-slate-500/25';
 }
 
 function getPermissionTone(enabled: boolean) {
-  return enabled ? 'bg-emerald-500/15 text-emerald-700 border-emerald-500/25' : 'bg-rose-500/15 text-rose-700 border-rose-500/25';
+  return enabled
+    ? 'bg-emerald-500/15 text-emerald-700 border-emerald-500/25'
+    : 'bg-rose-500/15 text-rose-700 border-rose-500/25';
 }
 
 function pillClassName(tone: string) {
@@ -129,7 +135,7 @@ export function UserListView({ embedded = false }: UserListViewProps = {}) {
       ...user,
       RoleTone: getRoleTone(user.Role),
       PermissionTone: getPermissionTone(Boolean(user.__EntityControl?.Updatable)),
-      MessageCount: user.SAP__Messages?.length ?? 0,
+      MessageCount: 0,
     }));
   }, [users]);
 
@@ -168,7 +174,6 @@ export function UserListView({ embedded = false }: UserListViewProps = {}) {
 
             return (
               <div className="flex items-center justify-end gap-2">
-               
                 <Button
                   design="Negative"
                   icon="delete"
@@ -240,7 +245,9 @@ export function UserListView({ embedded = false }: UserListViewProps = {}) {
     <>
       <div className="flex flex-col gap-4">
         <FlexBox alignItems="Center" className="text-primary gap-2">
-          <Title level="H1" className="text-primary">Users</Title>
+          <Title level="H1" className="text-primary">
+            Users
+          </Title>
         </FlexBox>
 
         <Toolbar className="rounded-2xl border border-slate-200/80 bg-white/90 px-4 py-3 shadow-sm">
@@ -252,7 +259,10 @@ export function UserListView({ embedded = false }: UserListViewProps = {}) {
         <UserSearchHelpBar onFilterChange={setFilterString} />
       </div>
 
-      <div className="overflow-hidden rounded-2xl border border-slate-200/80 bg-white shadow-sm" style={{ height: embedded ? 'min(72dvh, 56rem)' : '680px' }}>
+      <div
+        className="overflow-hidden rounded-2xl border border-slate-200/80 bg-white shadow-sm"
+        style={{ height: embedded ? 'min(72dvh, 56rem)' : '680px' }}
+      >
         <div className="flex h-full flex-col">
           <div className="min-h-0 flex-1">
             <AnalyticalTable
@@ -274,7 +284,11 @@ export function UserListView({ embedded = false }: UserListViewProps = {}) {
             <Bar className="border-t border-slate-200/80 bg-white px-4 py-3">
               <div className="flex w-full flex-wrap items-center gap-3">
                 <div className="ml-auto flex items-center gap-2">
-                  <Button design="Transparent" onClick={() => setCurrentPage((page) => Math.max(1, page - 1))} disabled={currentPage === 1}>
+                  <Button
+                    design="Transparent"
+                    onClick={() => setCurrentPage((page) => Math.max(1, page - 1))}
+                    disabled={currentPage === 1}
+                  >
                     Previous
                   </Button>
                   <div className="min-w-24 text-center text-sm font-medium text-slate-700">
@@ -304,26 +318,36 @@ export function UserListView({ embedded = false }: UserListViewProps = {}) {
                 <div className="text-lg font-semibold text-slate-900">Update role</div>
                 <div className="mt-1 text-sm text-slate-500">User: {selectedUser.Uname}</div>
               </div>
-              <button className="text-sm text-slate-500" onClick={() => setRoleDialogOpen(false)} type="button">Close</button>
+              <button className="text-sm text-slate-500" onClick={() => setRoleDialogOpen(false)} type="button">
+                Close
+              </button>
             </div>
 
             <div className="mt-5 grid gap-4">
               <div>
                 <label className="mb-2 block text-sm font-medium text-slate-700">Role</label>
-                <Input value={roleDraft} onInput={(event) => setRoleDraft(event.target.value)} placeholder="Enter role" />
+                <Input
+                  value={roleDraft}
+                  onInput={(event) => setRoleDraft(event.target.value)}
+                  placeholder="Enter role"
+                />
               </div>
               <div>
                 <label className="mb-2 block text-sm font-medium text-slate-700">Quick select</label>
                 <Select value={roleDraft} onChange={(event) => setRoleDraft(event.detail.selectedOption?.value || '')}>
                   {ROLE_OPTIONS.map((role) => (
-                    <Option key={role} value={role}>{role}</Option>
+                    <Option key={role} value={role}>
+                      {role}
+                    </Option>
                   ))}
                 </Select>
               </div>
             </div>
 
             <div className="mt-6 flex flex-wrap justify-end gap-3">
-              <Button design="Transparent" onClick={() => setRoleDialogOpen(false)}>Cancel</Button>
+              <Button design="Transparent" onClick={() => setRoleDialogOpen(false)}>
+                Cancel
+              </Button>
               <Button
                 design="Emphasized"
                 disabled={!roleDraft.trim()}
@@ -353,10 +377,16 @@ export function UserListView({ embedded = false }: UserListViewProps = {}) {
         Are you sure you want to delete {selectedUser?.Uname || 'this user'}? This action cannot be undone.
       </MessageBox>
 
-      <Toast open={toastVisible} duration={2500} onClose={() => setToastVisible(false)}>{toastMessage}</Toast>
+      <Toast open={toastVisible} duration={2500} onClose={() => setToastVisible(false)}>
+        {toastMessage}
+      </Toast>
 
       {isLoading ? (
-        <FlexBox alignItems="Center" justifyContent="Center" style={{ position: 'absolute', inset: 0, pointerEvents: 'none' }}>
+        <FlexBox
+          alignItems="Center"
+          justifyContent="Center"
+          style={{ position: 'absolute', inset: 0, pointerEvents: 'none' }}
+        >
           <BusyIndicator delay={0} active size="L" />
         </FlexBox>
       ) : null}
@@ -368,7 +398,14 @@ export function UserListView({ embedded = false }: UserListViewProps = {}) {
   }
 
   return (
-    <DynamicPage style={{ height: '100dvh', overflow: 'hidden', position: 'relative', background: 'linear-gradient(180deg,rgba(242,247,251,0.98) 0%,rgba(231,240,248,0.98) 100%)' }}>
+    <DynamicPage
+      style={{
+        height: '100dvh',
+        overflow: 'hidden',
+        position: 'relative',
+        background: 'linear-gradient(180deg,rgba(242,247,251,0.98) 0%,rgba(231,240,248,0.98) 100%)',
+      }}
+    >
       <section className="mx-auto flex w-full max-w-[96rem] flex-col gap-4 p-4 h-full">{content}</section>
     </DynamicPage>
   );
