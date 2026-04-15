@@ -11,6 +11,7 @@ export const API = {
   auditEndpoint: (fileId: string) => `/Attachments(${fileId})/_Audit`,
   attachmentTitleEndpoint: (fileId: string) => `/Attachments(${fileId})/Title`,
   attachmentCurrentVersionEndpoint: (fileId: string) => `/Attachments(${fileId})/CurrentVersion`,
+  linkBoEndpoint: (fileId: string) => `/Attachments(FileId=${fileId})/_Links`,
 };
 
 export const MUTATION_API = {

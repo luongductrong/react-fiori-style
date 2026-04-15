@@ -1,3 +1,5 @@
+import type { BizObjectItem } from '@/features/business-objects/types';
+
 export type AttachmentListItem = {
   FileId: string;
   Title: string;
@@ -174,16 +176,13 @@ export type CreateAttachmentResponse = {
   EditLock: boolean;
 };
 
-type BizObject = {
-  BoId: string;
-  BoType: string;
-  BoTitle: string;
-};
-
 type AttachmentBizObject = {
   BoId: string;
   FileId: string;
-  _Bo: BizObject;
+  Erdat: string;
+  Erzet: string;
+  Ernam: string;
+  _Bo: BizObjectItem;
 };
 
 export type AttachmentBizObjectsResponse = {
@@ -193,8 +192,11 @@ export type AttachmentBizObjectsResponse = {
 
 export type AttachmentBizObjectsParams = {
   'sap-client': number;
-  $count: boolean;
-  $expand: string;
+  $count?: boolean;
+  $select?: string;
+  $skip?: number;
+  $top?: number;
+  $expand?: string;
 };
 
 export type GooglePickerDocument = {

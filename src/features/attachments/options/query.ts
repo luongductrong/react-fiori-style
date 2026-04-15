@@ -8,6 +8,7 @@ import type { AttachmentAuditsParams, AttachmentDetailParams } from '../types';
 import type { AttachmentTitleParams, AttachmentTitleResponse } from '../types';
 import type { AttachmentVersionsResponse, VersionDetailParams } from '../types';
 import type { AttachmentDetailResponse, AttachmentVersionsParams } from '../types';
+import type { AttachmentBizObjectsResponse, AttachmentBizObjectsParams } from '../types';
 import type { AttachmentCurrentVersion, AttachmentCurrentVersionParams } from '../types';
 
 export function attachmentsQueryOptions(params: AttachmentListParams) {
@@ -38,6 +39,7 @@ export function attachmentsQueryOptions(params: AttachmentListParams) {
     gcTime: 5 * 60 * 1000, // 5 minutes
     refetchOnWindowFocus: false,
     placeholderData: keepPreviousData,
+    // TODO: remove placeholderData in other infinite queries
   });
 }
 
@@ -54,7 +56,6 @@ export function attachmentDetailQueryOptions(id: string, params: AttachmentDetai
     staleTime: 2 * 60 * 1000, // 2 minutes
     gcTime: 2 * 60 * 1000, // 2 minutes
     refetchOnWindowFocus: false,
-    placeholderData: keepPreviousData,
   });
 }
 
@@ -89,7 +90,6 @@ export function attachmentVersionsQueryOptions(fileId: string, params: Attachmen
     staleTime: 2 * 60 * 1000, // 2 minutes
     gcTime: 5 * 60 * 1000, // 5 minutes
     refetchOnWindowFocus: false,
-    placeholderData: keepPreviousData,
   });
 }
 
@@ -124,7 +124,6 @@ export function attachmentAuditsQueryOptions(fileId: string, params: AttachmentA
     staleTime: 2 * 60 * 1000, // 2 minutes
     gcTime: 5 * 60 * 1000, // 5 minutes
     refetchOnWindowFocus: false,
-    placeholderData: keepPreviousData,
   });
 }
 
@@ -144,7 +143,6 @@ export function attachmentVersionDetailQueryOptions(fileId: string, versionNo: s
     staleTime: 2 * 60 * 1000, // 2 minutes
     gcTime: 1 * 60 * 1000, // 1 minutes
     refetchOnWindowFocus: false,
-    placeholderData: keepPreviousData,
   });
 }
 
@@ -164,7 +162,6 @@ export function attachmentTitleQueryOptions(id: string, params: AttachmentTitleP
     staleTime: 2 * 60 * 1000, // 2 minutes
     gcTime: 5 * 60 * 1000, // 5 minutes
     refetchOnWindowFocus: false,
-    placeholderData: keepPreviousData,
   });
 }
 
@@ -184,6 +181,40 @@ export function attachmentCurrentVersionQueryOptions(id: string, params: Attachm
     staleTime: 2 * 60 * 1000, // 2 minutes
     gcTime: 5 * 60 * 1000, // 5 minutes
     refetchOnWindowFocus: false,
-    placeholderData: keepPreviousData,
+  });
+}
+
+export function attachmentBOsQueryOptions(fileId: string, params: AttachmentBizObjectsParams) {
+  return infiniteQueryOptions({
+    queryKey: ['attachments', fileId, 'biz-objects', params],
+    initialPageParam: params.$skip ?? 0,
+    queryFn: ({ pageParam }) => {
+      const res = axiosInstance.get<AttachmentBizObjectsResponse>(
+        `${ODATA_SERVICE.ATTACHMENT}${API.linkBoEndpoint(fileId)}`,
+        {
+          params: {
+            ...params,
+            $skip: pageParam,
+            $top: params.$top,
+          },
+        },
+      );
+      return res;
+    },
+    getNextPageParam: (lastPage, allPages) => {
+      const totalCount = Number(lastPage['@odata.count'] ?? 0);
+      const fetchedCount = allPages.reduce((total, page) => total + page.value.length, 0);
+      const pageSize = params.$top ?? lastPage.value.length;
+
+      if (fetchedCount >= totalCount || lastPage.value.length < pageSize) {
+        return undefined;
+      }
+
+      return (params.$skip ?? 0) + fetchedCount;
+    },
+    enabled: !!fileId,
+    staleTime: 2 * 60 * 1000, // 2 minutes
+    gcTime: 5 * 60 * 1000, // 5 minutes
+    refetchOnWindowFocus: false,
   });
 }
