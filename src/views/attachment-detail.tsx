@@ -6,6 +6,7 @@ import '@ui5/webcomponents-icons/decline.js';
 import '@ui5/webcomponents-icons/refresh.js';
 import '@ui5/webcomponents-icons/attachment.js';
 import { getError } from '@/libs/error-message';
+import { useAuthStore } from '@/stores/auth-store';
 import { Icon } from '@ui5/webcomponents-react/Icon';
 import { Text } from '@ui5/webcomponents-react/Text';
 import { useParams, useNavigate } from 'react-router';
@@ -31,14 +32,16 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { ObjectPageSection } from '@ui5/webcomponents-react/ObjectPageSection';
 import { attachmentDetailQueryOptions } from '@/features/attachments/options/query';
 import { deleteAttachmentMutationOptions } from '@/features/attachments/options/mutation';
+import { restoreAttachmentMutationOptions } from '@/features/attachments/options/mutation';
 import { updateAttachmentTitleMutationOptions } from '@/features/attachments/options/mutation';
 import { AttachmentVersionList, AttachmentAudit, FilePreview } from '@/features/attachments/components';
 import { AttachmentForm, type AttachmentFormValues } from '@/features/attachments/components/attachment-form';
 
 export function AttachmentDetailView() {
   const { id } = useParams();
-  const queryClient = useQueryClient();
   const navigate = useNavigate();
+  const queryClient = useQueryClient();
+  const isAdmin = useAuthStore((state) => state.isAdmin);
   const [isEditMode, setIsEditMode] = React.useState(false);
   const [titleError, setTitleError] = React.useState('');
   const [deleteDialogOpen, setDeleteDialogOpen] = React.useState(false);
@@ -53,7 +56,6 @@ export function AttachmentDetailView() {
   } = useQuery(
     attachmentDetailQueryOptions(id!, {
       'sap-client': 324,
-      $select: API.detailSelect,
       $expand: API.detailExpand,
     }),
   );
@@ -81,6 +83,18 @@ export function AttachmentDetailView() {
           queryKey: ['attachments'],
         });
         navigate('/attachments');
+      },
+    }),
+  );
+
+  const { mutate: restoreAttachment, isPending: isRestoring } = useMutation(
+    restoreAttachmentMutationOptions({
+      fileId: id!,
+      onSuccess: () => {
+        toast('Attachment restored successfully');
+        queryClient.invalidateQueries({
+          queryKey: ['attachments'],
+        });
       },
     }),
   );
@@ -169,22 +183,23 @@ export function AttachmentDetailView() {
             actionsBar={
               !isEditMode ? (
                 <Toolbar design="Transparent" style={{ height: 'auto' }}>
-                  <ToolbarButton
-                    design="Emphasized"
-                    text="Edit"
-                    onClick={() => handleEditModeOn()}
-                    disabled={!attachment?.IsActive || !attachment?.__EntityControl?.Updatable}
-                  />
-                  {attachment && !attachment.IsActive && (
+                  {attachment && attachment.__EntityControl?.Updatable && attachment?.IsActive && (
+                    <ToolbarButton
+                      design="Emphasized"
+                      text="Edit"
+                      onClick={() => handleEditModeOn()}
+                      disabled={!attachment?.IsActive || !attachment?.__EntityControl?.Updatable}
+                    />
+                  )}
+                  {isAdmin && attachment && !attachment.IsActive && attachment.__OperationControl?.Reactivate && (
                     <ToolbarButton
                       design="Default"
                       text="Restore"
-                      onClick={() => alert('Restore clicked')}
-                      // TODO: Implement restore logic
-                      disabled={attachment?.IsActive}
+                      onClick={() => restoreAttachment()}
+                      disabled={attachment.IsActive || isRestoring}
                     />
                   )}
-                  {attachment && attachment.IsActive && (
+                  {attachment && attachment.IsActive && attachment.__EntityControl?.Deletable && (
                     <ToolbarButton
                       design="Default"
                       text="Delete"
@@ -386,7 +401,7 @@ export function AttachmentDetailView() {
       >
         Are you sure you want to delete this attachment? This action cannot be undone.
       </MessageBox>
-      {(isUpdating || isDeleting) && <BusyIndicator type="pending" />}
+      {(isUpdating || isDeleting || isRestoring) && <BusyIndicator type="pending" />}
     </div>
   );
 }

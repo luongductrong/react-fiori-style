@@ -33,7 +33,7 @@ export type AttachmentListParams = {
 
 export type AttachmentDetailParams = {
   'sap-client': number;
-  $select: string;
+  $select?: string;
   $expand?: string;
 };
 
@@ -52,6 +52,9 @@ export type AttachmentDetailResponse = {
   __EntityControl: {
     Deletable: boolean;
     Updatable: boolean;
+  };
+  __OperationControl: {
+    Reactivate: boolean;
   };
   _CurrentVersion?: {
     FileName: string;

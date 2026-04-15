@@ -88,6 +88,36 @@ export function deleteAttachmentMutationOptions({ fileId, onSuccess, onError }: 
   });
 }
 
+export function restoreAttachmentMutationOptions({ fileId, onSuccess, onError }: Params) {
+  return mutationOptions({
+    mutationFn: async () => {
+      let token = getCsrfToken();
+
+      if (!token) {
+        await fetchCsrfToken(ODATA_SERVICE.ATTACHMENT);
+        token = getCsrfToken();
+      }
+
+      const res = await axiosInstance.post<unknown>(
+        `${ODATA_SERVICE.ATTACHMENT}${MUTATION_API.restoreAttachment(fileId)}`,
+        undefined,
+        {
+          headers: {
+            'accept-language': 'en',
+            ...(token ? { 'x-csrf-token': token } : {}),
+          },
+        },
+      );
+      return res;
+    },
+    onSuccess,
+    onError: (error) => {
+      pushApiErrorMessages(error);
+      onError?.(error);
+    },
+  });
+}
+
 export function updateAttachmentTitleMutationOptions({ fileId, onSuccess, onError }: Params) {
   return mutationOptions({
     mutationFn: async (payload: UpdateAttachmentPayload) => {
