@@ -1,10 +1,12 @@
-import * as React from 'react';
 import { toast } from '@/libs/toast';
+import { useQuery } from '@tanstack/react-query';
 import { pushErrorMessages } from '@/libs/errors';
 import { useAuthStore } from '@/stores/auth-store';
 import { GOOGLE_APP_ID, GOOGLE_CLIENT_ID } from '@/app-env';
-import { googleDriveFileToUploadedFileData } from '../upload-file';
 import type { UploadedFileData, GooglePickerDocument } from '../types';
+import { configFilesQueryOptions } from '@/features/config-files/options/query';
+import { findMatchingUploadConfig, validateUploadFileData } from '../upload-config';
+import { getGoogleDriveUploadMetadata, googleDriveFileToUploadedFileData } from '../upload-file';
 import { DrivePicker, DrivePickerDocsView, type DrivePickerEventHandlers } from '@googleworkspace/drive-picker-react';
 
 interface GoogleDrivePickerProps {
@@ -16,6 +18,11 @@ interface GoogleDrivePickerProps {
 export function GoogleDrivePicker({ onPick, onPickCancel, onLoadingChange }: GoogleDrivePickerProps) {
   const googleAccessToken = useAuthStore((state) => state.googleAccessToken);
   const setGoogleAccessToken = useAuthStore((state) => state.setGoogleAccessToken);
+  const { data: configFilesData } = useQuery(
+    configFilesQueryOptions({
+      'sap-client': 324,
+    }),
+  );
 
   const handleOAuthError: DrivePickerEventHandlers['onOauthError'] = function (e) {
     const errorType = e.detail.type;
@@ -53,12 +60,36 @@ export function GoogleDrivePicker({ onPick, onPickCancel, onLoadingChange }: Goo
       return;
     }
 
+    if (!configFilesData?.value) {
+      pushErrorMessages(['Upload configuration is unavailable. Please try again.']);
+      onPickCancel();
+      return;
+    }
+
     try {
       onLoadingChange(true);
+      const uploadMetadata = getGoogleDriveUploadMetadata(selectedDocument);
+      const matchedConfig = findMatchingUploadConfig(uploadMetadata, configFilesData.value);
       const fileData = await googleDriveFileToUploadedFileData({
         accessToken: googleAccessToken,
         file: selectedDocument,
+        maxFileSize: matchedConfig?.MaxBytes,
       });
+      const validationMessage = validateUploadFileData(
+        {
+          fileName: fileData.FileName,
+          fileExtension: fileData.FileExtension,
+          mimeType: fileData.MimeType,
+          fileSize: fileData.FileSize,
+        },
+        configFilesData.value,
+      );
+
+      if (validationMessage) {
+        pushErrorMessages([validationMessage]);
+        onPickCancel();
+        return;
+      }
       onPick?.(fileData);
     } catch (error) {
       const message = error instanceof Error ? error.message : 'Cannot import file from Google Drive.';

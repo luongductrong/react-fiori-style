@@ -2,7 +2,10 @@ import * as React from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { DynamicPage } from '@ui5/webcomponents-react/DynamicPage';
 import { AnalyticalTable } from '@ui5/webcomponents-react/AnalyticalTable';
-import type { AnalyticalTableCellInstance, AnalyticalTableColumnDefinition } from '@ui5/webcomponents-react/AnalyticalTable';
+import type {
+  AnalyticalTableCellInstance,
+  AnalyticalTableColumnDefinition,
+} from '@ui5/webcomponents-react/AnalyticalTable';
 import { Bar } from '@ui5/webcomponents-react/Bar';
 import { Button } from '@ui5/webcomponents-react/Button';
 import { Dialog } from '@ui5/webcomponents-react/Dialog';
@@ -24,8 +27,12 @@ import '@ui5/webcomponents-icons/edit.js';
 import '@ui5/webcomponents-icons/document.js';
 import '@ui5/webcomponents-icons/home.js';
 import '@ui5/webcomponents-icons/refresh.js';
-import { createConfigFileMutationOptions, deleteConfigFileMutationOptions, updateConfigFileMutationOptions } from '@/features/config-files/options/mutation';
-import { getConfigFilesQueryOptions } from '@/features/config-files/options/query';
+import {
+  createConfigFileMutationOptions,
+  deleteConfigFileMutationOptions,
+  updateConfigFileMutationOptions,
+} from '@/features/config-files/options/mutation';
+import { configFilesQueryOptions } from '@/features/config-files/options/query';
 import type { ConfigFileItem, CreateConfigFilePayload, UpdateConfigFilePayload } from '@/features/config-files/types';
 import { getBackendErrorMessage } from '@/libs/error-message';
 
@@ -33,7 +40,7 @@ type ConfigFileFormState = {
   FileExt: string;
   MimeType: string;
   MaxBytes: string;
-  IsActive: string;
+  IsActive: string | boolean;
   Description: string;
 };
 
@@ -83,9 +90,7 @@ export function ConfigFileView({ embedded = false }: ConfigFileViewProps = {}) {
     [filterString],
   );
 
-  const { data, isLoading, isFetching, error, refetch } = useQuery(
-    getConfigFilesQueryOptions(configFileListParams),
-  );
+  const { data, isLoading, isFetching, error, refetch } = useQuery(configFilesQueryOptions(configFileListParams));
 
   const configFiles = React.useMemo(() => data?.value ?? [], [data]);
 
@@ -196,7 +201,7 @@ export function ConfigFileView({ embedded = false }: ConfigFileViewProps = {}) {
                 design="Negative"
                 icon="delete"
                 onClick={() => setDeleteTarget(item)}
-                disabled={!item.__EntityControl?.Deletable || isDeleting}
+                disabled={!item.__OperationControl?.disable || isDeleting}
               >
                 Delete
               </Button>
@@ -220,7 +225,13 @@ export function ConfigFileView({ embedded = false }: ConfigFileViewProps = {}) {
     const parsedMaxBytes = Number(form.MaxBytes);
     const trimmedDescription = form.Description.trim();
 
-    if (!trimmedFileExt || !trimmedMimeType || !trimmedDescription || !Number.isFinite(parsedMaxBytes) || parsedMaxBytes <= 0) {
+    if (
+      !trimmedFileExt ||
+      !trimmedMimeType ||
+      !trimmedDescription ||
+      !Number.isFinite(parsedMaxBytes) ||
+      parsedMaxBytes <= 0
+    ) {
       setToastMessage('Please fill all required fields with valid values.');
       setToastVisible(true);
       return;
@@ -251,7 +262,7 @@ export function ConfigFileView({ embedded = false }: ConfigFileViewProps = {}) {
         </FlexBox>
 
         <Toolbar className="rounded-2xl border border-slate-200/80 bg-white/90 px-4 py-3 shadow-sm">
-          <ToolbarButton design="Emphasized"  text="Create Config File" onClick={openCreateDialog} />
+          <ToolbarButton design="Emphasized" text="Create Config File" onClick={openCreateDialog} />
           <ToolbarSpacer />
           <ToolbarButton design="Transparent" icon="refresh" text="Refresh" onClick={() => refetch()} />
         </Toolbar>
@@ -288,7 +299,11 @@ export function ConfigFileView({ embedded = false }: ConfigFileViewProps = {}) {
           <Bar className="border-t border-slate-200/80 bg-white px-4 py-3">
             <div className="flex w-full flex-wrap items-center gap-3">
               <div className="ml-auto flex items-center gap-2">
-                <Button design="Transparent" onClick={() => setCurrentPage((page) => Math.max(1, page - 1))} disabled={currentPage === 1}>
+                <Button
+                  design="Transparent"
+                  onClick={() => setCurrentPage((page) => Math.max(1, page - 1))}
+                  disabled={currentPage === 1}
+                >
                   Previous
                 </Button>
                 <div className="min-w-24 text-center text-sm font-medium text-slate-700">
@@ -402,7 +417,12 @@ export function ConfigFileView({ embedded = false }: ConfigFileViewProps = {}) {
   );
 
   if (embedded) {
-    return <section className="flex min-h-0 flex-1 flex-col gap-4 p-4">{content}{dialogs}</section>;
+    return (
+      <section className="flex min-h-0 flex-1 flex-col gap-4 p-4">
+        {content}
+        {dialogs}
+      </section>
+    );
   }
 
   return (
@@ -414,7 +434,7 @@ export function ConfigFileView({ embedded = false }: ConfigFileViewProps = {}) {
         background: 'linear-gradient(180deg,rgba(242,247,251,0.98) 0%,rgba(231,240,248,0.98) 100%)',
       }}
     >
-      <section className="mx-auto flex w-full max-w-[96rem] flex-col gap-4 p-4 h-full">{content}</section>
+      <section className="mx-auto flex w-full max-w-384 flex-col gap-4 p-4 h-full">{content}</section>
       {dialogs}
     </DynamicPage>
   );

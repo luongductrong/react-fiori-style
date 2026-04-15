@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { cn } from '@/libs/utils';
-import { MAX_FILE_SIZE } from '@/app-constant';
 import type { UploadedFileData } from '../types';
+import { useQuery } from '@tanstack/react-query';
 import { pushErrorMessages } from '@/libs/errors';
 import { GoogleDriveIcon } from '@/components/icons';
 import '@ui5/webcomponents-icons/upload-to-cloud.js';
@@ -9,6 +9,9 @@ import { Icon } from '@ui5/webcomponents-react/Icon';
 import { fileToUploadedFileData } from '../upload-file';
 import { BusyIndicator } from '@/components/busy-indicator';
 import { Button, type ButtonPropTypes } from '@ui5/webcomponents-react/Button';
+import { configFilesQueryOptions } from '@/features/config-files/options/query';
+import { buildUploadAcceptValue, findMatchingUploadConfig } from '../upload-config';
+import { getAllowedUploadExtensions, validateUploadFileData } from '../upload-config';
 import { FileUploader, type FileUploaderPropTypes } from '@ui5/webcomponents-react/FileUploader';
 
 interface FilePickerProps {
@@ -20,6 +23,24 @@ interface FilePickerProps {
 
 export function FilePicker({ disabled, onPick, onGoogleBtnClick, className }: FilePickerProps) {
   const [loading, setLoading] = React.useState(false);
+  const { data: configFilesData } = useQuery(
+    configFilesQueryOptions({
+      'sap-client': 324,
+    }),
+  );
+  const acceptedFileTypes = React.useMemo(
+    () => buildUploadAcceptValue(configFilesData?.value),
+    [configFilesData?.value],
+  );
+  const allowedExtensions = React.useMemo(
+    () => getAllowedUploadExtensions(configFilesData?.value),
+    [configFilesData?.value],
+  );
+  const allowedTypesLabel = !configFilesData
+    ? 'Loading upload configuration...'
+    : allowedExtensions.length > 0
+      ? allowedExtensions.join(', ')
+      : 'No active upload configuration';
 
   const handleDriveBtnClick: ButtonPropTypes['onClick'] = function (e) {
     e.preventDefault();
@@ -33,9 +54,33 @@ export function FilePicker({ disabled, onPick, onGoogleBtnClick, className }: Fi
     const file: File | undefined = event.target?.files?.[0];
     if (!file) return;
 
+    const matchedConfig = findMatchingUploadConfig(
+      {
+        fileName: file.name,
+        mimeType: file.type,
+      },
+      configFilesData?.value,
+    );
+    const validationMessage = validateUploadFileData(
+      {
+        fileName: file.name,
+        mimeType: file.type,
+        fileSize: file.size,
+      },
+      configFilesData?.value,
+    );
+
+    if (validationMessage) {
+      pushErrorMessages([validationMessage]);
+      if (event.target) {
+        event.target.value = '';
+      }
+      return;
+    }
+
     try {
       setLoading(true);
-      const fileData = await fileToUploadedFileData(file, MAX_FILE_SIZE);
+      const fileData = await fileToUploadedFileData(file, matchedConfig?.MaxBytes);
       onPick(fileData);
     } catch (err) {
       console.error(err);
@@ -51,7 +96,13 @@ export function FilePicker({ disabled, onPick, onGoogleBtnClick, className }: Fi
 
   return (
     <div className={cn('w-full relative', className)}>
-      <FileUploader hideInput onChange={handleChange} className="w-full" disabled={disabled || loading}>
+      <FileUploader
+        accept={acceptedFileTypes || undefined}
+        hideInput
+        onChange={handleChange}
+        className="w-full"
+        disabled={disabled || loading}
+      >
         <div className="w-full min-h-[50dvh] rounded-xl border-2 border-dashed flex flex-col items-center justify-center cursor-pointer p-6">
           <div className="text-base text-center font-medium">
             <Icon className="size-10 text-primary" name="upload-to-cloud" />
@@ -68,9 +119,8 @@ export function FilePicker({ disabled, onPick, onGoogleBtnClick, className }: Fi
               <span className="text-sm">Google Drive</span>
             </Button>
           </div>
-          <p className="text-sm text-muted-foreground mt-2">Maximum size: {MAX_FILE_SIZE / 1024 / 1024}MB</p>
-          {/* TODO: Apply MaxSize Config */}
-          {/* TODO: Apply File Type Filter */}
+          <p className="text-sm text-muted-foreground mt-2">Size limits are applied from server configuration.</p>
+          <p className="text-sm text-muted-foreground mt-1">Allowed types: {allowedTypesLabel}</p>
         </div>
       </FileUploader>
       <BusyIndicator type="pending" show={loading} />

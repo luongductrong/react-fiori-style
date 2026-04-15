@@ -1,6 +1,6 @@
 import type { GoogleWorkspaceMimeType } from '@/types/common';
 import type { UploadedFileData, GooglePickerDocument } from './types';
-import { FALLBACK_EXTENSION, FALLBACK_MIME_TYPE, MAX_FILE_SIZE, GOOGLE_WORKSPACE_EXPORTS } from '@/app-constant';
+import { FALLBACK_EXTENSION, FALLBACK_MIME_TYPE, GOOGLE_WORKSPACE_EXPORTS } from '@/app-constant';
 
 type GoogleDriveImportOptions = {
   accessToken: string;
@@ -22,7 +22,11 @@ export function getFileExtension(fileName: string) {
   return fileName.slice(lastDot + 1);
 }
 
-function assertFileSize(fileSize: number, maxFileSize = MAX_FILE_SIZE) {
+function assertFileSize(fileSize: number, maxFileSize?: number) {
+  if (!Number.isFinite(maxFileSize) || typeof maxFileSize !== 'number' || maxFileSize <= 0) {
+    return;
+  }
+
   if (fileSize > maxFileSize) {
     throw new Error(`File exceeds ${maxFileSize / 1024 / 1024}MB, please select a smaller file.`);
   }
@@ -41,6 +45,24 @@ function ensureFileExtension(fileName: string, extension: string) {
 
 function isGoogleWorkspaceMimeType(mimeType: string): mimeType is GoogleWorkspaceMimeType {
   return mimeType in GOOGLE_WORKSPACE_EXPORTS;
+}
+
+export function getGoogleDriveUploadMetadata(file: Pick<GooglePickerDocument, 'mimeType' | 'name'>) {
+  if (isGoogleWorkspaceMimeType(file.mimeType)) {
+    const exportConfig = GOOGLE_WORKSPACE_EXPORTS[file.mimeType];
+
+    return {
+      fileName: ensureFileExtension(file.name, exportConfig.extension),
+      fileExtension: exportConfig.extension,
+      mimeType: exportConfig.exportMimeType,
+    };
+  }
+
+  return {
+    fileName: file.name,
+    fileExtension: getFileExtension(file.name),
+    mimeType: file.mimeType,
+  };
 }
 
 async function responseToError(response: Response, fallbackMessage: string) {
@@ -105,7 +127,7 @@ export async function blobToUploadedFileData({
   };
 }
 
-export async function fileToUploadedFileData(file: File, maxFileSize = MAX_FILE_SIZE) {
+export async function fileToUploadedFileData(file: File, maxFileSize?: number) {
   assertFileSize(file.size, maxFileSize);
 
   return blobToUploadedFileData({
@@ -118,7 +140,7 @@ export async function fileToUploadedFileData(file: File, maxFileSize = MAX_FILE_
 export async function googleDriveFileToUploadedFileData({
   accessToken,
   file,
-  maxFileSize = MAX_FILE_SIZE,
+  maxFileSize,
 }: GoogleDriveImportOptions) {
   if (!file?.id || !file?.name || !file?.mimeType) {
     throw new Error('Selected Google Drive file is missing required metadata.');

@@ -1,34 +1,22 @@
-import { keepPreviousData, queryOptions } from '@tanstack/react-query';
-import { ODATA_SERVICE } from '@/app-constant';
-import { axiosInstance } from '@/libs/axios-instance';
-import { fetchCsrfToken, getCsrfToken } from '@/libs/helpers';
 import { API } from '../constants';
+import { ODATA_SERVICE } from '@/app-constant';
+import { queryOptions } from '@tanstack/react-query';
+import { axiosInstance } from '@/libs/axios-instance';
 import type { ConfigFileListParams, ConfigFileListResponse } from '../types';
 
-export function getConfigFilesQueryOptions(params: ConfigFileListParams) {
+export function configFilesQueryOptions(params: ConfigFileListParams) {
   return queryOptions({
     queryKey: ['config-files', params],
-    queryFn: async () => {
-      let token = getCsrfToken();
-
-      if (!token) {
-        await fetchCsrfToken(ODATA_SERVICE.CONFIG_FILE);
-        token = getCsrfToken();
-      }
-
-      const res = await axiosInstance.get<ConfigFileListResponse>(`${ODATA_SERVICE.CONFIG_FILE}${API.endpoint}`, {
+    queryFn: () => {
+      const res = axiosInstance.get<ConfigFileListResponse>(`${ODATA_SERVICE.CONFIG_FILE}${API.endpoint}`, {
         params,
-        headers: {
-          ...(token ? { 'x-csrf-token': token } : {}),
-          'accept-language': 'en',
-        },
       });
-
       return res;
     },
-    staleTime: 2 * 60 * 1000,
-    gcTime: 5 * 60 * 1000,
+    staleTime: 2 * 60 * 1000, // 2 minutes
+    gcTime: 0, // 0 minutes
     refetchOnWindowFocus: false,
-    placeholderData: keepPreviousData,
   });
 }
+
+// TODO: Check if non-ADMIN can access

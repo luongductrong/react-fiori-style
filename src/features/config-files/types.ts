@@ -2,33 +2,32 @@ export type ConfigFileItem = {
   FileExt: string;
   MimeType: string;
   MaxBytes: number;
-  IsActive: string;
+  IsActive: string | boolean;
   Description: string;
+  Type: 'DOCUMENT' | 'IMAGE';
   __EntityControl: {
-    Deletable: boolean;
     Updatable: boolean;
   };
-  SAP__Messages: Array<{
-    code: string;
-    message: string;
-    target?: string;
-  }>;
+  __OperationControl: {
+    disable: boolean;
+    enable: boolean;
+  };
 };
 
 export type ConfigFileListResponse = {
-  '@odata.context': string;
-  '@odata.metadataEtag'?: string;
+  '@odata.count': number;
   value: ConfigFileItem[];
 };
 
 export type ConfigFileListParams = {
   'sap-client': number;
+  $count?: boolean;
 };
 
 export type CreateConfigFilePayload = {
   MimeType: string;
   MaxBytes: number;
-  IsActive: string;
+  IsActive: string | boolean;
   Description: string;
 };
 
@@ -40,9 +39,8 @@ export type CreateConfigFileVariables = {
 export type UpdateConfigFilePayload = {
   MimeType: string;
   MaxBytes: number;
-  IsActive: string;
+  IsActive: string | boolean;
   Description: string;
 };
 
 export type DeleteConfigFileResponse = unknown;
-
