@@ -225,3 +225,5 @@ export type LinkBoPayload = {
   BoId: string;
   FileId: string;
 };
+
+export type UnlinkBoPayload = LinkBoPayload;

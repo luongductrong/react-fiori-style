@@ -6,7 +6,7 @@ import { mutationOptions } from '@tanstack/react-query';
 import { fetchCsrfToken, getCsrfToken } from '@/libs/helpers';
 import type { RollbackVersionPayload, UploadVersionResponse } from '../types';
 import type { UploadVersionPayload, CreateAttachmentResponse } from '../types';
-import type { LinkBoPayload, CreateAttachmentPayload, UpdateAttachmentPayload } from '../types';
+import type { LinkBoPayload, UnlinkBoPayload, CreateAttachmentPayload, UpdateAttachmentPayload } from '../types';
 
 type Params = {
   fileId: string;
@@ -21,7 +21,12 @@ type CreateAttachmentParams = {
 
 type LinkBoMutationParams = {
   onSuccess?: () => void;
-  onError?: (_error: Error) => void;
+  onError?: (_error: unknown) => void;
+};
+
+type UnlinkBoMutationParams = {
+  onSuccess?: () => void;
+  onError?: (_error: unknown) => void;
 };
 
 export function rollbackVersionMutationOptions({ fileId, onSuccess, onError }: Params) {
@@ -187,6 +192,33 @@ export function linkBoToAttachmentMutationOptions({ onSuccess, onError }: LinkBo
       }
 
       const res = await axiosInstance.post(`${ODATA_SERVICE.ATTACHMENT}${MUTATION_API.linkBo()}`, payload, {
+        headers: {
+          'accept-language': 'en',
+          ...(token ? { 'x-csrf-token': token } : {}),
+        },
+      });
+      return res;
+    },
+    onSuccess,
+    onError: (error) => {
+      pushApiErrorMessages(error);
+      onError?.(error);
+    },
+  });
+}
+
+export function unlinkBoFromAttachmentMutationOptions({ onSuccess, onError }: UnlinkBoMutationParams) {
+  return mutationOptions({
+    mutationFn: async (params: UnlinkBoPayload) => {
+      const { FileId, BoId } = params;
+      let token = getCsrfToken();
+
+      if (!token) {
+        await fetchCsrfToken(ODATA_SERVICE.ATTACHMENT);
+        token = getCsrfToken();
+      }
+
+      const res = await axiosInstance.delete(`${ODATA_SERVICE.ATTACHMENT}${MUTATION_API.unlinkBo(BoId, FileId)}`, {
         headers: {
           'accept-language': 'en',
           ...(token ? { 'x-csrf-token': token } : {}),

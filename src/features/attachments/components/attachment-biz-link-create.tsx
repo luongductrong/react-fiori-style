@@ -71,6 +71,7 @@ function AttachmentBizLinkCreateImpl({ fileId, linkedBizObjectIds, disabled }: A
         setSelectedBizObject(null);
         setOpen(false);
         queryClient.invalidateQueries({ queryKey: ['attachments', fileId, 'detail'] });
+        queryClient.invalidateQueries({ queryKey: ['attachments', fileId, 'audit'] });
         queryClient.invalidateQueries({ queryKey: ['attachments', fileId, 'biz-objects'] });
       },
     }),

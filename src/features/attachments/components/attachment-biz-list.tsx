@@ -1,19 +1,29 @@
 import * as React from 'react';
+import { toast } from '@/libs/toast';
 import { Link } from 'react-router';
+import '@ui5/webcomponents-icons/delete.js';
 import { Bar } from '@ui5/webcomponents-react/Bar';
 import { pushApiErrorMessages } from '@/libs/errors';
 import { Title } from '@ui5/webcomponents-react/Title';
-import { useInfiniteQuery } from '@tanstack/react-query';
 import { Button } from '@ui5/webcomponents-react/Button';
 import { Toolbar } from '@ui5/webcomponents-react/Toolbar';
+import { MessageBox } from '@ui5/webcomponents-react/MessageBox';
 import { attachmentBOsQueryOptions } from '../options/query';
 import { Link as UI5Link } from '@ui5/webcomponents-react/Link';
 import { AttachmentBizLinkCreate } from './attachment-biz-link-create';
 import { ToolbarSpacer } from '@ui5/webcomponents-react/ToolbarSpacer';
+import { unlinkBoFromAttachmentMutationOptions } from '../options/mutation';
 import { displayBoStatus, displayBoType } from '@/features/business-objects/helpers';
+import { useInfiniteQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { AnalyticalTable, type AnalyticalTableCellInstance } from '@ui5/webcomponents-react/AnalyticalTable';
 
 export function AttachmentBizList({ fileId, isActive }: { fileId: string; isActive: boolean }) {
+  const queryClient = useQueryClient();
+  const [deleteDialogOpen, setDeleteDialogOpen] = React.useState(false);
+  const [bizObjectToDelete, setBizObjectToDelete] = React.useState<{
+    boId: string;
+    title?: string;
+  } | null>(null);
   const {
     data: bizObjectsData,
     isFetching,
@@ -29,6 +39,17 @@ export function AttachmentBizList({ fileId, isActive }: { fileId: string; isActi
       $top: 5,
       // TODO: Move to constants
       $expand: '_Bo',
+    }),
+  );
+
+  const { mutate: unlinkBoFromAttachment, isPending } = useMutation(
+    unlinkBoFromAttachmentMutationOptions({
+      onSuccess: () => {
+        toast('Business object unlinked successfully');
+        queryClient.invalidateQueries({ queryKey: ['attachments', fileId, 'detail'] });
+        queryClient.invalidateQueries({ queryKey: ['attachments', fileId, 'audit'] });
+        queryClient.invalidateQueries({ queryKey: ['attachments', fileId, 'biz-objects'] });
+      },
     }),
   );
 
@@ -75,8 +96,30 @@ export function AttachmentBizList({ fileId, isActive }: { fileId: string; isActi
         Header: 'Linked By',
         accessor: 'Ernam',
       },
+      {
+        Header: 'Actions',
+        id: 'actions',
+        Cell: (props: AnalyticalTableCellInstance) => (
+          <Button
+            design="Transparent"
+            icon="delete"
+            className="h-6.5"
+            onClick={(e) => {
+              e.stopPropagation();
+              setBizObjectToDelete({
+                boId: props.row.original.BoId,
+                title: props.row.original._Bo?.BoTitle,
+              });
+              setDeleteDialogOpen(true);
+            }}
+            disabled={isPending}
+          >
+            Delete
+          </Button>
+        ),
+      },
     ],
-    [],
+    [isPending],
   );
 
   return (
@@ -95,7 +138,7 @@ export function AttachmentBizList({ fileId, isActive }: { fileId: string; isActi
         }
         data={bizObjects}
         columns={columns}
-        loading={isFetching || isFetchingNextPage}
+        loading={isFetching || isFetchingNextPage || isPending}
         rowHeight={36}
         selectionMode="None"
         visibleRows={10}
@@ -110,6 +153,26 @@ export function AttachmentBizList({ fileId, isActive }: { fileId: string; isActi
           </Button>
         </Bar>
       )}
+      <MessageBox
+        open={deleteDialogOpen && !!bizObjectToDelete?.boId}
+        type="Confirm"
+        titleText="Delete Linked Business Object"
+        actions={['Cancel', 'OK']}
+        onClose={(action) => {
+          setDeleteDialogOpen(false);
+          if (action === 'OK' && bizObjectToDelete?.boId) {
+            unlinkBoFromAttachment({
+              FileId: fileId,
+              BoId: bizObjectToDelete.boId,
+            });
+          }
+          setBizObjectToDelete(null);
+        }}
+      >
+        {bizObjectToDelete
+          ? `Are you sure you want to unlink business object "${bizObjectToDelete.title || bizObjectToDelete.boId}"?`
+          : 'Are you sure you want to unlink this business object?'}
+      </MessageBox>
     </>
   );
 }
