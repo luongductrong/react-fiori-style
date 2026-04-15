@@ -333,6 +333,7 @@ export function AttachmentDetailView() {
             fileId={id!}
             isActive={attachment?.IsActive || false}
             currentVersionNo={attachment?.CurrentVersion || '0'}
+            currentExtension={attachment?._CurrentVersion?.FileExtension || ''}
           />
         </ObjectPageSection>
         <ObjectPageSection

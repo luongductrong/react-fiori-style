@@ -17,9 +17,15 @@ interface AttachmentVersionListProps {
   fileId: string;
   isActive: boolean;
   currentVersionNo: string;
+  currentExtension: string;
 }
 
-export function AttachmentVersionList({ fileId, isActive, currentVersionNo }: AttachmentVersionListProps) {
+export function AttachmentVersionList({
+  fileId,
+  isActive,
+  currentVersionNo,
+  currentExtension,
+}: AttachmentVersionListProps) {
   const {
     data: versionsData,
     isFetching,
@@ -87,7 +93,7 @@ export function AttachmentVersionList({ fileId, isActive, currentVersionNo }: At
             <Title level="H4">Versions {totalCount ? `(${totalCount})` : ''}</Title>
             <ToolbarSpacer />
             {/* ToolbarButton - FileUpload */}
-            <FileUpload fileId={fileId} disabled={!isActive} />
+            <FileUpload fileId={fileId} currentExtension={currentExtension} disabled={!isActive} />
           </Toolbar>
         }
         data={versions}

@@ -8,34 +8,39 @@ import '@ui5/webcomponents-icons/upload-to-cloud.js';
 import { Icon } from '@ui5/webcomponents-react/Icon';
 import { fileToUploadedFileData } from '../upload-file';
 import { BusyIndicator } from '@/components/busy-indicator';
+import type { ConfigFileItem } from '@/features/config-files/types';
 import { Button, type ButtonPropTypes } from '@ui5/webcomponents-react/Button';
 import { configFilesQueryOptions } from '@/features/config-files/options/query';
-import { buildUploadAcceptValue, findMatchingUploadConfig } from '../upload-config';
-import { getAllowedUploadExtensions, validateUploadFileData } from '../upload-config';
+import { type UploadConfigType, validateUploadFileData } from '../upload-config';
 import { FileUploader, type FileUploaderPropTypes } from '@ui5/webcomponents-react/FileUploader';
+import { buildUploadAcceptValue, findMatchingUploadConfig, getAllowedUploadExtensions } from '../upload-config';
 
 interface FilePickerProps {
   disabled: boolean;
   onGoogleBtnClick: () => void;
   onPick: (fileData: UploadedFileData) => void;
+  requiredType?: UploadConfigType;
   className?: string;
 }
 
-export function FilePicker({ disabled, onPick, onGoogleBtnClick, className }: FilePickerProps) {
+export function FilePicker({ disabled, onPick, onGoogleBtnClick, requiredType, className }: FilePickerProps) {
   const [loading, setLoading] = React.useState(false);
   const { data: configFilesData } = useQuery(
     configFilesQueryOptions({
       'sap-client': 324,
     }),
   );
-  const acceptedFileTypes = React.useMemo(
-    () => buildUploadAcceptValue(configFilesData?.value),
-    [configFilesData?.value],
-  );
-  const allowedExtensions = React.useMemo(
-    () => getAllowedUploadExtensions(configFilesData?.value),
-    [configFilesData?.value],
-  );
+  const filteredConfigFiles = React.useMemo<ConfigFileItem[] | undefined>(() => {
+    if (!configFilesData?.value) {
+      return undefined;
+    }
+
+    return requiredType
+      ? configFilesData.value.filter((config) => config.Type === requiredType)
+      : configFilesData.value;
+  }, [configFilesData?.value, requiredType]);
+  const acceptedFileTypes = React.useMemo(() => buildUploadAcceptValue(filteredConfigFiles), [filteredConfigFiles]);
+  const allowedExtensions = React.useMemo(() => getAllowedUploadExtensions(filteredConfigFiles), [filteredConfigFiles]);
   const allowedTypesLabel = !configFilesData
     ? 'Loading upload configuration...'
     : allowedExtensions.length > 0
@@ -59,7 +64,7 @@ export function FilePicker({ disabled, onPick, onGoogleBtnClick, className }: Fi
         fileName: file.name,
         mimeType: file.type,
       },
-      configFilesData?.value,
+      filteredConfigFiles,
     );
     const validationMessage = validateUploadFileData(
       {
@@ -67,7 +72,7 @@ export function FilePicker({ disabled, onPick, onGoogleBtnClick, className }: Fi
         mimeType: file.type,
         fileSize: file.size,
       },
-      configFilesData?.value,
+      filteredConfigFiles,
     );
 
     if (validationMessage) {

@@ -1,21 +1,24 @@
+import * as React from 'react';
 import { toast } from '@/libs/toast';
 import { useQuery } from '@tanstack/react-query';
 import { pushErrorMessages } from '@/libs/errors';
 import { useAuthStore } from '@/stores/auth-store';
 import { GOOGLE_APP_ID, GOOGLE_CLIENT_ID } from '@/app-env';
+import type { ConfigFileItem } from '@/features/config-files/types';
 import type { UploadedFileData, GooglePickerDocument } from '../types';
 import { configFilesQueryOptions } from '@/features/config-files/options/query';
-import { findMatchingUploadConfig, validateUploadFileData } from '../upload-config';
 import { getGoogleDriveUploadMetadata, googleDriveFileToUploadedFileData } from '../upload-file';
+import { findMatchingUploadConfig, type UploadConfigType, validateUploadFileData } from '../upload-config';
 import { DrivePicker, DrivePickerDocsView, type DrivePickerEventHandlers } from '@googleworkspace/drive-picker-react';
 
 interface GoogleDrivePickerProps {
   onLoadingChange: (loading: boolean) => void;
   onPick: (fileData: UploadedFileData) => void;
   onPickCancel: () => void;
+  requiredType?: UploadConfigType;
 }
 
-export function GoogleDrivePicker({ onPick, onPickCancel, onLoadingChange }: GoogleDrivePickerProps) {
+export function GoogleDrivePicker({ onPick, onPickCancel, onLoadingChange, requiredType }: GoogleDrivePickerProps) {
   const googleAccessToken = useAuthStore((state) => state.googleAccessToken);
   const setGoogleAccessToken = useAuthStore((state) => state.setGoogleAccessToken);
   const { data: configFilesData } = useQuery(
@@ -23,6 +26,15 @@ export function GoogleDrivePicker({ onPick, onPickCancel, onLoadingChange }: Goo
       'sap-client': 324,
     }),
   );
+  const filteredConfigFiles = React.useMemo<ConfigFileItem[] | undefined>(() => {
+    if (!configFilesData?.value) {
+      return undefined;
+    }
+
+    return requiredType
+      ? configFilesData.value.filter((config) => config.Type === requiredType)
+      : configFilesData.value;
+  }, [configFilesData?.value, requiredType]);
 
   const handleOAuthError: DrivePickerEventHandlers['onOauthError'] = function (e) {
     const errorType = e.detail.type;
@@ -60,7 +72,7 @@ export function GoogleDrivePicker({ onPick, onPickCancel, onLoadingChange }: Goo
       return;
     }
 
-    if (!configFilesData?.value) {
+    if (!filteredConfigFiles) {
       pushErrorMessages(['Upload configuration is unavailable. Please try again.']);
       onPickCancel();
       return;
@@ -69,7 +81,15 @@ export function GoogleDrivePicker({ onPick, onPickCancel, onLoadingChange }: Goo
     try {
       onLoadingChange(true);
       const uploadMetadata = getGoogleDriveUploadMetadata(selectedDocument);
-      const matchedConfig = findMatchingUploadConfig(uploadMetadata, configFilesData.value);
+      const preValidationMessage = validateUploadFileData(uploadMetadata, filteredConfigFiles);
+
+      if (preValidationMessage) {
+        pushErrorMessages([preValidationMessage]);
+        onPickCancel();
+        return;
+      }
+
+      const matchedConfig = findMatchingUploadConfig(uploadMetadata, filteredConfigFiles);
       const fileData = await googleDriveFileToUploadedFileData({
         accessToken: googleAccessToken,
         file: selectedDocument,
@@ -82,7 +102,7 @@ export function GoogleDrivePicker({ onPick, onPickCancel, onLoadingChange }: Goo
           mimeType: fileData.MimeType,
           fileSize: fileData.FileSize,
         },
-        configFilesData.value,
+        filteredConfigFiles,
       );
 
       if (validationMessage) {

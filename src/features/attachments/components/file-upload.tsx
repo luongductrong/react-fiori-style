@@ -17,12 +17,15 @@ import { GoogleDrivePicker } from './google-drive-picker';
 import { FlexBox } from '@ui5/webcomponents-react/FlexBox';
 import { BusyIndicator } from '@/components/busy-indicator';
 import { buildFileName, getEditableFileName } from '../helpers';
+import { resolveUploadTypeByExtension } from '../upload-config';
 import { uploadVersionMutationOptions } from '../options/mutation';
-import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { ToolbarButton } from '@ui5/webcomponents-react/ToolbarButton';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { configFilesQueryOptions } from '@/features/config-files/options/query';
 
 interface FileUploadProps {
   fileId: string;
+  currentExtension: string;
   disabled?: boolean;
 }
 
@@ -30,7 +33,7 @@ export function FileUpload(props: FileUploadProps) {
   return <FileUploadImpl key={props.fileId} {...props} />;
 }
 
-function FileUploadImpl({ fileId, disabled }: FileUploadProps) {
+function FileUploadImpl({ fileId, currentExtension, disabled }: FileUploadProps) {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const [driveLoading, setDriveLoading] = React.useState(false);
@@ -38,6 +41,15 @@ function FileUploadImpl({ fileId, disabled }: FileUploadProps) {
   const [fileData, setFileData] = React.useState<UploadedFileData | null>(null);
   const [fileNameDraft, setFileNameDraft] = React.useState('');
   const [fileNameError, setFileNameError] = React.useState('');
+  const { data: configFilesData } = useQuery(
+    configFilesQueryOptions({
+      'sap-client': 324,
+    }),
+  );
+  const requiredType = React.useMemo(
+    () => resolveUploadTypeByExtension(currentExtension, configFilesData?.value),
+    [configFilesData?.value, currentExtension],
+  );
 
   const { mutate: uploadVersion, isPending } = useMutation(
     uploadVersionMutationOptions({
@@ -167,6 +179,7 @@ function FileUploadImpl({ fileId, disabled }: FileUploadProps) {
         onLoadingChange={(loading) => {
           setDriveLoading(loading);
         }}
+        requiredType={requiredType}
         onPick={(nextFileData) => {
           setFileData(nextFileData);
           if (nextFileData) {
@@ -185,7 +198,7 @@ function FileUploadImpl({ fileId, disabled }: FileUploadProps) {
         design="Transparent"
         text="Upload"
         onClick={() => setOpen('local')}
-        disabled={disabled || !fileId}
+        disabled={disabled || !fileId || !currentExtension}
         className="h-8"
       />
       <Dialog
@@ -218,6 +231,7 @@ function FileUploadImpl({ fileId, disabled }: FileUploadProps) {
       >
         <FilePicker
           disabled={driveLoading}
+          requiredType={requiredType}
           onGoogleBtnClick={() => setOpen('drive')}
           onPick={(nextFileData) => {
             setFileData(nextFileData);

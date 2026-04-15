@@ -9,6 +9,8 @@ export type UploadValidationInput = {
   fileSize?: number;
 };
 
+export type UploadConfigType = ConfigFileItem['Type'];
+
 export type ActiveUploadConfig = {
   FileExt: string;
   MimeType: string;
@@ -29,6 +31,26 @@ function normalizeMimeType(value?: string) {
 
 function isActiveConfig(config: Pick<ConfigFileItem, 'IsActive'>) {
   return config.IsActive === true || config.IsActive === 'X';
+}
+
+function normalizeConfigType(value?: ConfigFileItem['Type']): UploadConfigType {
+  return value === 'IMAGE' ? 'IMAGE' : 'DOCUMENT';
+}
+
+export function resolveUploadTypeByExtension(
+  fileExtension?: string,
+  configFiles?: ConfigFileItem[],
+  fallbackType: UploadConfigType = 'DOCUMENT',
+) {
+  const normalizedExtension = normalizeExtension(fileExtension);
+
+  if (!normalizedExtension) {
+    return fallbackType;
+  }
+
+  const config = (configFiles ?? []).find((item) => normalizeExtension(item.FileExt) === normalizedExtension);
+
+  return config ? normalizeConfigType(config.Type) : fallbackType;
 }
 
 export function getActiveUploadConfigs(configFiles?: ConfigFileItem[]): ActiveUploadConfig[] {
@@ -66,10 +88,7 @@ export function findMatchingUploadConfig(input: UploadValidationInput, configFil
     return null;
   }
 
-  return (
-    getActiveUploadConfigs(configFiles).find((config) => config.FileExt === fileExtension && config.MimeType === mimeType) ??
-    null
-  );
+  return getActiveUploadConfigs(configFiles).find((config) => config.FileExt === fileExtension && config.MimeType === mimeType) ?? null;
 }
 
 export function validateUploadFileData(input: UploadValidationInput, configFiles?: ConfigFileItem[]) {
