@@ -64,11 +64,8 @@ export type AttachmentVersionItem = {
   VersionNo: string;
   FileName: string;
   Erdat: string;
+  Erzet: string;
   Ernam: string;
-  __EntityControl: {
-    Deletable: boolean;
-    Updatable: boolean;
-  };
 };
 
 export type AttachmentVersionsResponse = {
@@ -115,11 +112,9 @@ export type VersionDetail = {
   MimeType: string;
   FileSize: number;
   FileContent: string;
+  Erdat: string;
+  Erzet: string;
   Ernam: string;
-  __EntityControl: {
-    Deletable: boolean;
-    Updatable: boolean;
-  };
 };
 
 export type VersionDetailParams = {
@@ -219,3 +214,7 @@ export type GooglePickerDocument = {
 };
 
 export type LinkedAttachment = AttachmentListItem;
+
+export type AttachmentCurrentVersion = AttachmentTitleResponse;
+
+export type AttachmentCurrentVersionParams = AttachmentTitleParams;

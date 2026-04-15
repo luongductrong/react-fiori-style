@@ -4,11 +4,13 @@ export const API = {
   detailSelect:
     'Aedat,Aenam,Aezet,CurrentVersion,EditLock,Erdat,Ernam,Erzet,FileId,IsActive,Title,__EntityControl/Deletable,__EntityControl/Updatable',
   detailExpand: '_CurrentVersion($select=FileContent,FileId,FileName,FileExtension,MimeType,VersionNo)',
+  versionDetailSelect: 'Erdat,Ernam,Erzet,FileContent,FileExtension,FileId,FileName,FileSize,MimeType,VersionNo',
   versionsEndpoint: (fileId: string) => `/Attachments(${fileId})/_Versions`,
   versionDetailEndpoint: (fileId: string, versionNo: string) =>
     `/Attachments(${fileId})/_Versions(FileId=${fileId},VersionNo='${versionNo}')`,
   auditEndpoint: (fileId: string) => `/Attachments(${fileId})/_Audit`,
   attachmentTitleEndpoint: (fileId: string) => `/Attachments(${fileId})/Title`,
+  attachmentCurrentVersionEndpoint: (fileId: string) => `/Attachments(${fileId})/CurrentVersion`,
 };
 
 export const MUTATION_API = {

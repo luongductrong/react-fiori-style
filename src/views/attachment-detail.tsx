@@ -32,7 +32,7 @@ import { ObjectPageSection } from '@ui5/webcomponents-react/ObjectPageSection';
 import { attachmentDetailQueryOptions } from '@/features/attachments/options/query';
 import { deleteAttachmentMutationOptions } from '@/features/attachments/options/mutation';
 import { updateAttachmentTitleMutationOptions } from '@/features/attachments/options/mutation';
-import { AttachmentVersion, AttachmentAudit, FilePreview } from '@/features/attachments/components';
+import { AttachmentVersionList, AttachmentAudit, FilePreview } from '@/features/attachments/components';
 import { AttachmentForm, type AttachmentFormValues } from '@/features/attachments/components/attachment-form';
 
 export function AttachmentDetailView() {
@@ -194,7 +194,7 @@ export function AttachmentDetailView() {
                   )}
                   <ToolbarButton
                     design="Default"
-                    text="Download current version"
+                    text="Download"
                     onClick={() => {
                       if (!attachment?._CurrentVersion) return;
                       const success = downloadFile(
@@ -213,12 +213,15 @@ export function AttachmentDetailView() {
                     icon="refresh"
                     tooltip="Refresh"
                     onClick={() => refetchAttachment()}
+                    disabled={isFetching}
+                    // TODO: Disable all Refresh buttons when isFetching is true
                   />
                 </Toolbar>
               ) : undefined
             }
             header={<Title level="H2">{isFetching ? 'Loading...' : attachment?.Title || 'Unnamed Object'}</Title>}
             subHeader={isFetching ? 'Loading...' : attachment?.FileId || 'Unnamed Object'}
+            // TODO: Allow subHeader selection
             navigationBar={
               <Button
                 accessibleName="Close"
@@ -325,7 +328,11 @@ export function AttachmentDetailView() {
           titleText="Version History"
           style={{ display: isFetching ? 'none' : 'block' }}
         >
-          <AttachmentVersion fileId={id!} isActive={attachment?.IsActive || false} />
+          <AttachmentVersionList
+            fileId={id!}
+            isActive={attachment?.IsActive || false}
+            currentVersionNo={attachment?.CurrentVersion || '0'}
+          />
         </ObjectPageSection>
         <ObjectPageSection
           aria-label="Linked Objects"

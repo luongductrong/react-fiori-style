@@ -1,48 +1,25 @@
 import * as React from 'react';
-import '@ui5/webcomponents-icons/add.js';
+import { Link } from 'react-router';
 import { FileUpload } from './file-upload';
-import { useNavigate } from 'react-router';
 import { Bar } from '@ui5/webcomponents-react/Bar';
 import { pushApiErrorMessages } from '@/libs/errors';
-import { Icon } from '@ui5/webcomponents-react/Icon';
 import { Title } from '@ui5/webcomponents-react/Title';
 import { useInfiniteQuery } from '@tanstack/react-query';
 import { Button } from '@ui5/webcomponents-react/Button';
 import { Toolbar } from '@ui5/webcomponents-react/Toolbar';
 import '@ui5/webcomponents-icons/navigation-right-arrow.js';
+import { Link as UI5Link } from '@ui5/webcomponents-react/Link';
 import { attachmentVersionsQueryOptions } from '../options/query';
 import { ToolbarSpacer } from '@ui5/webcomponents-react/ToolbarSpacer';
-import { AnalyticalTable } from '@ui5/webcomponents-react/AnalyticalTable';
+import { AnalyticalTable, type AnalyticalTableCellInstance } from '@ui5/webcomponents-react/AnalyticalTable';
 
-const versionColumns = [
-  {
-    Header: 'Version',
-    accessor: 'VersionNo',
-  },
-  {
-    Header: 'File Name',
-    accessor: 'FileName',
-  },
-  {
-    Header: 'Created On',
-    accessor: 'Erdat',
-  },
-  {
-    Header: 'Created By',
-    accessor: 'Ernam',
-  },
-  {
-    Header: '',
-    id: 'nav',
-    width: 60,
-    disableSortBy: true,
-    disableGroupBy: true,
-    Cell: () => <Icon name="navigation-right-arrow" />,
-  },
-];
+interface AttachmentVersionListProps {
+  fileId: string;
+  isActive: boolean;
+  currentVersionNo: string;
+}
 
-export function AttachmentVersion({ fileId, isActive }: { fileId: string; isActive: boolean }) {
-  const navigate = useNavigate();
+export function AttachmentVersionList({ fileId, isActive, currentVersionNo }: AttachmentVersionListProps) {
   const {
     data: versionsData,
     isFetching,
@@ -54,7 +31,7 @@ export function AttachmentVersion({ fileId, isActive }: { fileId: string; isActi
     attachmentVersionsQueryOptions(fileId, {
       'sap-client': 324,
       $count: true,
-      $select: 'Erdat,Ernam,FileId,FileName,VersionNo,__EntityControl/Deletable,__EntityControl/Updatable',
+      $select: 'Erdat,Ernam,Erzet,FileId,FileName,VersionNo',
       $skip: 0,
       $top: 5,
     }),
@@ -69,6 +46,39 @@ export function AttachmentVersion({ fileId, isActive }: { fileId: string; isActi
     }
   }, [error]);
 
+  const columns = React.useMemo(
+    () => [
+      {
+        Header: 'Version',
+        accessor: 'VersionNo',
+        Cell: (props: AnalyticalTableCellInstance) => (
+          <Link to={`/attachments/${fileId}/versions/${props.value}`}>
+            <UI5Link>{`${props.value ?? 'N/A'}${props.value === currentVersionNo ? ' (Current)' : ''}`}</UI5Link>
+          </Link>
+        ),
+      },
+      {
+        Header: 'File Name',
+        accessor: 'FileName',
+        Cell: (props: AnalyticalTableCellInstance) => (
+          <Link to={`/attachments/${fileId}/versions/${props.row.original.VersionNo}`}>
+            <UI5Link>{props.value ?? 'N/A'}</UI5Link>
+          </Link>
+        ),
+      },
+      {
+        Header: 'Created At',
+        id: 'created-at',
+        Cell: (props: AnalyticalTableCellInstance) => `${props.row.original.Erdat} ${props.row.original.Erzet}`,
+      },
+      {
+        Header: 'Created By',
+        accessor: 'Ernam',
+      },
+    ],
+    [fileId, currentVersionNo],
+  );
+
   return (
     <>
       <AnalyticalTable
@@ -81,23 +91,18 @@ export function AttachmentVersion({ fileId, isActive }: { fileId: string; isActi
           </Toolbar>
         }
         data={versions}
-        columns={versionColumns}
+        columns={columns}
         loading={isFetching || isFetchingNextPage}
         rowHeight={36}
         selectionMode="None"
         visibleRows={10}
         sortable
-        onRowClick={(e) => {
-          const item = e.detail.row.original;
-          if (!item?.FileId) return;
-          navigate(`/attachments/${item.FileId}/versions/${item.VersionNo}`);
-        }}
         groupable
         scaleWidthMode="Smart"
       />
       {hasNextPage && (
         <Bar>
-          <Button onClick={() => fetchNextPage()} disabled={isFetchingNextPage}>
+          <Button onClick={() => fetchNextPage()} disabled={isFetchingNextPage} design="Transparent">
             More [{versions.length}/{totalCount}]
           </Button>
         </Bar>
@@ -105,5 +110,3 @@ export function AttachmentVersion({ fileId, isActive }: { fileId: string; isActi
     </>
   );
 }
-
-// TODO: Rename to AttachmentVersionList

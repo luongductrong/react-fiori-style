@@ -1,4 +1,5 @@
 import * as React from 'react';
+import { displayAuditAction } from '../helpers';
 import { Bar } from '@ui5/webcomponents-react/Bar';
 import { pushApiErrorMessages } from '@/libs/errors';
 import { Title } from '@ui5/webcomponents-react/Title';
@@ -7,28 +8,26 @@ import { useInfiniteQuery } from '@tanstack/react-query';
 import { Toolbar } from '@ui5/webcomponents-react/Toolbar';
 import { attachmentAuditsQueryOptions } from '../options/query';
 import { ToolbarSpacer } from '@ui5/webcomponents-react/ToolbarSpacer';
-import { AnalyticalTable } from '@ui5/webcomponents-react/AnalyticalTable';
+import { AnalyticalTable, type AnalyticalTableCellInstance } from '@ui5/webcomponents-react/AnalyticalTable';
 
-const auditColumns = [
+const columns = [
   {
     Header: 'Action',
     accessor: 'Action',
+    Cell: (props: AnalyticalTableCellInstance) => displayAuditAction(props.value),
   },
   {
     Header: 'Note',
     accessor: 'Note',
   },
   {
-    Header: 'Performed By',
-    accessor: 'Ernam',
-  },
-  {
-    Header: 'Performed On',
-    accessor: 'Erdat',
-  },
-  {
     Header: 'Performed At',
     accessor: 'Erzet',
+    Cell: (props: AnalyticalTableCellInstance) => `${props.row.original.Erdat} ${props.row.original.Erzet}`,
+  },
+  {
+    Header: 'Performed By',
+    accessor: 'Ernam',
   },
 ];
 
@@ -45,6 +44,7 @@ export function AttachmentAudit({ fileId }: { fileId: string }) {
       'sap-client': 324,
       $count: true,
       $select: 'Action,Erdat,Ernam,Erzet,FileId,Note,Uname',
+      // TODO: ask BE what is the different between Uname and Ernam
       $skip: 0,
       $top: 5,
     }),
@@ -69,7 +69,7 @@ export function AttachmentAudit({ fileId }: { fileId: string }) {
           </Toolbar>
         }
         data={audits}
-        columns={auditColumns}
+        columns={columns}
         loading={isFetching || isFetchingNextPage}
         rowHeight={36}
         selectionMode="None"
@@ -80,7 +80,7 @@ export function AttachmentAudit({ fileId }: { fileId: string }) {
       />
       {hasNextPage && (
         <Bar>
-          <Button onClick={() => fetchNextPage()} disabled={isFetchingNextPage}>
+          <Button onClick={() => fetchNextPage()} disabled={isFetchingNextPage} design="Transparent">
             More [{audits.length}/{totalCount}]
           </Button>
         </Bar>

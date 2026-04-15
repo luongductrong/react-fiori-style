@@ -8,6 +8,7 @@ import type { AttachmentAuditsParams, AttachmentDetailParams } from '../types';
 import type { AttachmentTitleParams, AttachmentTitleResponse } from '../types';
 import type { AttachmentVersionsResponse, VersionDetailParams } from '../types';
 import type { AttachmentDetailResponse, AttachmentVersionsParams } from '../types';
+import type { AttachmentCurrentVersion, AttachmentCurrentVersionParams } from '../types';
 
 export function attachmentsQueryOptions(params: AttachmentListParams) {
   return infiniteQueryOptions({
@@ -153,6 +154,26 @@ export function attachmentTitleQueryOptions(id: string, params: AttachmentTitleP
     queryFn: () => {
       const res = axiosInstance.get<AttachmentTitleResponse>(
         `${ODATA_SERVICE.ATTACHMENT}${API.attachmentTitleEndpoint(id)}`,
+        {
+          params,
+        },
+      );
+      return res;
+    },
+    enabled: !!id,
+    staleTime: 2 * 60 * 1000, // 2 minutes
+    gcTime: 5 * 60 * 1000, // 5 minutes
+    refetchOnWindowFocus: false,
+    placeholderData: keepPreviousData,
+  });
+}
+
+export function attachmentCurrentVersionQueryOptions(id: string, params: AttachmentCurrentVersionParams) {
+  return queryOptions({
+    queryKey: ['attachments', id, 'current-version', params],
+    queryFn: () => {
+      const res = axiosInstance.get<AttachmentCurrentVersion>(
+        `${ODATA_SERVICE.ATTACHMENT}${API.attachmentCurrentVersionEndpoint(id)}`,
         {
           params,
         },

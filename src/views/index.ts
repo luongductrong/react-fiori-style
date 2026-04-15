@@ -1,10 +1,10 @@
 export { BoListView } from './bo-list';
 export { ShellHomeView } from './shell-home-view';
 export { AdminHomeView } from './admin-home-view';
-export { VersionDetailView } from './version-detail-view';
 export { BoDetailView } from './bo-detail';
 export { UserListView } from './user-list';
 export { UserCreateView } from './user-create';
 export { ConfigFileView } from './config-file-view';
+export { VersionDetailView } from './version-detail';
 export { AttachmentListView } from './attachment-list';
 export { AttachmentDetailView } from './attachment-detail';

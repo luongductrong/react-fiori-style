@@ -47,6 +47,7 @@ const rawColumns = [
   },
   {
     Header: 'Linked At',
+    id: 'linked-at',
     Cell: (props: AnalyticalTableCellInstance) => `${props.row.original.Erdat} ${props.row.original.Erzet}`,
   },
   {
