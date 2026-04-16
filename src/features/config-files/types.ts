@@ -24,6 +24,17 @@ export type ConfigFileListParams = {
   $count?: boolean;
 };
 
+export type CreateConfigFilePayload = {
+  FileExt: string;
+  MimeType: string;
+  MaxBytes: number;
+  IsActive: 'X';
+  Description: string;
+  Type: ConfigFileItem['Type'];
+};
+
+export type CreateConfigFileResponse = ConfigFileItem;
+
 export type EnableConfigFileParams = {
   FileExt: string;
 };

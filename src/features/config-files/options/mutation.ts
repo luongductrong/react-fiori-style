@@ -5,7 +5,13 @@ import { axiosInstance } from '@/libs/axios-instance';
 import { mutationOptions } from '@tanstack/react-query';
 import { fetchCsrfToken, getCsrfToken } from '@/libs/helpers';
 import type { EnableConfigFileParams, EnableConfigFileResponse } from '../types';
+import type { CreateConfigFilePayload, CreateConfigFileResponse } from '../types';
 import type { DisableConfigFileParams, DisableConfigFileResponse } from '../types';
+
+type CreateConfigFileMutationParams = {
+  onSuccess?: (data: CreateConfigFileResponse) => void;
+  onError?: (error: unknown) => void;
+};
 
 type EnableConfigFileMutationParams = {
   onSuccess?: (data: EnableConfigFileResponse) => void;
@@ -16,6 +22,37 @@ type DisableConfigFileMutationParams = {
   onSuccess?: (data: DisableConfigFileResponse) => void;
   onError?: (error: unknown) => void;
 };
+
+export function createConfigFileMutationOptions({ onSuccess, onError }: CreateConfigFileMutationParams) {
+  return mutationOptions({
+    mutationFn: async (payload: CreateConfigFilePayload) => {
+      let token = getCsrfToken();
+
+      if (!token) {
+        await fetchCsrfToken(ODATA_SERVICE.CONFIG_FILE);
+        token = getCsrfToken();
+      }
+
+      const res = await axiosInstance.post<CreateConfigFileResponse>(
+        `${ODATA_SERVICE.CONFIG_FILE}${MUTATION_API.create}`,
+        payload,
+        {
+          headers: {
+            'accept-language': 'en',
+            ...(token ? { 'x-csrf-token': token } : {}),
+          },
+        },
+      );
+
+      return res;
+    },
+    onSuccess,
+    onError: (error) => {
+      pushApiErrorMessages(error);
+      onError?.(error);
+    },
+  });
+}
 
 export function enableConfigFileMutationOptions({ onSuccess, onError }: EnableConfigFileMutationParams) {
   return mutationOptions({

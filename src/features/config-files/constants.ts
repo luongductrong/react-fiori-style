@@ -3,6 +3,7 @@ export const API = {
 };
 
 export const MUTATION_API = {
+  create: '/AttCfg?sap-client=324',
   enable: (fileExt: string) =>
     `/AttCfg(FileExt='${fileExt}')/com.sap.gateway.srvd.zui_att_cfg.v0001.enable?sap-client=324`,
   disable: (fileExt: string) =>

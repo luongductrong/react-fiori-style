@@ -15,11 +15,11 @@ import { DynamicPage } from '@ui5/webcomponents-react/DynamicPage';
 import { ToolbarSpacer } from '@ui5/webcomponents-react/ToolbarSpacer';
 import { ToolbarButton } from '@ui5/webcomponents-react/ToolbarButton';
 import { AnalyticalTable } from '@ui5/webcomponents-react/AnalyticalTable';
-import { ConfigFilesFilterBar } from '@/features/config-files/components';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { DynamicPageHeader } from '@ui5/webcomponents-react/DynamicPageHeader';
 import { configFilesQueryOptions } from '@/features/config-files/options/query';
 import { enableConfigFileMutationOptions } from '@/features/config-files/options/mutation';
+import { ConfigFileCreate, ConfigFilesFilterBar } from '@/features/config-files/components';
 import type { AnalyticalTableCellInstance } from '@ui5/webcomponents-react/AnalyticalTable';
 import { disableConfigFileMutationOptions } from '@/features/config-files/options/mutation';
 
@@ -166,6 +166,7 @@ export function ConfigFileListView() {
           <Toolbar className="py-2 px-4 rounded-t-xl">
             <Title level="H2">Configuration Files {totalCount ? `(${totalCount})` : ''}</Title>
             <ToolbarSpacer />
+            <ConfigFileCreate />
             <ToolbarButton
               design="Transparent"
               icon="refresh"
