@@ -6,7 +6,7 @@ import '@ui5/webcomponents-icons/person-placeholder.js';
 import '@ui5/webcomponents-icons/document.js';
 import '@ui5/webcomponents-icons/log.js';
 import { UserListView } from './user-list';
-import { ConfigFileView } from './config-file-view';
+import { ConfigFileListView } from './config-file-list';
 
 export function AdminHomeView() {
   const navigate = useNavigate();
@@ -27,7 +27,7 @@ export function AdminHomeView() {
               <UserListView />
             </Tab>
             <Tab icon="document" text="Configuration Files">
-              <ConfigFileView embedded />
+              <ConfigFileListView />
             </Tab>
           </TabContainer>
         </div>

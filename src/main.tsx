@@ -9,8 +9,8 @@ import { ErrorsMessageBox } from '@/components/errors-message-box';
 import { QueryProvider } from '@/context-providers/query-provider';
 import { HashRouter, Navigate, Route, Routes } from 'react-router';
 import { ThemeProvider } from '@ui5/webcomponents-react/ThemeProvider';
-import { AttachmentListView, AttachmentDetailView, VersionDetailView } from '@/views';
 import { BoDetailView, BoListView, UserListView, ShellHomeView, AdminHomeView } from '@/views';
+import { AttachmentListView, AttachmentDetailView, VersionDetailView, ConfigFileListView } from '@/views';
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
@@ -29,8 +29,7 @@ createRoot(document.getElementById('root')!).render(
             <Route path="/business-objects/:id" element={<BoDetailView />} />
             {/*  */}
             <Route path="/users" element={<UserListView />} />
-            <Route path="/configuration-files" element={<Navigate replace to="/admin" />} />
-            <Route path="/config-files" element={<Navigate replace to="/admin" />} />
+            <Route path="/configurations" element={<ConfigFileListView />} />
             {/* Attachments */}
             <Route path="/attachments" element={<AttachmentListView />} />
             <Route path="/attachments/:id" element={<AttachmentDetailView />} />

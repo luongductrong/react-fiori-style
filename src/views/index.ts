@@ -3,7 +3,7 @@ export { ShellHomeView } from './shell-home-view';
 export { AdminHomeView } from './admin-home-view';
 export { BoDetailView } from './bo-detail';
 export { UserListView } from './user-list';
-export { ConfigFileView } from './config-file-view';
 export { VersionDetailView } from './version-detail';
 export { AttachmentListView } from './attachment-list';
+export { ConfigFileListView } from './config-file-list';
 export { AttachmentDetailView } from './attachment-detail';

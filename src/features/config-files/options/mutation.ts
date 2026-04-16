@@ -1,59 +1,35 @@
-import { mutationOptions } from '@tanstack/react-query';
+import { MUTATION_API } from '../constants';
 import { ODATA_SERVICE } from '@/app-constant';
+import { pushApiErrorMessages } from '@/libs/errors';
 import { axiosInstance } from '@/libs/axios-instance';
+import { mutationOptions } from '@tanstack/react-query';
 import { fetchCsrfToken, getCsrfToken } from '@/libs/helpers';
-import { API } from '../constants';
-import type {
-  ConfigFileItem,
-  CreateConfigFileVariables,
-  CreateConfigFilePayload,
-  DeleteConfigFileResponse,
-  UpdateConfigFilePayload,
-} from '../types';
+import type { EnableConfigFileParams, EnableConfigFileResponse } from '../types';
+import type { DisableConfigFileParams, DisableConfigFileResponse } from '../types';
 
-type CreateConfigFileMutationParams = {
-  onSuccess?: (data: ConfigFileItem) => void;
-  onError?: (error: Error) => void;
+type EnableConfigFileMutationParams = {
+  onSuccess?: (data: EnableConfigFileResponse) => void;
+  onError?: (error: unknown) => void;
 };
 
-type UpdateConfigFileMutationParams = {
-  fileExt: string;
-  onSuccess?: (data: ConfigFileItem) => void;
-  onError?: (error: Error) => void;
+type DisableConfigFileMutationParams = {
+  onSuccess?: (data: DisableConfigFileResponse) => void;
+  onError?: (error: unknown) => void;
 };
 
-type DeleteConfigFileMutationParams = {
-  onSuccess?: (data: DeleteConfigFileResponse) => void;
-  onError?: (error: Error) => void;
-};
-
-function escapeODataString(value: string) {
-  return value.replace(/'/g, "''");
-}
-
-async function ensureCsrfToken() {
-  let token = getCsrfToken();
-
-  if (!token) {
-    await fetchCsrfToken(ODATA_SERVICE.CONFIG_FILE);
-    token = getCsrfToken();
-  }
-
-  return token;
-}
-
-export function createConfigFileMutationOptions({ onSuccess, onError }: CreateConfigFileMutationParams) {
+export function enableConfigFileMutationOptions({ onSuccess, onError }: EnableConfigFileMutationParams) {
   return mutationOptions({
-    mutationFn: async (variables: CreateConfigFileVariables) => {
-      const { fileExt, payload } = variables;
-      const token = await ensureCsrfToken();
+    mutationFn: async (params: EnableConfigFileParams) => {
+      let token = getCsrfToken();
 
-      const res = await axiosInstance.post<ConfigFileItem, CreateConfigFilePayload & { FileExt: string }>(
-        `${ODATA_SERVICE.CONFIG_FILE}${API.endpoint}?sap-client=324`,
-        {
-          FileExt: fileExt,
-          ...payload,
-        },
+      if (!token) {
+        await fetchCsrfToken(ODATA_SERVICE.CONFIG_FILE);
+        token = getCsrfToken();
+      }
+
+      const res = await axiosInstance.post<EnableConfigFileResponse>(
+        `${ODATA_SERVICE.CONFIG_FILE}${MUTATION_API.enable(params.FileExt)}`,
+        undefined,
         {
           headers: {
             'accept-language': 'en',
@@ -65,18 +41,26 @@ export function createConfigFileMutationOptions({ onSuccess, onError }: CreateCo
       return res;
     },
     onSuccess,
-    onError,
+    onError: (error) => {
+      pushApiErrorMessages(error);
+      onError?.(error);
+    },
   });
 }
 
-export function updateConfigFileMutationOptions({ fileExt, onSuccess, onError }: UpdateConfigFileMutationParams) {
+export function disableConfigFileMutationOptions({ onSuccess, onError }: DisableConfigFileMutationParams) {
   return mutationOptions({
-    mutationFn: async (payload: UpdateConfigFilePayload) => {
-      const token = await ensureCsrfToken();
+    mutationFn: async (params: DisableConfigFileParams) => {
+      let token = getCsrfToken();
 
-      const res = await axiosInstance.patch<ConfigFileItem, UpdateConfigFilePayload>(
-        `${ODATA_SERVICE.CONFIG_FILE}${API.endpoint}(FileExt='${escapeODataString(fileExt)}')?sap-client=324`,
-        payload,
+      if (!token) {
+        await fetchCsrfToken(ODATA_SERVICE.CONFIG_FILE);
+        token = getCsrfToken();
+      }
+
+      const res = await axiosInstance.post<DisableConfigFileResponse>(
+        `${ODATA_SERVICE.CONFIG_FILE}${MUTATION_API.disable(params.FileExt)}`,
+        undefined,
         {
           headers: {
             'accept-language': 'en',
@@ -88,28 +72,9 @@ export function updateConfigFileMutationOptions({ fileExt, onSuccess, onError }:
       return res;
     },
     onSuccess,
-    onError,
-  });
-}
-
-export function deleteConfigFileMutationOptions({ onSuccess, onError }: DeleteConfigFileMutationParams) {
-  return mutationOptions({
-    mutationFn: async (targetFileExt: string) => {
-      const token = await ensureCsrfToken();
-
-      const res = await axiosInstance.delete<DeleteConfigFileResponse>(
-        `${ODATA_SERVICE.CONFIG_FILE}${API.endpoint}(FileExt='${escapeODataString(targetFileExt)}')?sap-client=324`,
-        {
-          headers: {
-            'accept-language': 'en',
-            ...(token ? { 'x-csrf-token': token } : {}),
-          },
-        },
-      );
-
-      return res;
+    onError: (error) => {
+      pushApiErrorMessages(error);
+      onError?.(error);
     },
-    onSuccess,
-    onError,
   });
 }

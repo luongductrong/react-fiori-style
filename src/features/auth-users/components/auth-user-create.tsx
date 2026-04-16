@@ -13,7 +13,7 @@ import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { createAuthUserMutationOptions } from '../options/mutation';
 import { ToolbarButton } from '@ui5/webcomponents-react/ToolbarButton';
 
-export function AuthUserCreate() {
+export function AuthUserCreate({ onCreated }: { onCreated: () => void }) {
   const queryClient = useQueryClient();
   const [open, setOpen] = React.useState(false);
   const [values, setValues] = React.useState({ Uname: '' });
@@ -23,6 +23,7 @@ export function AuthUserCreate() {
       onSuccess: () => {
         toast('User created successfully');
         queryClient.invalidateQueries({ queryKey: ['auth-users'] });
+        onCreated();
         setOpen(false);
         setValues({ Uname: '' });
       },

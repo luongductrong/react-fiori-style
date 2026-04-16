@@ -58,6 +58,8 @@ export function UserListView() {
     deleteAuthUserMutationOptions({
       onSuccess: () => {
         queryClient.invalidateQueries({ queryKey: ['auth-users'] });
+        setFilter('');
+        setSearch('');
         toast('User deleted successfully');
         setDeleteDialogOpen(false);
         setSelectedUser(null);
@@ -135,7 +137,12 @@ export function UserListView() {
           <Toolbar className="py-2 px-4 rounded-t-xl">
             <Title level="H2">Users {totalCount ? `(${totalCount})` : ''}</Title>
             <ToolbarSpacer />
-            <AuthUserCreate />
+            <AuthUserCreate
+              onCreated={() => {
+                setFilter('');
+                setSearch('');
+              }}
+            />
             <ToolbarButton
               design="Transparent"
               icon="refresh"

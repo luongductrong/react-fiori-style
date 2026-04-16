@@ -24,23 +24,14 @@ export type ConfigFileListParams = {
   $count?: boolean;
 };
 
-export type CreateConfigFilePayload = {
-  MimeType: string;
-  MaxBytes: number;
-  IsActive: string | boolean;
-  Description: string;
+export type EnableConfigFileParams = {
+  FileExt: string;
 };
 
-export type CreateConfigFileVariables = {
-  fileExt: string;
-  payload: CreateConfigFilePayload;
+export type EnableConfigFileResponse = unknown;
+
+export type DisableConfigFileParams = {
+  FileExt: string;
 };
 
-export type UpdateConfigFilePayload = {
-  MimeType: string;
-  MaxBytes: number;
-  IsActive: string | boolean;
-  Description: string;
-};
-
-export type DeleteConfigFileResponse = unknown;
+export type DisableConfigFileResponse = unknown;
