@@ -1,4 +1,4 @@
-import { formatFileSize } from './helpers';
+import { formatFileSize } from '@/libs/utils';
 import { getFileExtension } from './upload-file';
 import type { ConfigFileItem } from '@/features/config-files/types';
 
@@ -88,7 +88,11 @@ export function findMatchingUploadConfig(input: UploadValidationInput, configFil
     return null;
   }
 
-  return getActiveUploadConfigs(configFiles).find((config) => config.FileExt === fileExtension && config.MimeType === mimeType) ?? null;
+  return (
+    getActiveUploadConfigs(configFiles).find(
+      (config) => config.FileExt === fileExtension && config.MimeType === mimeType,
+    ) ?? null
+  );
 }
 
 export function validateUploadFileData(input: UploadValidationInput, configFiles?: ConfigFileItem[]) {
@@ -113,7 +117,9 @@ export function validateUploadFileData(input: UploadValidationInput, configFiles
     return 'Selected file does not have a valid MIME type.';
   }
 
-  const matchedConfig = activeConfigs.find((config) => config.FileExt === fileExtension && config.MimeType === mimeType);
+  const matchedConfig = activeConfigs.find(
+    (config) => config.FileExt === fileExtension && config.MimeType === mimeType,
+  );
 
   if (!matchedConfig) {
     const hasActiveExtension = activeConfigs.some((config) => config.FileExt === fileExtension);

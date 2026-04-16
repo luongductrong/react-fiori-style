@@ -114,23 +114,6 @@ export function downloadFile(base64?: string, fileName?: string, mimeType?: stri
   return true;
 }
 
-export function formatFileSize(bytes: number | string | undefined, decimals = 2) {
-  const numBytes = typeof bytes === 'string' ? Number(bytes) : bytes;
-  if (!numBytes || isNaN(numBytes)) return '0 Bytes';
-
-  const k = 1024;
-
-  if (numBytes < k) {
-    return numBytes + ' Bytes';
-  }
-
-  if (numBytes < k * k) {
-    return (numBytes / k).toFixed(decimals) + ' KB';
-  }
-
-  return (numBytes / (k * k)).toFixed(decimals) + ' MB';
-}
-
 // TODO: Separate the above section into a separate file.
 
 // Returns the editable file name by removing the extension suffix (if present).

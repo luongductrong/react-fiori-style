@@ -25,22 +25,34 @@ export type ConfigFileListParams = {
 };
 
 export type CreateConfigFilePayload = {
+  FileExt: string;
   MimeType: string;
   MaxBytes: number;
-  IsActive: string | boolean;
+  IsActive: 'X';
   Description: string;
+  Type: ConfigFileItem['Type'];
 };
 
-export type CreateConfigFileVariables = {
-  fileExt: string;
-  payload: CreateConfigFilePayload;
-};
+export type CreateConfigFileResponse = ConfigFileItem;
 
 export type UpdateConfigFilePayload = {
   MimeType: string;
   MaxBytes: number;
-  IsActive: string | boolean;
   Description: string;
+  Type: ConfigFileItem['Type'];
+  IsActive: 'X';
 };
 
-export type DeleteConfigFileResponse = unknown;
+export type UpdateConfigFileResponse = unknown;
+
+export type EnableConfigFileParams = {
+  FileExt: string;
+};
+
+export type EnableConfigFileResponse = unknown;
+
+export type DisableConfigFileParams = {
+  FileExt: string;
+};
+
+export type DisableConfigFileResponse = unknown;

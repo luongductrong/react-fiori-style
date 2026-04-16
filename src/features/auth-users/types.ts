@@ -1,8 +1,10 @@
-export type CurrentUser = {
-  value: {
-    Uname: string;
-    Role: string;
-  }[];
+export type CurrentAuthUserItem = {
+  Uname: string;
+  Role: string;
+};
+
+export type CurrentAuthUserResponse = {
+  value: CurrentAuthUserItem[];
 };
 
 export type AuthUserItem = {
@@ -16,32 +18,29 @@ export type AuthUserItem = {
   };
 };
 
-export type AuthUserListResponse = {
-  '@odata.count'?: string;
+export type AuthUsersResponse = {
+  '@odata.count'?: number | string;
   value: AuthUserItem[];
 };
 
-export type AuthUserListParams = {
+export type AuthUsersQueryParams = {
   'sap-client': number;
   $count?: boolean;
   $select?: string;
-  $skip?: number;
-  $top?: number;
   $filter?: string;
+  $search?: string;
   $orderby?: string;
 };
 
 export type CreateAuthUserPayload = {
   Uname: string;
-  Role: string;
+  Role: 'ADMIN';
 };
 
 export type CreateAuthUserResponse = AuthUserItem;
 
-export type UpdateAuthUserPayload = {
-  Role: string;
+export type DeleteAuthUserParams = {
+  Uname: string;
 };
-
-export type UpdateAuthUserResponse = AuthUserItem;
 
 export type DeleteAuthUserResponse = unknown;

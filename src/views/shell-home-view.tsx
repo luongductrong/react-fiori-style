@@ -2,6 +2,7 @@ import '@ui5/webcomponents-icons/log.js';
 import { ODATA_BASE_URL } from '@/app-env';
 import { useNavigate } from 'react-router';
 import '@ui5/webcomponents-icons/attachment.js';
+import { useAuthStore } from '@/stores/auth-store';
 import { Card } from '@ui5/webcomponents-react/Card';
 import { Icon } from '@ui5/webcomponents-react/Icon';
 import { Title } from '@ui5/webcomponents-react/Title';
@@ -10,9 +11,11 @@ import { Button } from '@ui5/webcomponents-react/Button';
 import { FlexBox } from '@ui5/webcomponents-react/FlexBox';
 import '@ui5/webcomponents-icons/business-objects-mobile.js';
 import { CardHeader } from '@ui5/webcomponents-react/CardHeader';
+import { AuthUserLoader } from '@/features/auth-users/components';
 
 export function ShellHomeView() {
   const navigate = useNavigate();
+  const isAdmin = useAuthStore((state) => state.isAdmin);
   return (
     <main className="relative isolate min-h-screen overflow-hidden bg-[linear-gradient(180deg,#d9eafb_0%,#dceaf7_44%,#e1ecf6_100%)] text-[#16314d]">
       <div className="pointer-events-none absolute inset-0" aria-hidden="true">
@@ -51,7 +54,7 @@ export function ShellHomeView() {
                 titleText="File Attachments"
               />
             }
-          ></Card>
+          />
           <Card
             header={
               <CardHeader
@@ -62,23 +65,26 @@ export function ShellHomeView() {
                 titleText="Business Objects"
               />
             }
-          ></Card>
-          <Card
-            header={
-              <CardHeader
-                interactive
-                onClick={() => navigate('/admin')}
-                avatar={<Icon name="person-placeholder" />}
-                subtitleText="Users Management and Configuration Files"
-                titleText="Admin"
-              />
-            }
-          ></Card>
+          />
+          {isAdmin && (
+            <Card
+              header={
+                <CardHeader
+                  interactive
+                  onClick={() => navigate('/admin')}
+                  avatar={<Icon name="person-placeholder" />}
+                  subtitleText="Users Management and Configuration Files"
+                  titleText="Admin"
+                />
+              }
+            />
+          )}
         </FlexBox>
       </FlexBox>
       <footer className="absolute bottom-[0.95rem] left-4 right-4 z-10 text-center text-[0.7rem] text-muted-foreground sm:left-auto sm:right-5 sm:text-left">
         Copyright (c) {new Date().getFullYear()} SAP SE All Rights Reserved.
       </footer>
+      <AuthUserLoader showLoader />
     </main>
   );
 }

@@ -1,0 +1,651 @@
+<edmx:Edmx xmlns:edmx="http://docs.oasis-open.org/odata/ns/edmx"
+  xmlns="http://docs.oasis-open.org/odata/ns/edm" Version="4.0">
+  <edmx:Reference
+    Uri="/sap/opu/odata/IWFND/CATALOGSERVICE;v=2/Vocabularies(TechnicalName='%2FIWBEP%2FVOC_COMMUNICATION',Version='0001',SAP__Origin='LOCAL')/$value">
+    <edmx:Include Namespace="com.sap.vocabularies.Communication.v1" Alias="Communication" />
+  </edmx:Reference>
+  <edmx:Reference
+    Uri="/sap/opu/odata/IWFND/CATALOGSERVICE;v=2/Vocabularies(TechnicalName='%2FIWBEP%2FVOC_PERSONALDATA',Version='0001',SAP__Origin='LOCAL')/$value">
+    <edmx:Include Namespace="com.sap.vocabularies.PersonalData.v1" Alias="PersonalData" />
+  </edmx:Reference>
+  <edmx:Reference
+    Uri="/sap/opu/odata/IWFND/CATALOGSERVICE;v=2/Vocabularies(TechnicalName='%2FIWBEP%2FVOC_ANALYTICS',Version='0001',SAP__Origin='LOCAL')/$value">
+    <edmx:Include Namespace="com.sap.vocabularies.Analytics.v1" Alias="Analytics" />
+  </edmx:Reference>
+  <edmx:Reference
+    Uri="/sap/opu/odata/IWFND/CATALOGSERVICE;v=2/Vocabularies(TechnicalName='%2FIWBEP%2FVOC_COMMON',Version='0001',SAP__Origin='LOCAL')/$value">
+    <edmx:Include Namespace="com.sap.vocabularies.Common.v1" Alias="SAP__common" />
+  </edmx:Reference>
+  <edmx:Reference
+    Uri="/sap/opu/odata/IWFND/CATALOGSERVICE;v=2/Vocabularies(TechnicalName='%2FIWBEP%2FVOC_MEASURES',Version='0001',SAP__Origin='LOCAL')/$value">
+    <edmx:Include Namespace="Org.OData.Measures.V1" Alias="SAP__measures" />
+  </edmx:Reference>
+  <edmx:Reference
+    Uri="/sap/opu/odata/IWFND/CATALOGSERVICE;v=2/Vocabularies(TechnicalName='%2FIWBEP%2FVOC_CORE',Version='0001',SAP__Origin='LOCAL')/$value">
+    <edmx:Include Namespace="Org.OData.Core.V1" Alias="SAP__core" />
+  </edmx:Reference>
+  <edmx:Reference
+    Uri="/sap/opu/odata/IWFND/CATALOGSERVICE;v=2/Vocabularies(TechnicalName='%2FIWBEP%2FVOC_CAPABILITIES',Version='0001',SAP__Origin='LOCAL')/$value">
+    <edmx:Include Namespace="Org.OData.Capabilities.V1" Alias="SAP__capabilities" />
+  </edmx:Reference>
+  <edmx:Reference
+    Uri="/sap/opu/odata/IWFND/CATALOGSERVICE;v=2/Vocabularies(TechnicalName='%2FIWBEP%2FVOC_AGGREGATION',Version='0001',SAP__Origin='LOCAL')/$value">
+    <edmx:Include Namespace="Org.OData.Aggregation.V1" Alias="SAP__aggregation" />
+  </edmx:Reference>
+  <edmx:Reference
+    Uri="/sap/opu/odata/IWFND/CATALOGSERVICE;v=2/Vocabularies(TechnicalName='%2FIWBEP%2FVOC_VALIDATION',Version='0001',SAP__Origin='LOCAL')/$value">
+    <edmx:Include Namespace="Org.OData.Validation.V1" Alias="SAP__validation" />
+  </edmx:Reference>
+  <edmx:Reference
+    Uri="/sap/opu/odata/IWFND/CATALOGSERVICE;v=2/Vocabularies(TechnicalName='%2FIWBEP%2FVOC_CODELIST',Version='0001',SAP__Origin='LOCAL')/$value">
+    <edmx:Include Namespace="com.sap.vocabularies.CodeList.v1" Alias="SAP__CodeList" />
+  </edmx:Reference>
+  <edmx:Reference
+    Uri="/sap/opu/odata/IWFND/CATALOGSERVICE;v=2/Vocabularies(TechnicalName='%2FIWBEP%2FVOC_UI',Version='0001',SAP__Origin='LOCAL')/$value">
+    <edmx:Include Namespace="com.sap.vocabularies.UI.v1" Alias="SAP__UI" />
+  </edmx:Reference>
+  <edmx:Reference
+    Uri="/sap/opu/odata/IWFND/CATALOGSERVICE;v=2/Vocabularies(TechnicalName='%2FIWBEP%2FVOC_HTML5',Version='0001',SAP__Origin='LOCAL')/$value">
+    <edmx:Include Namespace="com.sap.vocabularies.HTML5.v1" Alias="SAP__HTML5" />
+  </edmx:Reference>
+  <edmx:Reference
+    Uri="/sap/opu/odata/IWFND/CATALOGSERVICE;v=2/Vocabularies(TechnicalName='%2FIWBEP%2FVOC_PDF',Version='0001',SAP__Origin='LOCAL')/$value">
+    <edmx:Include Namespace="com.sap.vocabularies.PDF.v1" Alias="SAP__PDF" />
+  </edmx:Reference>
+  <edmx:Reference
+    Uri="/sap/opu/odata/IWFND/CATALOGSERVICE;v=2/Vocabularies(TechnicalName='%2FIWBEP%2FVOC_SESSION',Version='0001',SAP__Origin='LOCAL')/$value">
+    <edmx:Include Namespace="com.sap.vocabularies.Session.v1" Alias="SAP__session" />
+  </edmx:Reference>
+  <edmx:DataServices>
+    <Schema Namespace="com.sap.gateway.srvd.zui_att_admin_dash.v0001" Alias="SAP__self">
+      <Annotation Term="SAP__core.SchemaVersion" String="1.0.0" />
+      <EntityType Name="UserRoleOverviewType">
+        <Key>
+          <PropertyRef Name="Role" />
+        </Key>
+        <Property Name="Role" Type="Edm.String" Nullable="false" MaxLength="10" />
+        <Property Name="UserCount" Type="Edm.Int32" Nullable="false" />
+      </EntityType>
+      <EntityType Name="ConfigOverviewType">
+        <Key>
+          <PropertyRef Name="OverviewKey" />
+        </Key>
+        <Property Name="OverviewKey" Type="Edm.String" Nullable="false" MaxLength="1" />
+        <Property Name="TotalConfigs" Type="Edm.Int32" Nullable="false" />
+        <Property Name="ActiveConfigs" Type="Edm.Byte" Nullable="false" />
+      </EntityType>
+      <EntityType Name="BusinessObjectOverviewType">
+        <Key>
+          <PropertyRef Name="OverviewKey" />
+        </Key>
+        <Property Name="OverviewKey" Type="Edm.String" Nullable="false" MaxLength="1" />
+        <Property Name="TotalBusinessObjects" Type="Edm.Int32" Nullable="false" />
+      </EntityType>
+      <EntityType Name="AttachmentOverviewType">
+        <Key>
+          <PropertyRef Name="OverviewKey" />
+        </Key>
+        <Property Name="OverviewKey" Type="Edm.String" Nullable="false" MaxLength="1" />
+        <Property Name="TotalAttachments" Type="Edm.Int32" Nullable="false" />
+        <Property Name="ActiveAttachments" Type="Edm.Byte" Nullable="false" />
+        <Property Name="InactiveAttachments" Type="Edm.Byte" Nullable="false" />
+      </EntityType>
+      <EntityType Name="AdminDashboardStatsType">
+        <Key>
+          <PropertyRef Name="OverviewKey" />
+        </Key>
+        <Property Name="OverviewKey" Type="Edm.String" Nullable="false" MaxLength="1" />
+        <Property Name="AttachmentsCreatedDay" Type="Edm.Int32" Nullable="false" />
+        <Property Name="AttachmentsCreatedWeek" Type="Edm.Int32" Nullable="false" />
+        <Property Name="AttachmentsCreatedMonth" Type="Edm.Int32" Nullable="false" />
+        <Property Name="AttachmentsCreatedYear" Type="Edm.Int32" Nullable="false" />
+        <Property Name="BoCreatedDay" Type="Edm.Int32" Nullable="false" />
+        <Property Name="BoCreatedWeek" Type="Edm.Int32" Nullable="false" />
+        <Property Name="BoCreatedMonth" Type="Edm.Int32" Nullable="false" />
+        <Property Name="BoCreatedYear" Type="Edm.Int32" Nullable="false" />
+        <Property Name="LinksCreatedDay" Type="Edm.Int32" Nullable="false" />
+        <Property Name="LinksCreatedWeek" Type="Edm.Int32" Nullable="false" />
+        <Property Name="LinksCreatedMonth" Type="Edm.Int32" Nullable="false" />
+        <Property Name="LinksCreatedYear" Type="Edm.Int32" Nullable="false" />
+        <Property Name="DeletedAttachmentsDay" Type="Edm.Int32" Nullable="false" />
+        <Property Name="DeletedAttachmentsWeek" Type="Edm.Int32" Nullable="false" />
+        <Property Name="DeletedAttachmentsMonth" Type="Edm.Int32" Nullable="false" />
+        <Property Name="DeletedAttachmentsYear" Type="Edm.Int32" Nullable="false" />
+        <Property Name="ReactivatedAttachmentsDay" Type="Edm.Int32" Nullable="false" />
+        <Property Name="ReactivatedAttachmentsWeek" Type="Edm.Int32" Nullable="false" />
+        <Property Name="ReactivatedAttachmentsMonth" Type="Edm.Int32" Nullable="false" />
+        <Property Name="ReactivatedAttachmentsYear" Type="Edm.Int32" Nullable="false" />
+        <Property Name="UnlinkedAttachments" Type="Edm.Int32" Nullable="false" />
+        <Property Name="BoWithoutAttachments" Type="Edm.Int32" Nullable="false" />
+      </EntityType>
+      <EntityType Name="RecentAuditLogsType">
+        <Key>
+          <PropertyRef Name="FileId" />
+          <PropertyRef Name="Erdat" />
+          <PropertyRef Name="Erzet" />
+        </Key>
+        <Property Name="FileId" Type="Edm.Guid" Nullable="false" />
+        <Property Name="Erdat" Type="Edm.Date" Nullable="false" />
+        <Property Name="Erzet" Type="Edm.TimeOfDay" Nullable="false" />
+        <Property Name="Uname" Type="Edm.String" Nullable="false" MaxLength="12" />
+        <Property Name="Action" Type="Edm.String" Nullable="false" MaxLength="20" />
+        <Property Name="Note" Type="Edm.String" Nullable="false" MaxLength="255" />
+        <Property Name="Ernam" Type="Edm.String" Nullable="false" MaxLength="12" />
+      </EntityType>
+      <EntityType Name="AuthOverviewType">
+        <Key>
+          <PropertyRef Name="OverviewKey" />
+        </Key>
+        <Property Name="OverviewKey" Type="Edm.String" Nullable="false" MaxLength="1" />
+        <Property Name="AdminCount" Type="Edm.Byte" Nullable="false" />
+        <Property Name="UserCount" Type="Edm.Byte" Nullable="false" />
+      </EntityType>
+      <EntityType Name="FileConfigListType">
+        <Key>
+          <PropertyRef Name="FileExt" />
+        </Key>
+        <Property Name="FileExt" Type="Edm.String" Nullable="false" MaxLength="10" />
+        <Property Name="MimeType" Type="Edm.String" Nullable="false" MaxLength="128" />
+        <Property Name="MaxBytes" Type="Edm.Int32" Nullable="false" />
+        <Property Name="IsActive" Type="Edm.String" Nullable="false" MaxLength="1" />
+        <Property Name="Description" Type="Edm.String" Nullable="false" MaxLength="100" />
+      </EntityType>
+      <EntityType Name="LinkOverviewType">
+        <Key>
+          <PropertyRef Name="OverviewKey" />
+        </Key>
+        <Property Name="OverviewKey" Type="Edm.String" Nullable="false" MaxLength="1" />
+        <Property Name="TotalLinks" Type="Edm.Int32" Nullable="false" />
+      </EntityType>
+      <EntityType Name="AttachmentStatsByTypeType">
+        <Key>
+          <PropertyRef Name="FileExt" />
+        </Key>
+        <Property Name="FileExt" Type="Edm.String" Nullable="false" MaxLength="10" />
+        <Property Name="VersionCount" Type="Edm.Int32" Nullable="false" />
+        <Property Name="TotalSize" Type="Edm.Int32" Nullable="false" />
+      </EntityType>
+      <EntityContainer Name="Container">
+        <EntitySet Name="AdminDashboardStats"
+          EntityType="com.sap.gateway.srvd.zui_att_admin_dash.v0001.AdminDashboardStatsType" />
+        <EntitySet Name="AttachmentOverview"
+          EntityType="com.sap.gateway.srvd.zui_att_admin_dash.v0001.AttachmentOverviewType" />
+        <EntitySet Name="AttachmentStatsByType"
+          EntityType="com.sap.gateway.srvd.zui_att_admin_dash.v0001.AttachmentStatsByTypeType" />
+        <EntitySet Name="AuthOverview"
+          EntityType="com.sap.gateway.srvd.zui_att_admin_dash.v0001.AuthOverviewType" />
+        <EntitySet Name="BusinessObjectOverview"
+          EntityType="com.sap.gateway.srvd.zui_att_admin_dash.v0001.BusinessObjectOverviewType" />
+        <EntitySet Name="ConfigOverview"
+          EntityType="com.sap.gateway.srvd.zui_att_admin_dash.v0001.ConfigOverviewType" />
+        <EntitySet Name="FileConfigList"
+          EntityType="com.sap.gateway.srvd.zui_att_admin_dash.v0001.FileConfigListType" />
+        <EntitySet Name="LinkOverview"
+          EntityType="com.sap.gateway.srvd.zui_att_admin_dash.v0001.LinkOverviewType" />
+        <EntitySet Name="RecentAuditLogs"
+          EntityType="com.sap.gateway.srvd.zui_att_admin_dash.v0001.RecentAuditLogsType" />
+        <EntitySet Name="UserRoleOverview"
+          EntityType="com.sap.gateway.srvd.zui_att_admin_dash.v0001.UserRoleOverviewType" />
+      </EntityContainer>
+      <Annotations Target="SAP__self.UserRoleOverviewType/Role">
+        <Annotation Term="SAP__common.IsUpperCase" />
+        <Annotation Term="SAP__common.Label" String="Role" />
+        <Annotation Term="SAP__common.QuickInfo" String="ZGSP26SAP20_ROLE" />
+      </Annotations>
+      <Annotations Target="SAP__self.UserRoleOverviewType">
+        <Annotation Term="SAP__common.Label" String="User Role Overview" />
+      </Annotations>
+      <Annotations Target="SAP__self.Container/UserRoleOverview">
+        <Annotation Term="SAP__capabilities.SearchRestrictions">
+          <Record>
+            <PropertyValue Property="Searchable" Bool="false" />
+          </Record>
+        </Annotation>
+        <Annotation Term="SAP__capabilities.InsertRestrictions">
+          <Record>
+            <PropertyValue Property="Insertable" Bool="false" />
+          </Record>
+        </Annotation>
+        <Annotation Term="SAP__capabilities.DeleteRestrictions">
+          <Record>
+            <PropertyValue Property="Deletable" Bool="false" />
+          </Record>
+        </Annotation>
+        <Annotation Term="SAP__capabilities.UpdateRestrictions">
+          <Record>
+            <PropertyValue Property="Updatable" Bool="false" />
+            <PropertyValue Property="QueryOptions">
+              <Record>
+                <PropertyValue Property="SelectSupported" Bool="true" />
+              </Record>
+            </PropertyValue>
+          </Record>
+        </Annotation>
+        <Annotation Term="SAP__core.OptimisticConcurrency">
+          <Collection />
+        </Annotation>
+        <Annotation Term="SAP__capabilities.FilterRestrictions">
+          <Record>
+            <PropertyValue Property="FilterExpressionRestrictions">
+              <Collection>
+                <Record>
+                  <PropertyValue Property="Property" PropertyPath="Role" />
+                  <PropertyValue Property="AllowedExpressions" String="MultiValue" />
+                </Record>
+              </Collection>
+            </PropertyValue>
+          </Record>
+        </Annotation>
+      </Annotations>
+      <Annotations Target="SAP__self.ConfigOverviewType">
+        <Annotation Term="SAP__common.Label" String="Config Overview Stats" />
+      </Annotations>
+      <Annotations Target="SAP__self.Container/ConfigOverview">
+        <Annotation Term="SAP__capabilities.SearchRestrictions">
+          <Record>
+            <PropertyValue Property="Searchable" Bool="false" />
+          </Record>
+        </Annotation>
+        <Annotation Term="SAP__capabilities.InsertRestrictions">
+          <Record>
+            <PropertyValue Property="Insertable" Bool="false" />
+          </Record>
+        </Annotation>
+        <Annotation Term="SAP__capabilities.DeleteRestrictions">
+          <Record>
+            <PropertyValue Property="Deletable" Bool="false" />
+          </Record>
+        </Annotation>
+        <Annotation Term="SAP__capabilities.UpdateRestrictions">
+          <Record>
+            <PropertyValue Property="Updatable" Bool="false" />
+            <PropertyValue Property="QueryOptions">
+              <Record>
+                <PropertyValue Property="SelectSupported" Bool="true" />
+              </Record>
+            </PropertyValue>
+          </Record>
+        </Annotation>
+        <Annotation Term="SAP__core.OptimisticConcurrency">
+          <Collection />
+        </Annotation>
+      </Annotations>
+      <Annotations Target="SAP__self.BusinessObjectOverviewType">
+        <Annotation Term="SAP__common.Label" String="Business Object Overview Stats" />
+      </Annotations>
+      <Annotations Target="SAP__self.Container/BusinessObjectOverview">
+        <Annotation Term="SAP__capabilities.SearchRestrictions">
+          <Record>
+            <PropertyValue Property="Searchable" Bool="false" />
+          </Record>
+        </Annotation>
+        <Annotation Term="SAP__capabilities.InsertRestrictions">
+          <Record>
+            <PropertyValue Property="Insertable" Bool="false" />
+          </Record>
+        </Annotation>
+        <Annotation Term="SAP__capabilities.DeleteRestrictions">
+          <Record>
+            <PropertyValue Property="Deletable" Bool="false" />
+          </Record>
+        </Annotation>
+        <Annotation Term="SAP__capabilities.UpdateRestrictions">
+          <Record>
+            <PropertyValue Property="Updatable" Bool="false" />
+            <PropertyValue Property="QueryOptions">
+              <Record>
+                <PropertyValue Property="SelectSupported" Bool="true" />
+              </Record>
+            </PropertyValue>
+          </Record>
+        </Annotation>
+        <Annotation Term="SAP__core.OptimisticConcurrency">
+          <Collection />
+        </Annotation>
+      </Annotations>
+      <Annotations Target="SAP__self.AttachmentOverviewType">
+        <Annotation Term="SAP__common.Label" String="Attachment Overview Stats" />
+      </Annotations>
+      <Annotations Target="SAP__self.Container/AttachmentOverview">
+        <Annotation Term="SAP__capabilities.SearchRestrictions">
+          <Record>
+            <PropertyValue Property="Searchable" Bool="false" />
+          </Record>
+        </Annotation>
+        <Annotation Term="SAP__capabilities.InsertRestrictions">
+          <Record>
+            <PropertyValue Property="Insertable" Bool="false" />
+          </Record>
+        </Annotation>
+        <Annotation Term="SAP__capabilities.DeleteRestrictions">
+          <Record>
+            <PropertyValue Property="Deletable" Bool="false" />
+          </Record>
+        </Annotation>
+        <Annotation Term="SAP__capabilities.UpdateRestrictions">
+          <Record>
+            <PropertyValue Property="Updatable" Bool="false" />
+            <PropertyValue Property="QueryOptions">
+              <Record>
+                <PropertyValue Property="SelectSupported" Bool="true" />
+              </Record>
+            </PropertyValue>
+          </Record>
+        </Annotation>
+        <Annotation Term="SAP__core.OptimisticConcurrency">
+          <Collection />
+        </Annotation>
+      </Annotations>
+      <Annotations Target="SAP__self.AdminDashboardStatsType">
+        <Annotation Term="SAP__common.Label" String="Admin Dashboard Statistics" />
+      </Annotations>
+      <Annotations Target="SAP__self.Container/AdminDashboardStats">
+        <Annotation Term="SAP__capabilities.SearchRestrictions">
+          <Record>
+            <PropertyValue Property="Searchable" Bool="false" />
+          </Record>
+        </Annotation>
+        <Annotation Term="SAP__capabilities.InsertRestrictions">
+          <Record>
+            <PropertyValue Property="Insertable" Bool="false" />
+          </Record>
+        </Annotation>
+        <Annotation Term="SAP__capabilities.DeleteRestrictions">
+          <Record>
+            <PropertyValue Property="Deletable" Bool="false" />
+          </Record>
+        </Annotation>
+        <Annotation Term="SAP__capabilities.UpdateRestrictions">
+          <Record>
+            <PropertyValue Property="Updatable" Bool="false" />
+            <PropertyValue Property="QueryOptions">
+              <Record>
+                <PropertyValue Property="SelectSupported" Bool="true" />
+              </Record>
+            </PropertyValue>
+          </Record>
+        </Annotation>
+        <Annotation Term="SAP__core.OptimisticConcurrency">
+          <Collection />
+        </Annotation>
+      </Annotations>
+      <Annotations Target="SAP__self.RecentAuditLogsType/Uname">
+        <Annotation Term="SAP__common.IsUpperCase" />
+        <Annotation Term="SAP__common.Label" String="User" />
+        <Annotation Term="SAP__common.Heading" String="User Name" />
+        <Annotation Term="SAP__common.QuickInfo" String="User Name in User Master Record" />
+      </Annotations>
+      <Annotations Target="SAP__self.RecentAuditLogsType/Note">
+        <Annotation Term="SAP__common.IsUpperCase" />
+        <Annotation Term="SAP__common.Label" String="Note" />
+        <Annotation Term="SAP__common.QuickInfo" String="ZGSP26SAP20_NOTE" />
+      </Annotations>
+      <Annotations Target="SAP__self.RecentAuditLogsType/Ernam">
+        <Annotation Term="SAP__common.IsUpperCase" />
+        <Annotation Term="SAP__common.Label" String="Created By" />
+        <Annotation Term="SAP__common.QuickInfo"
+          String="Name of Person Responsible for Creating the Object" />
+      </Annotations>
+      <Annotations Target="SAP__self.RecentAuditLogsType">
+        <Annotation Term="SAP__common.Label" String="Recent Attachment Audit Logs" />
+      </Annotations>
+      <Annotations Target="SAP__self.Container/RecentAuditLogs">
+        <Annotation Term="SAP__capabilities.SearchRestrictions">
+          <Record>
+            <PropertyValue Property="Searchable" Bool="false" />
+          </Record>
+        </Annotation>
+        <Annotation Term="SAP__capabilities.InsertRestrictions">
+          <Record>
+            <PropertyValue Property="Insertable" Bool="false" />
+          </Record>
+        </Annotation>
+        <Annotation Term="SAP__capabilities.DeleteRestrictions">
+          <Record>
+            <PropertyValue Property="Deletable" Bool="false" />
+          </Record>
+        </Annotation>
+        <Annotation Term="SAP__capabilities.UpdateRestrictions">
+          <Record>
+            <PropertyValue Property="Updatable" Bool="false" />
+            <PropertyValue Property="QueryOptions">
+              <Record>
+                <PropertyValue Property="SelectSupported" Bool="true" />
+              </Record>
+            </PropertyValue>
+          </Record>
+        </Annotation>
+        <Annotation Term="SAP__core.OptimisticConcurrency">
+          <Collection />
+        </Annotation>
+        <Annotation Term="SAP__capabilities.FilterRestrictions">
+          <Record>
+            <PropertyValue Property="FilterExpressionRestrictions">
+              <Collection>
+                <Record>
+                  <PropertyValue Property="Property" PropertyPath="Uname" />
+                  <PropertyValue Property="AllowedExpressions" String="MultiValue" />
+                </Record>
+                <Record>
+                  <PropertyValue Property="Property" PropertyPath="Note" />
+                  <PropertyValue Property="AllowedExpressions" String="MultiValue" />
+                </Record>
+                <Record>
+                  <PropertyValue Property="Property" PropertyPath="Ernam" />
+                  <PropertyValue Property="AllowedExpressions" String="MultiValue" />
+                </Record>
+              </Collection>
+            </PropertyValue>
+          </Record>
+        </Annotation>
+      </Annotations>
+      <Annotations Target="SAP__self.AuthOverviewType">
+        <Annotation Term="SAP__common.Label" String="Authorization Overview Stats" />
+      </Annotations>
+      <Annotations Target="SAP__self.Container/AuthOverview">
+        <Annotation Term="SAP__capabilities.SearchRestrictions">
+          <Record>
+            <PropertyValue Property="Searchable" Bool="false" />
+          </Record>
+        </Annotation>
+        <Annotation Term="SAP__capabilities.InsertRestrictions">
+          <Record>
+            <PropertyValue Property="Insertable" Bool="false" />
+          </Record>
+        </Annotation>
+        <Annotation Term="SAP__capabilities.DeleteRestrictions">
+          <Record>
+            <PropertyValue Property="Deletable" Bool="false" />
+          </Record>
+        </Annotation>
+        <Annotation Term="SAP__capabilities.UpdateRestrictions">
+          <Record>
+            <PropertyValue Property="Updatable" Bool="false" />
+            <PropertyValue Property="QueryOptions">
+              <Record>
+                <PropertyValue Property="SelectSupported" Bool="true" />
+              </Record>
+            </PropertyValue>
+          </Record>
+        </Annotation>
+        <Annotation Term="SAP__core.OptimisticConcurrency">
+          <Collection />
+        </Annotation>
+      </Annotations>
+      <Annotations Target="SAP__self.FileConfigListType">
+        <Annotation Term="SAP__common.Label" String="File Config Overview" />
+      </Annotations>
+      <Annotations Target="SAP__self.Container/FileConfigList">
+        <Annotation Term="SAP__capabilities.SearchRestrictions">
+          <Record>
+            <PropertyValue Property="Searchable" Bool="false" />
+          </Record>
+        </Annotation>
+        <Annotation Term="SAP__capabilities.InsertRestrictions">
+          <Record>
+            <PropertyValue Property="Insertable" Bool="false" />
+          </Record>
+        </Annotation>
+        <Annotation Term="SAP__capabilities.DeleteRestrictions">
+          <Record>
+            <PropertyValue Property="Deletable" Bool="false" />
+          </Record>
+        </Annotation>
+        <Annotation Term="SAP__capabilities.UpdateRestrictions">
+          <Record>
+            <PropertyValue Property="Updatable" Bool="false" />
+            <PropertyValue Property="QueryOptions">
+              <Record>
+                <PropertyValue Property="SelectSupported" Bool="true" />
+              </Record>
+            </PropertyValue>
+          </Record>
+        </Annotation>
+        <Annotation Term="SAP__core.OptimisticConcurrency">
+          <Collection />
+        </Annotation>
+      </Annotations>
+      <Annotations Target="SAP__self.LinkOverviewType">
+        <Annotation Term="SAP__common.Label" String="Link Overview Stats" />
+      </Annotations>
+      <Annotations Target="SAP__self.Container/LinkOverview">
+        <Annotation Term="SAP__capabilities.SearchRestrictions">
+          <Record>
+            <PropertyValue Property="Searchable" Bool="false" />
+          </Record>
+        </Annotation>
+        <Annotation Term="SAP__capabilities.InsertRestrictions">
+          <Record>
+            <PropertyValue Property="Insertable" Bool="false" />
+          </Record>
+        </Annotation>
+        <Annotation Term="SAP__capabilities.DeleteRestrictions">
+          <Record>
+            <PropertyValue Property="Deletable" Bool="false" />
+          </Record>
+        </Annotation>
+        <Annotation Term="SAP__capabilities.UpdateRestrictions">
+          <Record>
+            <PropertyValue Property="Updatable" Bool="false" />
+            <PropertyValue Property="QueryOptions">
+              <Record>
+                <PropertyValue Property="SelectSupported" Bool="true" />
+              </Record>
+            </PropertyValue>
+          </Record>
+        </Annotation>
+        <Annotation Term="SAP__core.OptimisticConcurrency">
+          <Collection />
+        </Annotation>
+      </Annotations>
+      <Annotations Target="SAP__self.AttachmentStatsByTypeType">
+        <Annotation Term="SAP__common.Label" String="Attachment Stats By Type" />
+      </Annotations>
+      <Annotations Target="SAP__self.Container/AttachmentStatsByType">
+        <Annotation Term="SAP__capabilities.SearchRestrictions">
+          <Record>
+            <PropertyValue Property="Searchable" Bool="false" />
+          </Record>
+        </Annotation>
+        <Annotation Term="SAP__capabilities.InsertRestrictions">
+          <Record>
+            <PropertyValue Property="Insertable" Bool="false" />
+          </Record>
+        </Annotation>
+        <Annotation Term="SAP__capabilities.DeleteRestrictions">
+          <Record>
+            <PropertyValue Property="Deletable" Bool="false" />
+          </Record>
+        </Annotation>
+        <Annotation Term="SAP__capabilities.UpdateRestrictions">
+          <Record>
+            <PropertyValue Property="Updatable" Bool="false" />
+            <PropertyValue Property="QueryOptions">
+              <Record>
+                <PropertyValue Property="SelectSupported" Bool="true" />
+              </Record>
+            </PropertyValue>
+          </Record>
+        </Annotation>
+        <Annotation Term="SAP__core.OptimisticConcurrency">
+          <Collection />
+        </Annotation>
+      </Annotations>
+      <Annotations Target="SAP__self.Container">
+        <Annotation Term="SAP__aggregation.ApplySupported">
+          <Record>
+            <PropertyValue Property="Transformations">
+              <Collection>
+                <String>aggregate</String>
+                <String>groupby</String>
+                <String>filter</String>
+              </Collection>
+            </PropertyValue>
+            <PropertyValue Property="Rollup" EnumMember="SAP__aggregation.RollupType/None" />
+          </Record>
+        </Annotation>
+        <Annotation Term="SAP__common.ApplyMultiUnitBehaviorForSortingAndFiltering" Bool="true" />
+        <Annotation Term="SAP__capabilities.FilterFunctions">
+          <Collection>
+            <String>eq</String>
+            <String>ne</String>
+            <String>gt</String>
+            <String>ge</String>
+            <String>lt</String>
+            <String>le</String>
+            <String>and</String>
+            <String>or</String>
+            <String>contains</String>
+            <String>startswith</String>
+            <String>endswith</String>
+            <String>any</String>
+            <String>all</String>
+          </Collection>
+        </Annotation>
+        <Annotation Term="SAP__capabilities.SupportedFormats">
+          <Collection>
+            <String>application/json</String>
+            <String>application/pdf</String>
+          </Collection>
+        </Annotation>
+        <Annotation Term="SAP__PDF.Features">
+          <Record>
+            <PropertyValue Property="DocumentDescriptionReference"
+              String="../../../../default/iwbep/common/0001/$metadata" />
+            <PropertyValue Property="DocumentDescriptionCollection" String="MyDocumentDescriptions" />
+            <PropertyValue Property="ArchiveFormat" Bool="true" />
+            <PropertyValue Property="Border" Bool="true" />
+            <PropertyValue Property="CoverPage" Bool="true" />
+            <PropertyValue Property="FitToPage" Bool="true" />
+            <PropertyValue Property="FontName" Bool="true" />
+            <PropertyValue Property="FontSize" Bool="true" />
+            <PropertyValue Property="Margin" Bool="true" />
+            <PropertyValue Property="Signature" Bool="true" />
+            <PropertyValue Property="ResultSizeDefault" Int="20000" />
+            <PropertyValue Property="ResultSizeMaximum" Int="20000" />
+          </Record>
+        </Annotation>
+      </Annotations>
+      <Annotations Target="SAP__self.RecentAuditLogsType/FileId">
+        <Annotation Term="SAP__common.Label" String="UUID" />
+        <Annotation Term="SAP__common.QuickInfo" String="16 Byte UUID in 16 Bytes (Raw Format)" />
+      </Annotations>
+      <Annotations Target="SAP__self.RecentAuditLogsType/Erdat">
+        <Annotation Term="SAP__common.Label" String="Created On" />
+        <Annotation Term="SAP__common.QuickInfo" String="Record Created On" />
+      </Annotations>
+      <Annotations Target="SAP__self.RecentAuditLogsType/Erzet">
+        <Annotation Term="SAP__common.Label" String="Time" />
+        <Annotation Term="SAP__common.QuickInfo" String="Entry time" />
+      </Annotations>
+      <Annotations Target="SAP__self.RecentAuditLogsType/Action">
+        <Annotation Term="SAP__common.Label" String="Action" />
+        <Annotation Term="SAP__common.QuickInfo" String="ZGSP26SAP20_ACTION" />
+      </Annotations>
+      <Annotations Target="SAP__self.AttachmentStatsByTypeType/FileExt">
+        <Annotation Term="SAP__common.Label" String="FileExtension" />
+        <Annotation Term="SAP__common.QuickInfo" String="ZGSP26SAP20_File_Extension" />
+      </Annotations>
+    </Schema>
+  </edmx:DataServices>
+</edmx:Edmx>
