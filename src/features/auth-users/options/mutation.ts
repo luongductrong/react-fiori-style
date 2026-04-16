@@ -1,32 +1,21 @@
-import { mutationOptions } from '@tanstack/react-query';
-import { ODATA_SERVICE } from '@/app-constant';
-import { axiosInstance } from '@/libs/axios-instance';
-import { fetchCsrfToken, getCsrfToken } from '@/libs/helpers';
 import { API } from '../constants';
-import type {
-  CreateAuthUserPayload,
-  CreateAuthUserResponse,
-  DeleteAuthUserResponse,
-  UpdateAuthUserPayload,
-  UpdateAuthUserResponse,
-} from '../types';
+import { ODATA_SERVICE } from '@/app-constant';
+import { pushApiErrorMessages } from '@/libs/errors';
+import { axiosInstance } from '@/libs/axios-instance';
+import { mutationOptions } from '@tanstack/react-query';
+import { fetchCsrfToken, getCsrfToken } from '@/libs/helpers';
+import type { DeleteAuthUserParams, DeleteAuthUserResponse } from '../types';
+import type { CreateAuthUserPayload, CreateAuthUserResponse } from '../types';
 
 type CreateAuthUserMutationParams = {
   onSuccess?: (data: CreateAuthUserResponse) => void;
-  onError?: (error: Error) => void;
-};
-
-type UpdateAuthUserMutationParams = {
-  onSuccess?: (data: UpdateAuthUserResponse) => void;
-  onError?: (error: Error) => void;
+  onError?: (error: unknown) => void;
 };
 
 type DeleteAuthUserMutationParams = {
   onSuccess?: (data: DeleteAuthUserResponse) => void;
-  onError?: (error: Error) => void;
+  onError?: (error: unknown) => void;
 };
-
-const CSRF_BLOCKED_MESSAGE = 'Sign in with role ADMIN to update roles or delete users.';
 
 export function createAuthUserMutationOptions({ onSuccess, onError }: CreateAuthUserMutationParams) {
   return mutationOptions({
@@ -34,70 +23,17 @@ export function createAuthUserMutationOptions({ onSuccess, onError }: CreateAuth
       let token = getCsrfToken();
 
       if (!token) {
-        try {
-          await fetchCsrfToken(ODATA_SERVICE.AUTH);
-          token = getCsrfToken();
-        } catch {
-          throw new Error(CSRF_BLOCKED_MESSAGE);
-        }
+        await fetchCsrfToken(ODATA_SERVICE.AUTH);
+        token = getCsrfToken();
       }
 
-      if (!token) {
-        throw new Error(CSRF_BLOCKED_MESSAGE);
-      }
-
-      try {
-        const res = await axiosInstance.post<CreateAuthUserResponse>(
-          `${ODATA_SERVICE.AUTH}${API.endpoint}?sap-client=324`,
-          payload,
-          {
-            headers: {
-              'accept-language': 'en',
-              'x-csrf-token': token,
-            },
-          },
-        );
-
-        return res;
-      } catch (error) {
-        if (error instanceof Error) {
-          throw error;
-        }
-
-        throw new Error('Cannot create user');
-      }
-    },
-    onSuccess,
-    onError,
-  });
-}
-
-export function updateAuthUserMutationOptions({ onSuccess, onError }: UpdateAuthUserMutationParams) {
-  return mutationOptions({
-    mutationFn: async (variables: { uname: string; payload: UpdateAuthUserPayload }) => {
-      const { uname, payload } = variables;
-      let token = getCsrfToken();
-
-      if (!token) {
-        try {
-          await fetchCsrfToken(ODATA_SERVICE.AUTH);
-          token = getCsrfToken();
-        } catch {
-          throw new Error(CSRF_BLOCKED_MESSAGE);
-        }
-      }
-
-      if (!token) {
-        throw new Error(CSRF_BLOCKED_MESSAGE);
-      }
-
-      const res = await axiosInstance.put<UpdateAuthUserResponse>(
-        `${ODATA_SERVICE.AUTH}${API.endpoint}(Uname='${uname}')?sap-client=324`,
+      const res = axiosInstance.post<CreateAuthUserResponse>(
+        `${ODATA_SERVICE.AUTH}${API.endpoint}?sap-client=324`,
         payload,
         {
           headers: {
             'accept-language': 'en',
-            'x-csrf-token': token,
+            ...(token ? { 'x-csrf-token': token } : {}),
           },
         },
       );
@@ -105,35 +41,29 @@ export function updateAuthUserMutationOptions({ onSuccess, onError }: UpdateAuth
       return res;
     },
     onSuccess,
-    onError,
+    onError: (error) => {
+      pushApiErrorMessages(error);
+      onError?.(error);
+    },
   });
 }
 
 export function deleteAuthUserMutationOptions({ onSuccess, onError }: DeleteAuthUserMutationParams) {
   return mutationOptions({
-    mutationFn: async (variables: { uname: string }) => {
-      const { uname } = variables;
+    mutationFn: async (params: DeleteAuthUserParams) => {
       let token = getCsrfToken();
 
       if (!token) {
-        try {
-          await fetchCsrfToken(ODATA_SERVICE.AUTH);
-          token = getCsrfToken();
-        } catch {
-          throw new Error(CSRF_BLOCKED_MESSAGE);
-        }
-      }
-
-      if (!token) {
-        throw new Error(CSRF_BLOCKED_MESSAGE);
+        await fetchCsrfToken(ODATA_SERVICE.AUTH);
+        token = getCsrfToken();
       }
 
       const res = await axiosInstance.delete<DeleteAuthUserResponse>(
-        `${ODATA_SERVICE.AUTH}${API.endpoint}(Uname='${uname}')?sap-client=324`,
+        `${ODATA_SERVICE.AUTH}${API.endpoint}(Uname='${params.Uname}')?sap-client=324`,
         {
           headers: {
             'accept-language': 'en',
-            'x-csrf-token': token,
+            ...(token ? { 'x-csrf-token': token } : {}),
           },
         },
       );
@@ -141,6 +71,9 @@ export function deleteAuthUserMutationOptions({ onSuccess, onError }: DeleteAuth
       return res;
     },
     onSuccess,
-    onError,
+    onError: (error) => {
+      pushApiErrorMessages(error);
+      onError?.(error);
+    },
   });
 }

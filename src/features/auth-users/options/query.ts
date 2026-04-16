@@ -1,17 +1,17 @@
 import { API } from '../constants';
 import { ODATA_SERVICE } from '@/app-constant';
+import type { AxiosApiError } from '@/types/common';
 import { queryOptions } from '@tanstack/react-query';
 import { axiosInstance } from '@/libs/axios-instance';
-import type { AuthUserListParams, AuthUserListResponse, CurrentUser } from '../types';
+import type { AuthUsersQueryParams, AuthUsersResponse, CurrentAuthUserResponse } from '../types';
 
-export function getAuthUsersQueryOptions(params: AuthUserListParams) {
-  return queryOptions({
+export function authUsersQueryOptions(params: AuthUsersQueryParams) {
+  return queryOptions<AuthUsersResponse, AxiosApiError>({
     queryKey: ['auth-users', params],
-    queryFn: async () => {
-      const res = await axiosInstance.get<AuthUserListResponse>(`${ODATA_SERVICE.AUTH}${API.endpoint}`, {
+    queryFn: () => {
+      const res = axiosInstance.get<AuthUsersResponse>(`${ODATA_SERVICE.AUTH}${API.endpoint}`, {
         params,
       });
-
       return res;
     },
     staleTime: 2 * 60 * 1000,
@@ -20,11 +20,11 @@ export function getAuthUsersQueryOptions(params: AuthUserListParams) {
   });
 }
 
-export function currentUserQueryOptions() {
-  return queryOptions({
+export function currentAuthUserQueryOptions() {
+  return queryOptions<CurrentAuthUserResponse, AxiosApiError>({
     queryKey: ['auth-users', 'current-user'],
     queryFn: () => {
-      const res = axiosInstance.get<CurrentUser>(`${ODATA_SERVICE.AUTH}${API.currentUserEndpoint}`, {
+      const res = axiosInstance.get<CurrentAuthUserResponse>(`${ODATA_SERVICE.AUTH}${API.currentUserEndpoint}`, {
         params: {
           'sap-client': 324,
         },

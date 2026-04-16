@@ -1,8 +1,8 @@
 import * as React from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { useAuthStore } from '@/stores/auth-store';
-import { currentUserQueryOptions } from '../options/query';
 import { BusyIndicator } from '@/components/busy-indicator';
+import { currentAuthUserQueryOptions } from '../options/query';
 import { pushApiErrorMessages, pushErrorMessages } from '@/libs/errors';
 
 const ADMIN_ROLE = 'ADMIN';
@@ -10,7 +10,7 @@ const ADMIN_ROLE = 'ADMIN';
 export function AuthUserLoader({ showLoader = false }: { showLoader?: boolean }) {
   const setIsAdmin = useAuthStore((state) => state.setIsAdmin);
   const setUsername = useAuthStore((state) => state.setUsername);
-  const { data, isError, error, isFetching } = useQuery(currentUserQueryOptions());
+  const { data, isError, error, isFetching } = useQuery(currentAuthUserQueryOptions());
 
   React.useEffect(() => {
     if (isError) {
