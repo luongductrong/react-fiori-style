@@ -20,20 +20,24 @@ export function AuthUserLoader() {
     }
 
     try {
-      const role = data?.value[0].Role?.trim().toUpperCase();
-      const username = data?.value[0].Uname;
+      const currentUser = data?.value?.[0];
+      const username = currentUser?.Uname ?? null;
+      const normalizedRole = currentUser?.Role?.trim().toUpperCase() || undefined;
 
-      if (role === undefined) {
+      if (!normalizedRole) {
+        setIsAdmin(false);
+        setUsername(username);
         return;
       }
-      setUsername(username ?? null);
-      setIsAdmin(role === ADMIN_ROLE);
+
+      setUsername(username);
+      setIsAdmin(normalizedRole === ADMIN_ROLE);
     } catch {
       pushErrorMessages(['Failed to load current user information']);
       setIsAdmin(false);
       setUsername(null);
     }
-  }, [isError, setIsAdmin, error, data, setUsername]);
+  }, [data, error, isError, setIsAdmin, setUsername]);
 
   return null;
 }

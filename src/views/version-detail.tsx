@@ -100,7 +100,7 @@ export function VersionDetailView() {
       pushApiErrorMessages(dataError);
     }
     if (titleError && titleError !== attachmentNotFoundError) {
-      pushApiErrorMessages(titleError);
+      pushApiErrorMessages(attachmentNotFoundError);
     }
   }, [dataError, titleError, attachmentNotFoundError, versionNotFoundError]);
 
