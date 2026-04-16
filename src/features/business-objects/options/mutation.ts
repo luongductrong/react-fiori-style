@@ -1,6 +1,6 @@
-import type { ApiError } from '@/types/common';
 import { ODATA_SERVICE } from '@/app-constant';
 import { API, MUTATION_API } from '../constants';
+import { pushApiErrorMessages } from '@/libs/errors';
 import { axiosInstance } from '@/libs/axios-instance';
 import { mutationOptions } from '@tanstack/react-query';
 import { fetchCsrfToken, getCsrfToken } from '@/libs/helpers';
@@ -9,29 +9,29 @@ import type { LinkAttachmentPayload, UpdateBizObjectPayload, UnlinkAttachmentPar
 
 type CreateBizObjectMutationParams = {
   onSuccess?: (data: CreateBizObjectResponse) => void;
-  onError?: (error: Error) => void;
+  onError?: (error: unknown) => void;
 };
 
 type UpdateBizObjectMutationParams = {
   boId: string;
   onSuccess?: () => void;
-  onError?: (error: Error) => void;
+  onError?: (error: unknown) => void;
 };
 
 type DeleteBizObjectMutationParams = {
   boId: string;
   onSuccess?: () => void;
-  onError?: (error: ApiError) => void;
+  onError?: (error: unknown) => void;
 };
 
 type LinkAttachmentMutationParams = {
   onSuccess?: () => void;
-  onError?: (error: Error) => void;
+  onError?: (error: unknown) => void;
 };
 
 type UnlinkAttachmentMutationParams = {
   onSuccess?: () => void;
-  onError?: (error: Error) => void;
+  onError?: (error: unknown) => void;
 };
 
 export function createBizObjectMutationOptions({ onSuccess, onError }: CreateBizObjectMutationParams) {
@@ -57,7 +57,10 @@ export function createBizObjectMutationOptions({ onSuccess, onError }: CreateBiz
       return res;
     },
     onSuccess,
-    onError,
+    onError: (error) => {
+      pushApiErrorMessages(error);
+      onError?.(error);
+    },
   });
 }
 
@@ -84,7 +87,10 @@ export function updateBizObjectMutationOptions({ boId, onSuccess, onError }: Upd
       return res;
     },
     onSuccess,
-    onError,
+    onError: (error) => {
+      pushApiErrorMessages(error);
+      onError?.(error);
+    },
   });
 }
 
@@ -106,7 +112,10 @@ export function deleteBizObjectMutationOptions({ boId, onSuccess, onError }: Del
       return res;
     },
     onSuccess,
-    onError,
+    onError: (error) => {
+      pushApiErrorMessages(error);
+      onError?.(error);
+    },
   });
 }
 
@@ -129,7 +138,10 @@ export function linkAttachmentToBoMutationOptions({ onSuccess, onError }: LinkAt
       return res;
     },
     onSuccess,
-    onError,
+    onError: (error) => {
+      pushApiErrorMessages(error);
+      onError?.(error);
+    },
   });
 }
 
@@ -151,7 +163,10 @@ export function unlinkAttachmentFromBoMutationOptions({ onSuccess, onError }: Un
       return res;
     },
     onSuccess,
-    onError,
+    onError: (error) => {
+      pushApiErrorMessages(error);
+      onError?.(error);
+    },
   });
 }
 

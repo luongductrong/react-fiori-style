@@ -4,6 +4,7 @@ import { toast } from '@/libs/toast';
 import '@ui5/webcomponents-icons/refresh.js';
 import '@ui5/webcomponents-icons/decline.js';
 import { getError } from '@/libs/error-message';
+import { pushApiErrorMessages } from '@/libs/errors';
 import { Text } from '@ui5/webcomponents-react/Text';
 import { Icon } from '@ui5/webcomponents-react/Icon';
 import { useNavigate, useParams } from 'react-router';
@@ -35,9 +36,7 @@ export function BoDetailView() {
   const { id } = useParams();
   const queryClient = useQueryClient();
   const navigate = useNavigate();
-  const [errorBoxOpen, setErrorBoxOpen] = React.useState(false);
   const [deleteDialogOpen, setDeleteDialogOpen] = React.useState(false);
-  const [errorBoxMessages, setErrorBoxMessages] = React.useState<string[]>([]);
   const [editMode, setEditMode] = React.useState(false);
   const [editValues, setEditValues] = React.useState<BizFormValues>({
     title: '',
@@ -73,11 +72,6 @@ export function BoDetailView() {
         toast('Business object deleted successfully');
         navigate('/business-objects');
       },
-      onError: (error) => {
-        const messages = getError(error);
-        setErrorBoxMessages((prev) => [...messages, ...prev]);
-        setErrorBoxOpen(true);
-      },
     }),
   );
 
@@ -88,11 +82,6 @@ export function BoDetailView() {
         refetch();
         toast('Business object updated successfully');
         setEditMode(false);
-      },
-      onError: (error) => {
-        const messages = getError(error);
-        setErrorBoxMessages((prev) => [...messages, ...prev]);
-        setErrorBoxOpen(true);
       },
     }),
   );
@@ -108,9 +97,7 @@ export function BoDetailView() {
 
   React.useEffect(() => {
     if (bizObjectError) {
-      const messages = getError(bizObjectError);
-      setErrorBoxMessages((prev) => [...messages, ...prev]);
-      setErrorBoxOpen(true);
+      pushApiErrorMessages(bizObjectError);
     }
   }, [bizObjectError]);
 
@@ -301,24 +288,7 @@ export function BoDetailView() {
       >
         Are you sure you want to delete this business object? This action cannot be undone.
       </MessageBox>
-      {(isDeleting || isUpdating) && <BusyIndicator type="pending" />}
-      {errorBoxOpen && errorBoxMessages.length > 0 && (
-        <MessageBox
-          open
-          title="Error"
-          type="Error"
-          onClose={() => {
-            setErrorBoxOpen(false);
-            setErrorBoxMessages([]);
-          }}
-        >
-          <ul className="list-disc list-inside">
-            {errorBoxMessages.map((message, index) => (
-              <li key={index}>{message}</li>
-            ))}
-          </ul>
-        </MessageBox>
-      )}
+      <BusyIndicator type="pending" show={isDeleting || isUpdating} />
       {/* TODO: Handle time zone display */}
     </div>
   );

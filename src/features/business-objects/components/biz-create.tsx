@@ -1,13 +1,11 @@
 import * as React from 'react';
 import { toast } from '@/libs/toast';
 import { useNavigate } from 'react-router';
-import { getError } from '@/libs/error-message';
 import { Bar } from '@ui5/webcomponents-react/Bar';
 import { BizForm, type BizFormValues } from './biz-form';
 import { Dialog } from '@ui5/webcomponents-react/Dialog';
 import { Button } from '@ui5/webcomponents-react/Button';
 import { BusyIndicator } from '@/components/busy-indicator';
-import { MessageBox } from '@ui5/webcomponents-react/MessageBox';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { createBizObjectMutationOptions } from '../options/mutation';
 import { ToolbarButton } from '@ui5/webcomponents-react/ToolbarButton';
@@ -16,8 +14,6 @@ export function BizCreate() {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const [open, setOpen] = React.useState(false);
-  const [errorBoxOpen, setErrorBoxOpen] = React.useState(false);
-  const [errorBoxMessages, setErrorBoxMessages] = React.useState<string[]>([]);
   const [values, setValues] = React.useState<BizFormValues>({
     title: '',
     type: '',
@@ -32,16 +28,13 @@ export function BizCreate() {
         queryClient.invalidateQueries({ queryKey: ['biz-objects'] });
         navigate(`/business-objects/${data.BoId}`);
       },
-      onError: (error) => {
-        const messages = getError(error);
-        setErrorBoxMessages((prev) => [...messages, ...prev]);
+      onError: () => {
         setValues({
           title: '',
           type: '',
           status: '',
         });
         setOpen(false);
-        setErrorBoxOpen(true);
       },
     }),
   );
@@ -86,23 +79,6 @@ export function BizCreate() {
         <BizForm value={values} onChange={setValues} inputClassName="md:w-full" />
         <BusyIndicator type="pending" show={isPending} />
       </Dialog>
-      {errorBoxOpen && errorBoxMessages.length > 0 && (
-        <MessageBox
-          open
-          title="Error"
-          type="Error"
-          onClose={() => {
-            setErrorBoxOpen(false);
-            setErrorBoxMessages([]);
-          }}
-        >
-          <ul className="list-disc list-inside">
-            {errorBoxMessages.map((message, index) => (
-              <li key={index}>{message}</li>
-            ))}
-          </ul>
-        </MessageBox>
-      )}
     </React.Fragment>
   );
 }

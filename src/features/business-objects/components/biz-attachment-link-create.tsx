@@ -1,13 +1,12 @@
 import * as React from 'react';
 import { toast } from '@/libs/toast';
-import { getError } from '@/libs/error-message';
 import { Bar } from '@ui5/webcomponents-react/Bar';
+import { pushApiErrorMessages } from '@/libs/errors';
 import { Title } from '@ui5/webcomponents-react/Title';
 import { Dialog } from '@ui5/webcomponents-react/Dialog';
 import { Button } from '@ui5/webcomponents-react/Button';
 import { Toolbar } from '@ui5/webcomponents-react/Toolbar';
 import { BusyIndicator } from '@/components/busy-indicator';
-import { MessageBox } from '@ui5/webcomponents-react/MessageBox';
 import { ToolbarButton } from '@ui5/webcomponents-react/ToolbarButton';
 import { ToolbarSpacer } from '@ui5/webcomponents-react/ToolbarSpacer';
 import { linkAttachmentToBoMutationOptions } from '../options/mutation';
@@ -37,6 +36,7 @@ const columns = [
   },
   {
     Header: 'Created At',
+    id: 'created-at',
     Cell: (props: AnalyticalTableCellInstance) => `${props.row.original.Erdat ?? ''} ${props.row.original.Erzet ?? ''}`,
   },
   {
@@ -53,8 +53,6 @@ function BizAttachmentLinkCreateImpl({ boId, linkedAttachmentIds, disabled }: Bi
   const queryClient = useQueryClient();
   const [open, setOpen] = React.useState(false);
   const [filter, setFilter] = React.useState('');
-  const [errorBoxOpen, setErrorBoxOpen] = React.useState(false);
-  const [errorBoxMessages, setErrorBoxMessages] = React.useState<string[]>([]);
   const [selectedAttachment, setSelectedAttachment] = React.useState<{
     id: string;
     title: string;
@@ -68,17 +66,10 @@ function BizAttachmentLinkCreateImpl({ boId, linkedAttachmentIds, disabled }: Bi
         setOpen(false);
         queryClient.invalidateQueries({ queryKey: ['biz-objects', boId] });
       },
-      onError: (error) => {
-        const messages = getError(error);
-        setErrorBoxMessages((prev) => [...messages, ...prev]);
-        setSelectedAttachment(null);
-        setOpen(false);
-        setErrorBoxOpen(true);
-      },
     }),
   );
 
-  const { data, isFetching, hasNextPage, fetchNextPage, isFetchingNextPage } = useInfiniteQuery({
+  const { data, isFetching, hasNextPage, fetchNextPage, isFetchingNextPage, error } = useInfiniteQuery({
     ...attachmentsQueryOptions({
       'sap-client': 324,
       $skip: 0,
@@ -100,6 +91,12 @@ function BizAttachmentLinkCreateImpl({ boId, linkedAttachmentIds, disabled }: Bi
 
   const totalCount = data?.pages[0]?.['@odata.count'] ?? 0;
   const remainingCount = totalCount - linkedAttachmentIds.length;
+
+  React.useEffect(() => {
+    if (error) {
+      pushApiErrorMessages(error);
+    }
+  }, [error]);
 
   return (
     <React.Fragment>
@@ -184,24 +181,6 @@ function BizAttachmentLinkCreateImpl({ boId, linkedAttachmentIds, disabled }: Bi
         )}
         {isPending && <BusyIndicator type="pending" />}
       </Dialog>
-      {errorBoxOpen && errorBoxMessages.length > 0 && (
-        <MessageBox
-          open
-          title="Error"
-          type="Error"
-          onClose={() => {
-            setErrorBoxOpen(false);
-            setErrorBoxMessages([]);
-          }}
-        >
-          <ul className="list-disc list-inside">
-            {errorBoxMessages.map((message, index) => (
-              <li key={index}>{message}</li>
-            ))}
-          </ul>
-        </MessageBox>
-        // TODO: Consider turning it into a separate component.
-      )}
     </React.Fragment>
   );
 }

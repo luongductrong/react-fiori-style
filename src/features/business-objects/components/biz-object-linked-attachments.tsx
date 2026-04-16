@@ -1,9 +1,9 @@
 import * as React from 'react';
-import { toast } from '@/libs/toast';
 import { Link } from 'react-router';
+import { toast } from '@/libs/toast';
 import '@ui5/webcomponents-icons/delete.js';
-import { getError } from '@/libs/error-message';
 import { Bar } from '@ui5/webcomponents-react/Bar';
+import { pushApiErrorMessages } from '@/libs/errors';
 import { Title } from '@ui5/webcomponents-react/Title';
 import { Button } from '@ui5/webcomponents-react/Button';
 import { Toolbar } from '@ui5/webcomponents-react/Toolbar';
@@ -58,15 +58,13 @@ const rawColumns = [
 
 export function BizObjectLinkedAttachments({ boId, disabled }: BizObjectLinkedAttachmentsProps) {
   const queryClient = useQueryClient();
-  const [errorBoxOpen, setErrorBoxOpen] = React.useState(false);
-  const [errorBoxMessages, setErrorBoxMessages] = React.useState<string[]>([]);
   const [deleteDialogOpen, setDeleteDialogOpen] = React.useState(false);
   const [attachmentToDelete, setAttachmentToDelete] = React.useState<{
     fileId: string;
     title?: string;
   } | null>(null);
 
-  const { data, isFetching, fetchNextPage, hasNextPage, isFetchingNextPage } = useInfiniteQuery(
+  const { data, isFetching, fetchNextPage, hasNextPage, isFetchingNextPage, error } = useInfiniteQuery(
     bizObjectLinkedAttachmentsQueryOptions(boId, {
       'sap-client': 324,
       $count: true,
@@ -81,11 +79,6 @@ export function BizObjectLinkedAttachments({ boId, disabled }: BizObjectLinkedAt
       onSuccess: () => {
         toast('Attachment unlinked successfully');
         queryClient.invalidateQueries({ queryKey: ['biz-objects', boId] });
-      },
-      onError: (error) => {
-        const messages = getError(error);
-        setErrorBoxMessages((prev) => [...messages, ...prev]);
-        setErrorBoxOpen(true);
       },
     }),
   );
@@ -127,6 +120,12 @@ export function BizObjectLinkedAttachments({ boId, disabled }: BizObjectLinkedAt
     ],
     [isPending],
   );
+
+  React.useEffect(() => {
+    if (error) {
+      pushApiErrorMessages(error);
+    }
+  }, [error]);
 
   return (
     <>
@@ -179,23 +178,6 @@ export function BizObjectLinkedAttachments({ boId, disabled }: BizObjectLinkedAt
           ? `Are you sure you want to unlink attachment "${attachmentToDelete.title || attachmentToDelete.fileId}"?`
           : 'Are you sure you want to unlink this attachment?'}
       </MessageBox>
-      {errorBoxOpen && errorBoxMessages.length > 0 && (
-        <MessageBox
-          open
-          title="Error"
-          type="Error"
-          onClose={() => {
-            setErrorBoxOpen(false);
-            setErrorBoxMessages([]);
-          }}
-        >
-          <ul className="list-disc list-inside">
-            {errorBoxMessages.map((message, index) => (
-              <li key={index}>{message}</li>
-            ))}
-          </ul>
-        </MessageBox>
-      )}
     </>
   );
 }

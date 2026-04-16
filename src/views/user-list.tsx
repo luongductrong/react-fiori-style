@@ -406,7 +406,7 @@ export function UserListView({ embedded = false }: UserListViewProps = {}) {
         background: 'linear-gradient(180deg,rgba(242,247,251,0.98) 0%,rgba(231,240,248,0.98) 100%)',
       }}
     >
-      <section className="mx-auto flex w-full max-w-[96rem] flex-col gap-4 p-4 h-full">{content}</section>
+      <section className="mx-auto flex w-full max-w-384 flex-col gap-4 p-4 h-full">{content}</section>
     </DynamicPage>
   );
 }

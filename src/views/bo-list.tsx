@@ -1,10 +1,15 @@
 import * as React from 'react';
+import { cn } from '@/libs/utils';
+import { Link } from 'react-router';
 import '@ui5/webcomponents-icons/home.js';
+import '@ui5/webcomponents-icons/list.js';
 import { useNavigate } from 'react-router';
 import '@ui5/webcomponents-icons/refresh.js';
-import '@ui5/webcomponents-icons/document.js';
-import { getError } from '@/libs/error-message';
+import '@ui5/webcomponents-icons/table-view.js';
+import { useAppStore } from '@/stores/app-store';
 import { Bar } from '@ui5/webcomponents-react/Bar';
+import { Grid } from '@ui5/webcomponents-react/Grid';
+import { pushApiErrorMessages } from '@/libs/errors';
 import { Icon } from '@ui5/webcomponents-react/Icon';
 import { Title } from '@ui5/webcomponents-react/Title';
 import { useInfiniteQuery } from '@tanstack/react-query';
@@ -12,23 +17,36 @@ import { Button } from '@ui5/webcomponents-react/Button';
 import { FlexBox } from '@ui5/webcomponents-react/FlexBox';
 import { Toolbar } from '@ui5/webcomponents-react/Toolbar';
 import { API } from '@/features/business-objects/constants';
-import '@ui5/webcomponents-icons/navigation-right-arrow.js';
-import { MessageBox } from '@ui5/webcomponents-react/MessageBox';
+import '@ui5/webcomponents-fiori/dist/illustrations/NoData.js';
+import { Link as UI5Link } from '@ui5/webcomponents-react/Link';
 import { DynamicPage } from '@ui5/webcomponents-react/DynamicPage';
 import { ToolbarSpacer } from '@ui5/webcomponents-react/ToolbarSpacer';
 import { ToolbarButton } from '@ui5/webcomponents-react/ToolbarButton';
 import { DynamicPageHeader } from '@ui5/webcomponents-react/DynamicPageHeader';
+import { IllustratedMessage } from '@ui5/webcomponents-react/IllustratedMessage';
 import { bizObjectsQueryOptions } from '@/features/business-objects/options/query';
 import { displayBoType, displayBoStatus } from '@/features/business-objects/helpers';
-import { BizObjectsFilterBar, BizCreate } from '@/features/business-objects/components';
+import { BizObjectCard, BizObjectsFilterBar, BizCreate } from '@/features/business-objects/components';
 import { AnalyticalTable, type AnalyticalTableCellInstance } from '@ui5/webcomponents-react/AnalyticalTable';
 
-const rawColumns = [
-  { Header: 'ID', accessor: 'BoId' },
+const columns = [
+  {
+    Header: 'ID',
+    accessor: 'BoId',
+    Cell: (props: AnalyticalTableCellInstance) => (
+      <Link to={`/business-objects/${props.value}`}>
+        <UI5Link>{props.value}</UI5Link>
+      </Link>
+    ),
+  },
   { Header: 'Title', accessor: 'BoTitle' },
   { Header: 'Type', accessor: 'BoType', Cell: (props: AnalyticalTableCellInstance) => displayBoType(props.value) },
   { Header: 'Status', accessor: 'Status', Cell: (props: AnalyticalTableCellInstance) => displayBoStatus(props.value) },
-  { Header: 'Created On', accessor: 'Erdat' },
+  {
+    Header: 'Created At',
+    id: 'created-at',
+    Cell: (props: AnalyticalTableCellInstance) => `${props.row.original.Erdat ?? ''} ${props.row.original.Erzet ?? ''}`,
+  },
   { Header: 'Created By', accessor: 'Ernam' },
 ];
 
@@ -36,10 +54,10 @@ const ROWS_PER_PAGE = 10; // TODO: Move to constants
 
 export function BoListView() {
   const navigate = useNavigate();
+  const viewMode = useAppStore((state) => state.viewMode);
+  const setViewMode = useAppStore((state) => state.setViewMode);
   const [search, setSearch] = React.useState('');
   const [filter, setFilter] = React.useState('');
-  const [errorBoxOpen, setErrorBoxOpen] = React.useState(false);
-  const [errorBoxMessages, setErrorBoxMessages] = React.useState<string[]>([]);
 
   const { data, isFetching, isFetchingNextPage, error, refetch, hasNextPage, fetchNextPage } = useInfiniteQuery(
     bizObjectsQueryOptions({
@@ -47,7 +65,7 @@ export function BoListView() {
       $skip: 0,
       $top: ROWS_PER_PAGE,
       $count: true,
-      $select: API.select, // TODO: The same handle applies to Attachments.
+      $select: API.select,
       $filter: filter || undefined,
       $search: search || undefined,
     }),
@@ -60,31 +78,8 @@ export function BoListView() {
     if (!error) {
       return;
     }
-    const messages = getError(error);
-    setErrorBoxMessages((prev) => [...messages, ...prev]);
-    setErrorBoxOpen(true);
+    pushApiErrorMessages(error);
   }, [error]);
-
-  const columns = React.useMemo(
-    () => [
-      ...rawColumns,
-      {
-        Header: '',
-        id: 'nav',
-        width: 60,
-        disableSortBy: true,
-        disableGroupBy: true,
-        Cell: (props: AnalyticalTableCellInstance) => (
-          <Icon
-            name="navigation-right-arrow"
-            onClick={() => navigate(`/business-objects/${props.row.original.BoId}`)}
-          />
-        ),
-        // TODO: Implement the same process to other tables.
-      },
-    ],
-    [navigate],
-  );
 
   return (
     <DynamicPage
@@ -111,12 +106,44 @@ export function BoListView() {
       className="h-dvh"
       showFooter={true}
     >
-      <AnalyticalTable
-        header={
-          <Toolbar className="py-2 px-4 rounded-t-xl">
+      {viewMode === 'table' && (
+        <AnalyticalTable
+          header={
+            <Toolbar className="py-2 px-4 rounded-t-xl">
+              <Title level="H2">Business Objects {totalCount ? `(${totalCount})` : ''}</Title>
+              <ToolbarSpacer />
+              <BizCreate />
+              <ToolbarButton
+                design="Transparent"
+                icon="refresh"
+                text="Refresh"
+                onClick={() => {
+                  refetch();
+                }}
+              />
+              <ToolbarButton
+                icon="table-view"
+                tooltip="Toggle grid view"
+                disabled={isFetching || bizObjects.length === 0}
+                onClick={() => setViewMode('grid')}
+              />
+            </Toolbar>
+          }
+          data={bizObjects}
+          columns={columns}
+          sortable
+          groupable
+          loading={isFetching || isFetchingNextPage}
+          rowHeight={36}
+          scaleWidthMode="Smart"
+          visibleRowCountMode="Auto"
+        />
+      )}
+      {viewMode === 'grid' && (
+        <FlexBox direction="Column" style={{ width: '100%', gap: '1rem' }}>
+          <Toolbar className="py-2 px-4 rounded-xl">
             <Title level="H2">Business Objects {totalCount ? `(${totalCount})` : ''}</Title>
             <ToolbarSpacer />
-            {/* ToolbarButton - BizCreate */}
             <BizCreate />
             <ToolbarButton
               design="Transparent"
@@ -126,59 +153,30 @@ export function BoListView() {
                 refetch();
               }}
             />
-            {/* <ToolbarButton
-              icon="table-view"
-              tooltip="Toggle grid view"
-              disabled={isFetching || attachments.length === 0}
-              onClick={() => setViewMode('grid')}
-            /> */}
+            <ToolbarButton
+              icon="list"
+              tooltip="Toggle list view"
+              onClick={() => setViewMode('table')}
+              disabled={isFetching || bizObjects.length === 0}
+            />
           </Toolbar>
-        }
-        data={bizObjects}
-        columns={columns}
-        sortable
-        groupable
-        loading={isFetching || isFetchingNextPage}
-        rowHeight={36}
-        scaleWidthMode="Smart"
-        visibleRowCountMode="Auto"
-        onRowClick={(event) => {
-          const item = event.detail.row.original;
-          if (item?.BoId) {
-            navigate(`/business-objects/${item.BoId}`);
-          }
-        }}
-      />
+          {bizObjects.length === 0 && <IllustratedMessage name="NoData" />}
+          <Grid defaultSpan="XL3 L4 M6 S12" hSpacing="1.5rem" vSpacing="1.5rem" className="px-3 md:px-0">
+            {bizObjects.map((bizObject) => (
+              <BizObjectCard key={bizObject.BoId} data={bizObject} loading={isFetching || isFetchingNextPage} />
+            ))}
+          </Grid>
+        </FlexBox>
+      )}
       {hasNextPage && (
-        <Bar>
-          {/* className={cn({ 'rounded-xl mt-4': viewMode === 'grid' })} */}
+        <Bar className={cn({ 'rounded-xl mt-4': viewMode === 'grid' })}>
           <Button onClick={() => fetchNextPage()} disabled={isFetchingNextPage} design="Transparent">
             More [{bizObjects.length}/{totalCount}]
           </Button>
         </Bar>
       )}
-      {errorBoxOpen && errorBoxMessages.length > 0 && (
-        <MessageBox
-          open
-          title="Error"
-          type="Error"
-          onClose={() => {
-            setErrorBoxOpen(false);
-            setErrorBoxMessages([]);
-          }}
-        >
-          <ul className="list-disc list-inside">
-            {errorBoxMessages.map((message, index) => (
-              <li key={index}>{message}</li>
-            ))}
-          </ul>
-        </MessageBox>
-      )}
     </DynamicPage>
   );
 }
-
-// TODO: Grid View
-// TODO: Fix filter by ID
 // TODO: Handle time zone display
 // TODO: Handle default orderby
