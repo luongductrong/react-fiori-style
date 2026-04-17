@@ -1,6 +1,5 @@
 import { useNavigate } from 'react-router';
 import '@ui5/webcomponents-icons/document.js';
-import { useAuthStore } from '@/stores/auth-store';
 import { Card } from '@ui5/webcomponents-react/Card';
 import { Icon } from '@ui5/webcomponents-react/Icon';
 import { List } from '@ui5/webcomponents-react/List';
@@ -18,12 +17,12 @@ type Attachment = {
 
 type AttachmentCardProps = {
   data: Attachment;
+  isAdmin: boolean;
   loading?: boolean;
 };
 
-export function AttachmentCard({ data, loading }: AttachmentCardProps) {
+export function AttachmentCard({ data, isAdmin, loading }: AttachmentCardProps) {
   const navigate = useNavigate();
-  const isAdmin = useAuthStore((state) => state.isAdmin);
 
   return (
     <Card

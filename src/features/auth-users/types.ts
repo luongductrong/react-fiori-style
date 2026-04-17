@@ -7,6 +7,12 @@ export type CurrentAuthUserResponse = {
   value: CurrentAuthUserItem[];
 };
 
+export type CurrentAuthUserState = {
+  currentUser: CurrentAuthUserItem | null;
+  username: string | null;
+  isAdmin: boolean;
+};
+
 export type AuthUserItem = {
   Uname: string;
   Role: string;

@@ -2,20 +2,30 @@ import '@ui5/webcomponents-icons/log.js';
 import { ODATA_BASE_URL } from '@/app-env';
 import { useNavigate } from 'react-router';
 import '@ui5/webcomponents-icons/attachment.js';
-import { useAuthStore } from '@/stores/auth-store';
 import { Card } from '@ui5/webcomponents-react/Card';
 import { Icon } from '@ui5/webcomponents-react/Icon';
 import { Title } from '@ui5/webcomponents-react/Title';
 import '@ui5/webcomponents-icons/person-placeholder.js';
 import { Button } from '@ui5/webcomponents-react/Button';
 import { FlexBox } from '@ui5/webcomponents-react/FlexBox';
+import { BusyIndicator } from '@/components/busy-indicator';
 import '@ui5/webcomponents-icons/business-objects-mobile.js';
+import { useCurrentAuthUser } from '@/features/auth-users/hooks';
 import { CardHeader } from '@ui5/webcomponents-react/CardHeader';
-import { AuthUserLoader } from '@/features/auth-users/components';
 
 export function ShellHomeView() {
   const navigate = useNavigate();
-  const isAdmin = useAuthStore((state) => state.isAdmin);
+  const { data: currentAuthUser, isPending: isAuthPending } = useCurrentAuthUser();
+  const isAdmin = currentAuthUser?.isAdmin ?? false;
+
+  if (isAuthPending) {
+    return (
+      <div className="flex h-dvh w-full items-center justify-center">
+        <BusyIndicator type="loading" />
+      </div>
+    );
+  }
+
   return (
     <main className="relative isolate min-h-screen overflow-hidden bg-[linear-gradient(180deg,#d9eafb_0%,#dceaf7_44%,#e1ecf6_100%)] text-[#16314d]">
       <div className="pointer-events-none absolute inset-0" aria-hidden="true">
@@ -84,7 +94,6 @@ export function ShellHomeView() {
       <footer className="absolute bottom-[0.95rem] left-4 right-4 z-10 text-center text-[0.7rem] text-muted-foreground sm:left-auto sm:right-5 sm:text-left">
         Copyright (c) {new Date().getFullYear()} SAP SE All Rights Reserved.
       </footer>
-      <AuthUserLoader showLoader />
     </main>
   );
 }

@@ -7,7 +7,6 @@ import '@ui5/webcomponents-icons/table-view.js';
 import { useNavigate, Link } from 'react-router';
 import { useAppStore } from '@/stores/app-store';
 import { Bar } from '@ui5/webcomponents-react/Bar';
-import { useAuthStore } from '@/stores/auth-store';
 import { pushApiErrorMessages } from '@/libs/errors';
 import { Grid } from '@ui5/webcomponents-react/Grid';
 import { Icon } from '@ui5/webcomponents-react/Icon';
@@ -16,9 +15,11 @@ import { Button } from '@ui5/webcomponents-react/Button';
 import { useInfiniteQuery } from '@tanstack/react-query';
 import { FlexBox } from '@ui5/webcomponents-react/FlexBox';
 import { Toolbar } from '@ui5/webcomponents-react/Toolbar';
+import { BusyIndicator } from '@/components/busy-indicator';
 import '@ui5/webcomponents-icons/navigation-right-arrow.js';
 import '@ui5/webcomponents-fiori/dist/illustrations/NoData.js';
 import { Link as UI5Link } from '@ui5/webcomponents-react/Link';
+import { useCurrentAuthUser } from '@/features/auth-users/hooks';
 import { DynamicPage } from '@ui5/webcomponents-react/DynamicPage';
 import { ToolbarButton } from '@ui5/webcomponents-react/ToolbarButton';
 import { ToolbarSpacer } from '@ui5/webcomponents-react/ToolbarSpacer';
@@ -30,13 +31,14 @@ import { AnalyticalTable, type AnalyticalTableCellInstance } from '@ui5/webcompo
 
 export function AttachmentListView() {
   const navigate = useNavigate();
-  const isAdmin = useAuthStore((state) => state.isAdmin);
   const viewMode = useAppStore((state) => state.viewMode);
   const setViewMode = useAppStore((state) => state.setViewMode);
+  const { data: currentAuthUser, isPending: isAuthPending } = useCurrentAuthUser();
   const [search, setSearch] = React.useState<string>('');
   const [filter, setFilter] = React.useState<string>('');
-  const { data, isFetching, hasNextPage, fetchNextPage, isFetchingNextPage, refetch, error } = useInfiniteQuery(
-    attachmentsQueryOptions({
+  const isAdmin = currentAuthUser?.isAdmin ?? false;
+  const attachmentListParams = React.useMemo(
+    () => ({
       'sap-client': 324,
       $skip: 0,
       $top: 10,
@@ -46,7 +48,12 @@ export function AttachmentListView() {
       $filter: isAdmin ? filter || undefined : filter ? `IsActive eq true and ${filter}` : 'IsActive eq true',
       $search: search || undefined,
     }),
+    [filter, isAdmin, search],
   );
+  const { data, isFetching, hasNextPage, fetchNextPage, isFetchingNextPage, refetch, error } = useInfiniteQuery({
+    ...attachmentsQueryOptions(attachmentListParams),
+    enabled: !isAuthPending,
+  });
 
   const attachments = React.useMemo(() => {
     return data?.pages.flatMap((page) => page.value) || [];
@@ -99,6 +106,14 @@ export function AttachmentListView() {
       pushApiErrorMessages(error);
     }
   }, [error]);
+
+  if (isAuthPending) {
+    return (
+      <div className="flex h-dvh w-full items-center justify-center">
+        <BusyIndicator type="loading" />
+      </div>
+    );
+  }
 
   return (
     <DynamicPage
@@ -186,7 +201,12 @@ export function AttachmentListView() {
           {attachments.length === 0 && <IllustratedMessage name="NoData" />}
           <Grid defaultSpan="XL3 L4 M6 S12" hSpacing="1.5rem" vSpacing="1.5rem" className="px-3 md:px-0">
             {attachments.map((attachment) => (
-              <AttachmentCard key={attachment.FileId} data={attachment} loading={isFetching || isFetchingNextPage} />
+              <AttachmentCard
+                key={attachment.FileId}
+                data={attachment}
+                isAdmin={isAdmin}
+                loading={isFetching || isFetchingNextPage}
+              />
             ))}
           </Grid>
         </FlexBox>

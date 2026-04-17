@@ -31,7 +31,7 @@ export function currentAuthUserQueryOptions() {
       });
       return res;
     },
-    staleTime: 10 * 60 * 1000,
+    staleTime: 10 * 60 * 1000, // 10 minutes
     gcTime: Infinity,
   });
 }

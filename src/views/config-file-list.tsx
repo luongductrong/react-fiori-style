@@ -1,11 +1,10 @@
 import * as React from 'react';
 import { toast } from '@/libs/toast';
 import '@ui5/webcomponents-icons/home.js';
+import { useNavigate } from 'react-router';
 import '@ui5/webcomponents-icons/refresh.js';
 import { formatFileSize } from '@/libs/utils';
-import { useAuthStore } from '@/stores/auth-store';
 import { pushApiErrorMessages } from '@/libs/errors';
-import { useNavigate, Navigate } from 'react-router';
 import { Icon } from '@ui5/webcomponents-react/Icon';
 import { Title } from '@ui5/webcomponents-react/Title';
 import { Button } from '@ui5/webcomponents-react/Button';
@@ -48,7 +47,6 @@ const rawColumns = [
 
 export function ConfigFileListView() {
   const navigate = useNavigate();
-  const isAdmin = useAuthStore((state) => state.isAdmin);
   const queryClient = useQueryClient();
   const [search, setSearch] = React.useState('');
   const [configFileToEdit, setConfigFileToEdit] = React.useState<ConfigFileItem | null>(null);
@@ -163,10 +161,6 @@ export function ConfigFileListView() {
       pushApiErrorMessages(error);
     }
   }, [error]);
-
-  if (!isAdmin) {
-    return <Navigate to="/shell-home" />;
-  }
 
   return (
     <DynamicPage

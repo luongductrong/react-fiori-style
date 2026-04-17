@@ -1,10 +1,9 @@
 import * as React from 'react';
 import { toast } from '@/libs/toast';
 import '@ui5/webcomponents-icons/home.js';
+import { useNavigate } from 'react-router';
 import '@ui5/webcomponents-icons/delete.js';
 import '@ui5/webcomponents-icons/refresh.js';
-import { useAuthStore } from '@/stores/auth-store';
-import { useNavigate, Navigate } from 'react-router';
 import { Icon } from '@ui5/webcomponents-react/Icon';
 import { Title } from '@ui5/webcomponents-react/Title';
 import { Button } from '@ui5/webcomponents-react/Button';
@@ -12,6 +11,7 @@ import { Toolbar } from '@ui5/webcomponents-react/Toolbar';
 import { FlexBox } from '@ui5/webcomponents-react/FlexBox';
 import type { AuthUserItem } from '@/features/auth-users/types';
 import { MessageBox } from '@ui5/webcomponents-react/MessageBox';
+import { useCurrentAuthUser } from '@/features/auth-users/hooks';
 import { DynamicPage } from '@ui5/webcomponents-react/DynamicPage';
 import { ToolbarSpacer } from '@ui5/webcomponents-react/ToolbarSpacer';
 import { ToolbarButton } from '@ui5/webcomponents-react/ToolbarButton';
@@ -33,13 +33,13 @@ const rawColumns = [
 
 export function UserListView() {
   const navigate = useNavigate();
-  const isAdmin = useAuthStore((state) => state.isAdmin);
-  const username = useAuthStore((state) => state.username);
   const queryClient = useQueryClient();
+  const { data: currentAuthUser } = useCurrentAuthUser();
   const [search, setSearch] = React.useState('');
   const [filter, setFilter] = React.useState('');
   const [deleteDialogOpen, setDeleteDialogOpen] = React.useState(false);
   const [selectedUser, setSelectedUser] = React.useState<AuthUserItem | null>(null);
+  const username = currentAuthUser?.username ?? null;
 
   const { data, isFetching, error, refetch } = useQuery(
     authUsersQueryOptions({
@@ -102,10 +102,6 @@ export function UserListView() {
       pushApiErrorMessages(error);
     }
   }, [error]);
-
-  if (!isAdmin) {
-    return <Navigate to="/shell-home" />;
-  }
 
   return (
     <DynamicPage

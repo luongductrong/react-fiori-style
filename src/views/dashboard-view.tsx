@@ -1,7 +1,6 @@
 import '@ui5/webcomponents-icons/home.js';
 import '@ui5/webcomponents-icons/refresh.js';
-import { useAuthStore } from '@/stores/auth-store';
-import { useNavigate, Navigate } from 'react-router';
+import { useNavigate } from 'react-router';
 import { Icon } from '@ui5/webcomponents-react/Icon';
 import { useQueryClient } from '@tanstack/react-query';
 import { Title } from '@ui5/webcomponents-react/Title';
@@ -21,12 +20,6 @@ import { DashboardConfigurationCoverage } from '@/features/dashboard/components'
 export function DashboardView() {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
-  const isAdmin = useAuthStore((state) => state.isAdmin);
-
-  if (!isAdmin) {
-    return <Navigate to="/shell-home" />;
-  }
-  // TODO: Change this logic
 
   return (
     <DynamicPage

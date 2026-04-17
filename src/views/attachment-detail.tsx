@@ -6,7 +6,6 @@ import '@ui5/webcomponents-icons/decline.js';
 import '@ui5/webcomponents-icons/refresh.js';
 import '@ui5/webcomponents-icons/attachment.js';
 import { getError } from '@/libs/error-message';
-import { useAuthStore } from '@/stores/auth-store';
 import { Icon } from '@ui5/webcomponents-react/Icon';
 import { Text } from '@ui5/webcomponents-react/Text';
 import { useParams, useNavigate } from 'react-router';
@@ -18,6 +17,7 @@ import { Button } from '@ui5/webcomponents-react/Button';
 import { Toolbar } from '@ui5/webcomponents-react/Toolbar';
 import { BusyIndicator } from '@/components/busy-indicator';
 import { downloadFile } from '@/features/attachments/helpers';
+import { useCurrentAuthUser } from '@/features/auth-users/hooks';
 import { ObjectPage } from '@ui5/webcomponents-react/ObjectPage';
 import { MessageBox } from '@ui5/webcomponents-react/MessageBox';
 import { Breadcrumbs } from '@ui5/webcomponents-react/Breadcrumbs';
@@ -41,8 +41,7 @@ export function AttachmentDetailView() {
   const { id } = useParams();
   const navigate = useNavigate();
   const queryClient = useQueryClient();
-  const isAdmin = useAuthStore((state) => state.isAdmin);
-  const username = useAuthStore((state) => state.username);
+  const { data: currentAuthUser, isPending: isAuthPending } = useCurrentAuthUser();
   const [isEditMode, setIsEditMode] = React.useState(false);
   const [titleError, setTitleError] = React.useState('');
   const [deleteDialogOpen, setDeleteDialogOpen] = React.useState(false);
@@ -100,8 +99,10 @@ export function AttachmentDetailView() {
     }),
   );
 
+  const isAdmin = currentAuthUser?.isAdmin ?? false;
+  const username = currentAuthUser?.username ?? null;
   const isOwner = username === attachment?.Ernam;
-  const canModifyLockedAttachment = !attachment?.EditLock || isOwner;
+  const canModifyLockedAttachment = !attachment?.EditLock || (!isAuthPending && isOwner);
   const canEditAttachment = Boolean(
     attachment?.IsActive && attachment.__EntityControl?.Updatable && canModifyLockedAttachment,
   );
