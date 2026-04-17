@@ -3,11 +3,11 @@ import { StrictMode } from 'react';
 import '@ui5/webcomponents/dist/Assets.js';
 import { Toaster } from '@/components/toast';
 import { createRoot } from 'react-dom/client';
-import { HashRouter, Route, Routes } from 'react-router';
 import { AppLayout } from '@/components/layouts/app-layout';
 import '@ui5/webcomponents-react/dist/json-imports/i18n.js';
 import { AdminLayout } from '@/components/layouts/admin-layout';
 import { PrivateRoute } from '@/components/layouts/private-route';
+import { HashRouter, Route, Routes, Navigate } from 'react-router';
 import { ErrorsMessageBox } from '@/components/errors-message-box';
 import { QueryProvider } from '@/context-providers/query-provider';
 import { ThemeProvider } from '@ui5/webcomponents-react/ThemeProvider';
@@ -51,6 +51,8 @@ createRoot(document.getElementById('root')!).render(
                   <Route path="versions/:versionNo" element={<VersionDetailView />} />
                 </Route>
               </Route>
+              {/* Redirect */}
+              <Route path="/" element={<Navigate to="/launchpad" replace />} />
               {/* Not Found */}
               <Route path="*" element={<NotFoundView />} />
             </Route>
