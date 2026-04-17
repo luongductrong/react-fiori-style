@@ -1,11 +1,8 @@
 import * as React from 'react';
 import { toast } from '@/libs/toast';
-import '@ui5/webcomponents-icons/home.js';
-import { useNavigate } from 'react-router';
 import '@ui5/webcomponents-icons/refresh.js';
 import { formatFileSize } from '@/libs/utils';
 import { pushApiErrorMessages } from '@/libs/errors';
-import { Icon } from '@ui5/webcomponents-react/Icon';
 import { Title } from '@ui5/webcomponents-react/Title';
 import { Button } from '@ui5/webcomponents-react/Button';
 import { Toolbar } from '@ui5/webcomponents-react/Toolbar';
@@ -46,7 +43,6 @@ const rawColumns = [
 ];
 
 export function ConfigFileListView() {
-  const navigate = useNavigate();
   const queryClient = useQueryClient();
   const [search, setSearch] = React.useState('');
   const [configFileToEdit, setConfigFileToEdit] = React.useState<ConfigFileItem | null>(null);
@@ -166,25 +162,10 @@ export function ConfigFileListView() {
     <DynamicPage
       headerArea={
         <DynamicPageHeader className="py-4 px-8">
-          <Button
-            design="Transparent"
-            tooltip="Click to go to home page"
-            onClick={() => {
-              navigate('/launchpad');
-            }}
-            className="cursor-pointer"
-          >
-            <FlexBox alignItems="Center" className="text-primary gap-2">
-              <Icon name="home" className="text-primary" mode="Interactive" />
-              <Title level="H1" className="text-primary cursor-pointer">
-                Configuration Files
-              </Title>
-            </FlexBox>
-          </Button>
           <ConfigFilesFilterBar onFilterChange={setFilter} onSearchChange={setSearch} />
         </DynamicPageHeader>
       }
-      className="h-dvh"
+      className="h-full"
       showFooter={true}
     >
       <ConfigFileEdit

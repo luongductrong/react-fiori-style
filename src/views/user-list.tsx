@@ -1,14 +1,10 @@
 import * as React from 'react';
 import { toast } from '@/libs/toast';
-import '@ui5/webcomponents-icons/home.js';
-import { useNavigate } from 'react-router';
 import '@ui5/webcomponents-icons/delete.js';
 import '@ui5/webcomponents-icons/refresh.js';
-import { Icon } from '@ui5/webcomponents-react/Icon';
 import { Title } from '@ui5/webcomponents-react/Title';
 import { Button } from '@ui5/webcomponents-react/Button';
 import { Toolbar } from '@ui5/webcomponents-react/Toolbar';
-import { FlexBox } from '@ui5/webcomponents-react/FlexBox';
 import type { AuthUserItem } from '@/features/auth-users/types';
 import { MessageBox } from '@ui5/webcomponents-react/MessageBox';
 import { useCurrentAuthUser } from '@/features/auth-users/hooks';
@@ -32,7 +28,6 @@ const rawColumns = [
 ];
 
 export function UserListView() {
-  const navigate = useNavigate();
   const queryClient = useQueryClient();
   const { data: currentAuthUser } = useCurrentAuthUser();
   const [search, setSearch] = React.useState('');
@@ -107,25 +102,10 @@ export function UserListView() {
     <DynamicPage
       headerArea={
         <DynamicPageHeader className="py-4 px-8">
-          <Button
-            design="Transparent"
-            tooltip="Click to go to home page"
-            onClick={() => {
-              navigate('/launchpad');
-            }}
-            className="cursor-pointer"
-          >
-            <FlexBox alignItems="Center" className="text-primary gap-2">
-              <Icon name="home" className="text-primary" mode="Interactive" />
-              <Title level="H1" className="text-primary cursor-pointer">
-                Users
-              </Title>
-            </FlexBox>
-          </Button>
           <AuthUsersFilterBar onFilterChange={setFilter} onSearchChange={setSearch} />
         </DynamicPageHeader>
       }
-      className="h-dvh"
+      className="h-full"
       showFooter={true}
     >
       <AnalyticalTable

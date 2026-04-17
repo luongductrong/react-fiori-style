@@ -116,12 +116,12 @@ const ADMIN_MAIN_TILES: LaunchpadMainTileConfig[] = [
   {
     title: 'Manage Administrators',
     icon: 'person-placeholder',
-    route: '/users',
+    route: '/dashboard/users',
   },
   {
     title: 'Manage Configuration Files',
     icon: 'document',
-    route: '/configurations',
+    route: '/dashboard/configurations',
   },
 ];
 
@@ -132,11 +132,11 @@ const ADMIN_SUB_TILES: LaunchpadSubTileConfig[] = [
   },
   {
     title: 'User Access',
-    route: '/users',
+    route: '/dashboard/users',
   },
   {
     title: 'File Rules',
-    route: '/configurations',
+    route: '/dashboard/configurations',
   },
 ];
 

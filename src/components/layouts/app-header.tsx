@@ -62,7 +62,10 @@ export function AppHeader({ primaryTitle = 'Corporate Portal', secondaryTitle, u
     }
 
     const updateHeaderHeight = () => {
-      setHeaderHeight(Math.ceil(headerElement.getBoundingClientRect().height));
+      const nextHeaderHeight = Math.ceil(headerElement.getBoundingClientRect().height);
+
+      setHeaderHeight(nextHeaderHeight);
+      document.documentElement.style.setProperty('--app-header-height', `${nextHeaderHeight}px`);
     };
 
     updateHeaderHeight();
@@ -75,6 +78,7 @@ export function AppHeader({ primaryTitle = 'Corporate Portal', secondaryTitle, u
 
     return () => {
       resizeObserver.disconnect();
+      document.documentElement.style.removeProperty('--app-header-height');
     };
   }, []);
 

@@ -2,6 +2,14 @@ import { Outlet, useLocation } from 'react-router';
 import { AppHeader } from '@/components/layouts/app-header';
 
 function getHeaderTitle(pathname: string) {
+  if (pathname.startsWith('/dashboard/users')) {
+    return 'Users Management';
+  }
+
+  if (pathname.startsWith('/dashboard/configurations')) {
+    return 'Configurations Management';
+  }
+
   if (pathname === '/launchpad') {
     return 'Home';
   }
@@ -18,14 +26,6 @@ function getHeaderTitle(pathname: string) {
     return 'Dashboard';
   }
 
-  if (pathname.startsWith('/users')) {
-    return 'Users Management';
-  }
-
-  if (pathname.startsWith('/configurations')) {
-    return 'Configurations Management';
-  }
-
   if (pathname.startsWith('/admin')) {
     return 'Administration';
   }
@@ -37,7 +37,7 @@ export function AppLayout() {
   const location = useLocation();
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen flex flex-col">
       <AppHeader primaryTitle={getHeaderTitle(location.pathname)} />
       <Outlet />
     </div>
