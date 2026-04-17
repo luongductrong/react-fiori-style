@@ -113,7 +113,7 @@ export function BoDetailView() {
   }
 
   return (
-    <div className="relative">
+    <div className="relative flex-1">
       <ObjectPage
         mode="Default"
         image={

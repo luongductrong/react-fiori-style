@@ -84,7 +84,7 @@ export function BoListView() {
           <BizObjectsFilterBar onFilterChange={setFilter} onSearchChange={setSearch} />
         </DynamicPageHeader>
       }
-      className="h-dvh"
+      className="flex-1"
       showFooter={true}
     >
       {viewMode === 'table' && (

@@ -203,6 +203,7 @@ export function ConfigFileForm({
                 <Button
                   design="Transparent"
                   icon="decline"
+                  tooltip="Remove MIME type"
                   onClick={() => handleRemoveMimeType(index)}
                   disabled={mimeTypes.length === 1}
                 />

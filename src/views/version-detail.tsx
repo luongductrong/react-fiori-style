@@ -115,7 +115,7 @@ export function VersionDetailView() {
   }
 
   return (
-    <div className="relative">
+    <div className="relative flex-1">
       <ObjectPage
         hidePinButton={true}
         image={

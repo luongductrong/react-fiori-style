@@ -1,7 +1,5 @@
 import { cn } from '@/libs/utils';
 import { Link } from 'react-router';
-import '@ui5/webcomponents-icons/log.js';
-import '@ui5/webcomponents-icons/home.js';
 import '@ui5/webcomponents-icons/document.js';
 import '@ui5/webcomponents-icons/bar-chart.js';
 import '@ui5/webcomponents-icons/attachment.js';
@@ -95,17 +93,6 @@ const BUSINESS_MAIN_TILES: LaunchpadMainTileConfig[] = [
   },
 ];
 
-const BUSINESS_SUB_TILES: LaunchpadSubTileConfig[] = [
-  {
-    title: 'Attachments Overview',
-    route: '/attachments',
-  },
-  {
-    title: 'Business Object Registry',
-    route: '/business-objects',
-  },
-];
-
 const ADMIN_MAIN_TILES: LaunchpadMainTileConfig[] = [
   {
     title: 'Dashboard',
@@ -127,16 +114,8 @@ const ADMIN_MAIN_TILES: LaunchpadMainTileConfig[] = [
 
 const ADMIN_SUB_TILES: LaunchpadSubTileConfig[] = [
   {
-    title: 'System Overview',
-    route: '/dashboard',
-  },
-  {
-    title: 'User Access',
-    route: '/dashboard/users',
-  },
-  {
-    title: 'File Rules',
-    route: '/dashboard/configurations',
+    title: 'Deleted Attachments',
+    route: '/dashboard/deleted-attachments',
   },
 ];
 
@@ -153,16 +132,9 @@ export function LaunchpadView() {
   }
 
   return (
-    <div className="relative isolate overflow-x-hidden overflow-y-auto bg-[linear-gradient(180deg,#d9eafb_0%,#dceaf7_44%,#e1ecf6_100%)]">
-      <div className="pointer-events-none absolute inset-0" aria-hidden="true">
-        <div className="absolute inset-0 bg-[linear-gradient(115deg,rgba(255,255,255,0.16),transparent_35%),linear-gradient(320deg,rgba(255,255,255,0.14),transparent_42%)] opacity-95" />
-        <div className="absolute inset-0 bg-[linear-gradient(90deg,rgba(255,255,255,0.08)_0_14%,transparent_14%_100%)]" />
-        <div className="absolute -left-32 -top-8 h-176 w-176 rotate-24 rounded-[42%_58%_51%_49%/46%_39%_61%_54%] bg-white/20" />
-        <div className="absolute left-1/2 -top-88 h-208 w-208 -translate-x-1/2 rounded-[54%_46%_39%_61%/40%_55%_45%_60%] bg-white/20" />
-        <div className="absolute -bottom-8 -right-32 h-136 w-3xl rotate-28 rounded-[60%_40%_47%_53%/38%_48%_52%_62%] bg-white/20" />
-      </div>
+    <div className="flex-1 relative isolate overflow-x-hidden overflow-y-auto bg-[linear-gradient(180deg,#d9eafb_0%,#dceaf7_44%,#e1ecf6_100%)]">
       <div className="mx-auto flex w-full flex-col gap-10 p-8 pb-20">
-        <LaunchpadSection mainTiles={BUSINESS_MAIN_TILES} subTiles={BUSINESS_SUB_TILES} />
+        <LaunchpadSection mainTiles={BUSINESS_MAIN_TILES} />
         {isAdmin && (
           <LaunchpadSection title="System Administration" mainTiles={ADMIN_MAIN_TILES} subTiles={ADMIN_SUB_TILES} />
         )}

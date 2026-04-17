@@ -11,8 +11,9 @@ import { HashRouter, Route, Routes, Navigate } from 'react-router';
 import { ErrorsMessageBox } from '@/components/errors-message-box';
 import { QueryProvider } from '@/context-providers/query-provider';
 import { ThemeProvider } from '@ui5/webcomponents-react/ThemeProvider';
-import { AttachmentListView, AttachmentDetailView, VersionDetailView, ConfigFileListView } from '@/views';
-import { BoDetailView, BoListView, UserListView, LaunchpadView, DashboardView, NotFoundView } from '@/views';
+import { AttachmentListView, AttachmentDetailView, NotFoundView } from '@/views';
+import { VersionDetailView, ConfigFileListView, DeletedAttachmentListView } from '@/views';
+import { BoDetailView, BoListView, UserListView, LaunchpadView, DashboardView } from '@/views';
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
@@ -37,6 +38,7 @@ createRoot(document.getElementById('root')!).render(
                 <Route index element={<DashboardView />} />
                 <Route path="users" element={<UserListView />} />
                 <Route path="configurations" element={<ConfigFileListView />} />
+                <Route path="deleted-attachments" element={<DeletedAttachmentListView />} />
               </Route>
               {/* Business Objects */}
               <Route path="/business-objects">

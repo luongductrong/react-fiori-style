@@ -129,12 +129,12 @@ export function DashboardOverviewCards() {
         subtitle="Attachment relations"
         details={[
           {
-            label: 'Created this month',
-            value: formatStatValue(adminDashboardStatsQuery.data?.LinksCreatedMonth, hasAdminDashboardStats),
-          },
-          {
             label: 'Unlinked attachments',
             value: formatStatValue(adminDashboardStatsQuery.data?.UnlinkedAttachments, hasAdminDashboardStats),
+          },
+          {
+            label: 'Created this month',
+            value: formatStatValue(adminDashboardStatsQuery.data?.LinksCreatedMonth, hasAdminDashboardStats),
           },
         ]}
       />

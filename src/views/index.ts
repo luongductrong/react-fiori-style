@@ -8,3 +8,4 @@ export { VersionDetailView } from './version-detail';
 export { AttachmentListView } from './attachment-list';
 export { ConfigFileListView } from './config-file-list';
 export { AttachmentDetailView } from './attachment-detail';
+export { DeletedAttachmentListView } from './deleted-attachment-list';

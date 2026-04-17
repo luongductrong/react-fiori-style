@@ -12,6 +12,9 @@ export type AttachmentListItem = {
     Deletable: boolean;
     Updatable: boolean;
   };
+  __OperationControl?: {
+    Reactivate: boolean;
+  };
 };
 
 export type AttachmentSearchParams = AttachmentListParams;

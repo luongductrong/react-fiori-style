@@ -1,4 +1,5 @@
 import '@ui5/webcomponents-icons/bar-chart.js';
+import '@ui5/webcomponents-icons/delete.js';
 import '@ui5/webcomponents-icons/document.js';
 import { Title } from '@ui5/webcomponents-react/Title';
 import '@ui5/webcomponents-icons/person-placeholder.js';
@@ -21,6 +22,11 @@ const ADMIN_NAV_ITEMS = [
     icon: 'document',
     route: '/dashboard/configurations',
     text: 'Configuration Files',
+  },
+  {
+    icon: 'delete',
+    route: '/dashboard/deleted-attachments',
+    text: 'Deleted Attachments',
   },
 ] as const;
 

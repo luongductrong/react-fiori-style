@@ -105,7 +105,7 @@ export function UserListView() {
           <AuthUsersFilterBar onFilterChange={setFilter} onSearchChange={setSearch} />
         </DynamicPageHeader>
       }
-      className="h-full"
+      className="flex-1"
       showFooter={true}
     >
       <AnalyticalTable

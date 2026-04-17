@@ -47,7 +47,6 @@ export function ConfigFileListView() {
   const [search, setSearch] = React.useState('');
   const [configFileToEdit, setConfigFileToEdit] = React.useState<ConfigFileItem | null>(null);
   const [configFileToView, setConfigFileToView] = React.useState<ConfigFileItem | null>(null);
-  // TODO: BE enable search for config files, users
   const [filter, setFilter] = React.useState('');
   const configFileListParams = React.useMemo(
     () => ({
@@ -165,7 +164,7 @@ export function ConfigFileListView() {
           <ConfigFilesFilterBar onFilterChange={setFilter} onSearchChange={setSearch} />
         </DynamicPageHeader>
       }
-      className="h-full"
+      className="flex-1"
       showFooter={true}
     >
       <ConfigFileEdit

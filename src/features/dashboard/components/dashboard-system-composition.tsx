@@ -13,7 +13,7 @@ import { dashboardAttachmentStatsByTypeQueryOptions } from '../options/query';
 function buildFileTypeItems(items: { FileExt: string; VersionCount: number; TotalSize: number }[]) {
   const totalSize = items.reduce((sum, item) => sum + item.TotalSize, 0);
 
-  return items.slice(0, 6).map((item) => ({
+  return items.map((item) => ({
     label: `.${item.FileExt}`,
     value: formatFileSize(item.TotalSize),
     meta: `${formatCount(item.VersionCount)} files`,
@@ -42,11 +42,13 @@ export function DashboardSystemComposition({ className }: { className?: string }
     >
       <div className="space-y-4">
         <div className="space-y-2">
-          <Text className="text-xs font-semibold uppercase tracking-widest">Storage by Extension</Text>
+          <Text className="text-xs font-semibold uppercase tracking-widest">
+            Storage by Extension ({fileTypeItems.length})
+          </Text>
           {fileTypeItems.length === 0 ? (
             <Text className="text-sm">No attachment type usage available.</Text>
           ) : (
-            <div className="space-y-3">
+            <div className="space-y-3 max-h-screen overflow-y-scroll p-2">
               {fileTypeItems.map((item) => (
                 <div key={item.label} className="space-y-1.5 rounded-2xl border p-3">
                   <FlexBox justifyContent="SpaceBetween" alignItems="Center" className="gap-3">

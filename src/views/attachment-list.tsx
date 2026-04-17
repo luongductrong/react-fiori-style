@@ -5,6 +5,7 @@ import '@ui5/webcomponents-icons/list.js';
 import '@ui5/webcomponents-icons/refresh.js';
 import '@ui5/webcomponents-icons/table-view.js';
 import { useAppStore } from '@/stores/app-store';
+import { API } from '@/features/attachments/constants';
 import { Bar } from '@ui5/webcomponents-react/Bar';
 import { pushApiErrorMessages } from '@/libs/errors';
 import { Grid } from '@ui5/webcomponents-react/Grid';
@@ -40,7 +41,7 @@ export function AttachmentListView() {
       $skip: 0,
       $top: 10,
       $count: true,
-      $select: 'CurrentVersion,Erdat,Ernam,FileId,IsActive,Title,__EntityControl/Deletable,__EntityControl/Updatable',
+      $select: API.select,
       // If user is admin, show all attachments, otherwise show only active attachments
       $filter: isAdmin ? filter || undefined : filter ? `IsActive eq true and ${filter}` : 'IsActive eq true',
       $search: search || undefined,
@@ -52,10 +53,9 @@ export function AttachmentListView() {
     enabled: !isAuthPending,
   });
 
-  const attachments = React.useMemo(() => {
-    return data?.pages.flatMap((page) => page.value) || [];
-  }, [data?.pages]);
-  const totalCount = data?.pages[data.pages.length - 1]['@odata.count'] ?? 0;
+  const attachments = data?.pages.flatMap((page) => page.value) ?? [];
+  const lastPage = data ? data.pages[data.pages.length - 1] : undefined;
+  const totalCount = lastPage?.['@odata.count'] ?? 0;
 
   const columns = React.useMemo(
     () => [
@@ -119,9 +119,7 @@ export function AttachmentListView() {
           <AttachmentsFilterBar onFilterChange={setFilter} onSearchChange={setSearch} showActiveFilter={isAdmin} />
         </DynamicPageHeader>
       }
-      style={{
-        height: '100dvh',
-      }}
+      className="flex-1"
       showFooter={true}
     >
       {viewMode === 'table' && (

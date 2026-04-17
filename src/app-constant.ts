@@ -16,6 +16,9 @@ export const ODATA_PUBLIC_SERVICE = {
   SAP_CLIENT: '324',
 };
 
+export const SAP_LOGO_URL =
+  '/sap/bc/ui5_ui5/ui2/ushell/resources/~20240619115500~/sap/ushell/themes/base/img/SAPLogo.svg';
+
 export const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB = 10,485,760 bytes
 
 export const MIME_BY_EXTENSION = {

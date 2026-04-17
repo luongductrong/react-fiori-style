@@ -14,6 +14,10 @@ function getHeaderTitle(pathname: string) {
     return 'Configurations Management';
   }
 
+  if (matchesRoute(pathname, '/dashboard/deleted-attachments')) {
+    return 'Deleted Attachments Management';
+  }
+
   if (pathname === '/launchpad') {
     return 'Home';
   }

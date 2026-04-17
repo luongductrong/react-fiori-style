@@ -47,6 +47,19 @@ export function BizCreate() {
     });
   };
 
+  const handleClose = React.useCallback(() => {
+    if (isPending) {
+      return;
+    }
+
+    setOpen(false);
+    setValues({
+      title: '',
+      type: '',
+      status: '',
+    });
+  }, [isPending, setOpen]);
+
   const isOkDisabled = React.useMemo(() => {
     return !values.title || !values.type || !values.status;
   }, [values]);
@@ -68,13 +81,14 @@ export function BizCreate() {
                 <Button design="Emphasized" onClick={handleSubmit} disabled={isOkDisabled} className="h-8">
                   OK
                 </Button>
-                <Button design="Transparent" onClick={() => setOpen(false)} className="h-8" disabled={isPending}>
+                <Button design="Transparent" onClick={handleClose} className="h-8" disabled={isPending}>
                   Cancel
                 </Button>
               </React.Fragment>
             }
           />
         }
+        onClose={handleClose}
       >
         <BizForm value={values} onChange={setValues} inputClassName="md:w-full" />
         <BusyIndicator type="pending" show={isPending} />

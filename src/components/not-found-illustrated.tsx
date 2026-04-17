@@ -14,14 +14,22 @@ interface NotFoundIllustratedProps {
   subtitle?: string;
   breadcrumbText?: string;
   breadcrumbRoute?: string;
+  className?: string;
 }
 
-export function NotFoundIllustrated({ title, subtitle, breadcrumbText, breadcrumbRoute }: NotFoundIllustratedProps) {
+export function NotFoundIllustrated({
+  title,
+  subtitle,
+  breadcrumbText,
+  breadcrumbRoute,
+  className,
+}: NotFoundIllustratedProps) {
   const navigate = useNavigate();
   return (
     <ObjectPage
       mode="Default"
       hidePinButton={true}
+      className={className}
       titleArea={
         <ObjectPageTitle
           breadcrumbs={

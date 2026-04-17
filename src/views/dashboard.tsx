@@ -15,7 +15,7 @@ export function DashboardView() {
   const queryClient = useQueryClient();
 
   return (
-    <DynamicPage className="h-full space-y-6" showFooter={true}>
+    <DynamicPage className="flex-1 space-y-6" showFooter={true}>
       <Toolbar className="py-2 px-4 rounded-xl">
         <Title level="H2">System Overview</Title>
         <ToolbarSpacer />

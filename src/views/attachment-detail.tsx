@@ -168,7 +168,7 @@ export function AttachmentDetailView() {
   }
 
   return (
-    <div className="relative">
+    <div className="relative flex-1">
       <ObjectPage
         image={
           <div className="border rounded-lg aspect-square flex! items-center justify-center p-2">

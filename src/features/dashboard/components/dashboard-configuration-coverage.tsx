@@ -46,7 +46,7 @@ export function DashboardConfigurationCoverage({ className }: { className?: stri
       {items.length === 0 ? (
         <Text className="text-sm">No configuration data available.</Text>
       ) : (
-        <div className="space-y-2">
+        <div className="space-y-2 max-h-[150vh] overflow-y-scroll p-2">
           {items.map((item) => (
             <div key={item.FileExt} className="grid gap-3 rounded-2xl border p-3">
               <div className="flex items-start justify-between gap-3">
