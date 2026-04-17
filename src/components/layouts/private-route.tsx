@@ -15,7 +15,7 @@ export function PrivateRoute({ children }: { children: React.ReactNode }) {
   }
 
   if (!data?.isAdmin) {
-    return <Navigate replace to="/shell-home" />;
+    return <Navigate replace to="/launchpad" />;
   }
 
   return <React.Fragment>{children}</React.Fragment>;

@@ -1,7 +1,7 @@
 import { cn } from '@/libs/utils';
+import { Link } from 'react-router';
 import '@ui5/webcomponents-icons/log.js';
 import '@ui5/webcomponents-icons/home.js';
-import { useNavigate } from 'react-router';
 import '@ui5/webcomponents-icons/document.js';
 import '@ui5/webcomponents-icons/bar-chart.js';
 import '@ui5/webcomponents-icons/attachment.js';
@@ -27,12 +27,9 @@ type LaunchpadSubTileConfig = {
 };
 
 function LaunchpadMainTile({ title, subtitle, icon, route }: LaunchpadMainTileConfig) {
-  const navigate = useNavigate();
-
   return (
-    <button
-      type="button"
-      onClick={() => navigate(route)}
+    <Link
+      to={route}
       className={cn(
         'group flex aspect-square w-44 flex-col justify-between rounded-md border bg-background p-4 text-left',
         'shadow-sm hover:shadow-lg',
@@ -45,21 +42,15 @@ function LaunchpadMainTile({ title, subtitle, icon, route }: LaunchpadMainTileCo
         {subtitle && <Text className="text-sm">{subtitle}</Text>}
       </div>
       <Icon name={icon} className="size-9 text-primary transition duration-200" />
-    </button>
+    </Link>
   );
 }
 
 function LaunchpadSubTile({ title, route }: LaunchpadSubTileConfig) {
-  const navigate = useNavigate();
-
   return (
-    <button
-      type="button"
-      onClick={() => navigate(route)}
-      className="rounded-md border bg-background px-4 py-2 text-left text-sm shadow-sm"
-    >
+    <Link to={route} className="rounded-md border bg-background px-4 py-2 text-left text-sm shadow-sm">
       <UI5Link>{title}</UI5Link>
-    </button>
+    </Link>
   );
 }
 
@@ -75,12 +66,10 @@ function LaunchpadSection({
   return (
     <section className="space-y-4">
       {title && <Title level="H3">{title}</Title>}
-      <div className="overflow-x-auto pb-1">
-        <div className="inline-grid grid-flow-col auto-cols-[11rem] gap-4">
-          {mainTiles.map((tile) => (
-            <LaunchpadMainTile key={tile.title} {...tile} />
-          ))}
-        </div>
+      <div className="flex flex-wrap gap-4">
+        {mainTiles.map((tile) => (
+          <LaunchpadMainTile {...tile} />
+        ))}
       </div>
       {subTiles.length > 0 && (
         <div className="flex flex-wrap gap-3">
@@ -172,7 +161,7 @@ export function LaunchpadView() {
         <div className="absolute left-1/2 -top-88 h-208 w-208 -translate-x-1/2 rounded-[54%_46%_39%_61%/40%_55%_45%_60%] bg-white/20" />
         <div className="absolute -bottom-8 -right-32 h-136 w-3xl rotate-28 rounded-[60%_40%_47%_53%/38%_48%_52%_62%] bg-white/20" />
       </div>
-      <div className="mx-auto flex w-full max-w-7xl flex-col gap-10 px-4 py-8 sm:px-8">
+      <div className="mx-auto flex w-full flex-col gap-10 p-8 pb-16">
         <LaunchpadSection mainTiles={BUSINESS_MAIN_TILES} subTiles={BUSINESS_SUB_TILES} />
         {isAdmin && (
           <LaunchpadSection title="System Administration" mainTiles={ADMIN_MAIN_TILES} subTiles={ADMIN_SUB_TILES} />

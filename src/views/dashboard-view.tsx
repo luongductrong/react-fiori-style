@@ -29,7 +29,7 @@ export function DashboardView() {
             design="Transparent"
             tooltip="Click to go to home page"
             onClick={() => {
-              navigate('/shell-home');
+              navigate('/launchpad');
             }}
             className="cursor-pointer"
           >

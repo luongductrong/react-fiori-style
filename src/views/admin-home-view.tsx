@@ -16,7 +16,7 @@ export function AdminHomeView() {
   return (
     <main className="relative min-h-screen bg-[linear-gradient(180deg,rgba(242,247,251,0.98)_0%,rgba(231,240,248,0.98)_100%)]">
       <div className="absolute top-4 left-4 z-20">
-        <ToolbarButton design="Transparent" icon="home" text="Home" onClick={() => navigate('/shell-home')} />
+        <ToolbarButton design="Transparent" icon="home" text="Home" onClick={() => navigate('/launchpad')} />
       </div>
 
       <section className="relative z-10 flex min-h-screen flex-col px-4 pb-6 pt-20 sm:px-8">
