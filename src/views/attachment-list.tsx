@@ -1,15 +1,13 @@
 import * as React from 'react';
 import { cn } from '@/libs/utils';
+import { Link } from 'react-router';
 import '@ui5/webcomponents-icons/list.js';
-import '@ui5/webcomponents-icons/home.js';
 import '@ui5/webcomponents-icons/refresh.js';
 import '@ui5/webcomponents-icons/table-view.js';
-import { useNavigate, Link } from 'react-router';
 import { useAppStore } from '@/stores/app-store';
 import { Bar } from '@ui5/webcomponents-react/Bar';
 import { pushApiErrorMessages } from '@/libs/errors';
 import { Grid } from '@ui5/webcomponents-react/Grid';
-import { Icon } from '@ui5/webcomponents-react/Icon';
 import { Title } from '@ui5/webcomponents-react/Title';
 import { Button } from '@ui5/webcomponents-react/Button';
 import { useInfiniteQuery } from '@tanstack/react-query';
@@ -30,7 +28,6 @@ import { AttachmentsFilterBar, AttachmentCard, AttachmentCreate } from '@/featur
 import { AnalyticalTable, type AnalyticalTableCellInstance } from '@ui5/webcomponents-react/AnalyticalTable';
 
 export function AttachmentListView() {
-  const navigate = useNavigate();
   const viewMode = useAppStore((state) => state.viewMode);
   const setViewMode = useAppStore((state) => state.setViewMode);
   const { data: currentAuthUser, isPending: isAuthPending } = useCurrentAuthUser();
@@ -118,22 +115,7 @@ export function AttachmentListView() {
   return (
     <DynamicPage
       headerArea={
-        <DynamicPageHeader style={{ padding: '1rem 2rem' }}>
-          <Button
-            design="Transparent"
-            tooltip="Click to go to home page"
-            onClick={() => {
-              navigate('/launchpad');
-            }}
-            className="cursor-pointer"
-          >
-            <FlexBox alignItems="Center" className="text-primary gap-2">
-              <Icon name="home" className="text-primary" mode="Interactive" />
-              <Title level="H1" className="text-primary cursor-pointer">
-                Attachments
-              </Title>
-            </FlexBox>
-          </Button>
+        <DynamicPageHeader className="px-8 py-4">
           <AttachmentsFilterBar onFilterChange={setFilter} onSearchChange={setSearch} showActiveFilter={isAdmin} />
         </DynamicPageHeader>
       }

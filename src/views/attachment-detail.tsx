@@ -1,7 +1,6 @@
 import * as React from 'react';
 import axios from 'axios';
 import { toast } from '@/libs/toast';
-import '@ui5/webcomponents-icons/share.js';
 import '@ui5/webcomponents-icons/decline.js';
 import '@ui5/webcomponents-icons/refresh.js';
 import '@ui5/webcomponents-icons/attachment.js';
@@ -20,13 +19,11 @@ import { downloadFile } from '@/features/attachments/helpers';
 import { useCurrentAuthUser } from '@/features/auth-users/hooks';
 import { ObjectPage } from '@ui5/webcomponents-react/ObjectPage';
 import { MessageBox } from '@ui5/webcomponents-react/MessageBox';
-import { Breadcrumbs } from '@ui5/webcomponents-react/Breadcrumbs';
 import { validateFileTitle } from '@/features/attachments/validate';
 import { AttachmentBizList } from '@/features/attachments/components';
 import { ToolbarButton } from '@ui5/webcomponents-react/ToolbarButton';
 import { pushErrorMessages, pushApiErrorMessages } from '@/libs/errors';
 import { NotFoundIllustrated } from '@/components/not-found-illustrated';
-import { BreadcrumbsItem } from '@ui5/webcomponents-react/BreadcrumbsItem';
 import { ObjectPageTitle } from '@ui5/webcomponents-react/ObjectPageTitle';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { ObjectPageSection } from '@ui5/webcomponents-react/ObjectPageSection';
@@ -182,19 +179,6 @@ export function AttachmentDetailView() {
         hidePinButton={true}
         titleArea={
           <ObjectPageTitle
-            breadcrumbs={
-              <Breadcrumbs
-                onItemClick={(event) => {
-                  const route = event.detail.item.dataset.route;
-                  if (route) {
-                    navigate(route);
-                  }
-                }}
-              >
-                <BreadcrumbsItem data-route="/attachments">Attachments</BreadcrumbsItem>
-                <BreadcrumbsItem>{isFetching ? 'Loading...' : attachment?.Title || 'Unnamed Object'}</BreadcrumbsItem>
-              </Breadcrumbs>
-            }
             actionsBar={
               !isEditMode ? (
                 <Toolbar design="Transparent" style={{ height: 'auto' }}>

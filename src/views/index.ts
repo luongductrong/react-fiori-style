@@ -1,4 +1,5 @@
 export { BoListView } from './bo-list';
+export { NotFoundView } from './not-found';
 export { BoDetailView } from './bo-detail';
 export { UserListView } from './user-list';
 export { LaunchpadView } from './launchpad';

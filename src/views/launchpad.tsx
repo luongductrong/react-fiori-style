@@ -153,7 +153,7 @@ export function LaunchpadView() {
   }
 
   return (
-    <main className="relative isolate overflow-hidden bg-[linear-gradient(180deg,#d9eafb_0%,#dceaf7_44%,#e1ecf6_100%)]">
+    <div className="relative isolate overflow-x-hidden overflow-y-auto bg-[linear-gradient(180deg,#d9eafb_0%,#dceaf7_44%,#e1ecf6_100%)]">
       <div className="pointer-events-none absolute inset-0" aria-hidden="true">
         <div className="absolute inset-0 bg-[linear-gradient(115deg,rgba(255,255,255,0.16),transparent_35%),linear-gradient(320deg,rgba(255,255,255,0.14),transparent_42%)] opacity-95" />
         <div className="absolute inset-0 bg-[linear-gradient(90deg,rgba(255,255,255,0.08)_0_14%,transparent_14%_100%)]" />
@@ -167,9 +167,6 @@ export function LaunchpadView() {
           <LaunchpadSection title="System Administration" mainTiles={ADMIN_MAIN_TILES} subTiles={ADMIN_SUB_TILES} />
         )}
       </div>
-      <footer className="absolute bottom-4 left-4 right-4 z-10 text-center text-xs text-muted-foreground sm:left-auto sm:right-5 sm:text-left">
-        Copyright (c) {new Date().getFullYear()} SAP SE All Rights Reserved.
-      </footer>
-    </main>
+    </div>
   );
 }

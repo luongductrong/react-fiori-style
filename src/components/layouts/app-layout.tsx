@@ -1,12 +1,16 @@
 import { Outlet, useLocation } from 'react-router';
 import { AppHeader } from '@/components/layouts/app-header';
 
+function matchesRoute(pathname: string, route: string) {
+  return pathname === route || pathname.startsWith(`${route}/`);
+}
+
 function getHeaderTitle(pathname: string) {
-  if (pathname.startsWith('/dashboard/users')) {
+  if (matchesRoute(pathname, '/dashboard/users')) {
     return 'Users Management';
   }
 
-  if (pathname.startsWith('/dashboard/configurations')) {
+  if (matchesRoute(pathname, '/dashboard/configurations')) {
     return 'Configurations Management';
   }
 
@@ -14,26 +18,26 @@ function getHeaderTitle(pathname: string) {
     return 'Home';
   }
 
-  if (pathname.startsWith('/attachments')) {
+  if (matchesRoute(pathname, '/attachments')) {
     return 'Attachments';
   }
 
-  if (pathname.startsWith('/business-objects')) {
+  if (matchesRoute(pathname, '/business-objects')) {
     return 'Business Objects';
   }
 
-  if (pathname.startsWith('/dashboard')) {
+  if (matchesRoute(pathname, '/dashboard')) {
     return 'Dashboard';
   }
 
-  return 'Corporate Portal';
+  return 'Not Found';
 }
 
 export function AppLayout() {
   const location = useLocation();
 
   return (
-    <div className="min-h-screen flex flex-col">
+    <div className="h-dvh flex flex-col overflow-hidden">
       <AppHeader primaryTitle={getHeaderTitle(location.pathname)} />
       <Outlet />
     </div>
