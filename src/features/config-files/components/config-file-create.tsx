@@ -9,6 +9,7 @@ import { getInitialConfigFileFormValues } from '../helpers/form';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { createConfigFileMutationOptions } from '../options/mutation';
 import { ToolbarButton } from '@ui5/webcomponents-react/ToolbarButton';
+import { findInvalidMimeTypes, normalizeMimeTypesForStorage } from '../helpers/mime-types';
 
 export function ConfigFileCreate() {
   const queryClient = useQueryClient();
@@ -27,11 +28,17 @@ export function ConfigFileCreate() {
   );
 
   const normalizedFileExt = values.fileExt.trim().replace(/^\./, '').toLowerCase();
-  const normalizedMimeType = values.mimeType.trim();
+  const normalizedMimeType = normalizeMimeTypesForStorage(values.mimeTypes);
   const normalizedDescription = values.description.trim();
   const maxBytes = Number(values.maxBytes);
+  const invalidMimeTypes = findInvalidMimeTypes(values.mimeTypes);
   const isSaveDisabled =
-    !normalizedFileExt || !normalizedMimeType || !normalizedDescription || !Number.isFinite(maxBytes) || maxBytes <= 0;
+    !normalizedFileExt ||
+    !normalizedMimeType ||
+    invalidMimeTypes.length > 0 ||
+    !normalizedDescription ||
+    !Number.isFinite(maxBytes) ||
+    maxBytes <= 0;
 
   const handleClose = function () {
     if (isPending) {

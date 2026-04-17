@@ -10,6 +10,7 @@ import { FlexBox } from '@ui5/webcomponents-react/FlexBox';
 import { BusyIndicator } from '@/components/busy-indicator';
 import { dashboardFileConfigListQueryOptions } from '../options/query';
 import { dashboardConfigOverviewQueryOptions } from '../options/query';
+import { formatMimeTypesForDisplay } from '@/features/config-files/helpers/mime-types';
 
 export function DashboardConfigurationCoverage({ className }: { className?: string }) {
   const [configOverviewQuery, fileConfigListQuery] = useQueries({
@@ -56,7 +57,7 @@ export function DashboardConfigurationCoverage({ className }: { className?: stri
                 <Tag design={item.IsActive ? 'Positive' : 'Negative'}>{item.IsActive ? 'Active' : 'Inactive'}</Tag>
               </div>
               <div className="grid gap-1 text-xs">
-                <span>{item.MimeType}</span>
+                <span>{formatMimeTypesForDisplay(item.MimeType) || '-'}</span>
                 <span>Max size {formatFileSize(item.MaxBytes)}</span>
               </div>
             </div>

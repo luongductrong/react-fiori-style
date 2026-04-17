@@ -19,6 +19,7 @@ import { AnalyticalTable } from '@ui5/webcomponents-react/AnalyticalTable';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { DynamicPageHeader } from '@ui5/webcomponents-react/DynamicPageHeader';
 import { configFilesQueryOptions } from '@/features/config-files/options/query';
+import { formatMimeTypesForDisplay } from '@/features/config-files/helpers/mime-types';
 import { enableConfigFileMutationOptions } from '@/features/config-files/options/mutation';
 import type { AnalyticalTableCellInstance } from '@ui5/webcomponents-react/AnalyticalTable';
 import { disableConfigFileMutationOptions } from '@/features/config-files/options/mutation';
@@ -26,7 +27,11 @@ import { ConfigFileCreate, ConfigFileEdit, ConfigFilesFilterBar } from '@/featur
 
 const rawColumns = [
   { Header: 'File Ext', accessor: 'FileExt' },
-  { Header: 'Mime Type', accessor: 'MimeType' },
+  {
+    Header: 'Mime Types',
+    accessor: 'MimeType',
+    Cell: (props: AnalyticalTableCellInstance) => formatMimeTypesForDisplay(props.value) || '-',
+  },
   {
     Header: 'Type',
     accessor: 'Type',

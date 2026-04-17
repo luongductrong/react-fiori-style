@@ -10,7 +10,7 @@ export const ODATA_SERVICE = {
   DASHBOARD: '/sap/opu/odata4/sap/zui_att_admin_dash/srvd/sap/zui_att_admin_dash/0001',
 };
 
-export const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB = 5,242,880 bytes
+export const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB = 10,485,760 bytes
 
 export const MIME_BY_EXTENSION = {
   pdf: ['application/pdf'],
@@ -39,6 +39,8 @@ export const MIME_TYPES = Object.values(MIME_BY_EXTENSION).flat();
 export const FALLBACK_MIME_TYPE = 'application/octet-stream' as const;
 
 export const FALLBACK_EXTENSION = 'bin' as const;
+
+export const MIME_TYPE_SEPARATOR = ';' as const;
 
 export const EXTENSION_GROUPS = {
   IMAGE: ['jpg', 'jpeg', 'png', 'gif'],

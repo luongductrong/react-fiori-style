@@ -1,6 +1,7 @@
 import { formatFileSize } from '@/libs/utils';
 import { getFileExtension } from './upload-file';
 import type { ConfigFileItem } from '@/features/config-files/types';
+import { parseMimeTypes } from '@/features/config-files/helpers/mime-types';
 
 export type UploadValidationInput = {
   fileName?: string;
@@ -13,7 +14,7 @@ export type UploadConfigType = ConfigFileItem['Type'];
 
 export type ActiveUploadConfig = {
   FileExt: string;
-  MimeType: string;
+  MimeTypes: string[];
   MaxBytes: number;
 };
 
@@ -52,16 +53,16 @@ export function resolveUploadTypeByExtension(
 export function getActiveUploadConfigs(configFiles?: ConfigFileItem[]): ActiveUploadConfig[] {
   return (configFiles ?? []).flatMap((config) => {
     const fileExt = normalizeExtension(config.FileExt);
-    const mimeType = normalizeMimeType(config.MimeType);
+    const mimeTypes = parseMimeTypes(config.MimeType).map(normalizeMimeType);
 
-    if (!config.IsActive || !fileExt || !mimeType) {
+    if (!config.IsActive || !fileExt || mimeTypes.length === 0) {
       return [];
     }
 
     return [
       {
         FileExt: fileExt,
-        MimeType: mimeType,
+        MimeTypes: mimeTypes,
         MaxBytes: Number(config.MaxBytes) || 0,
       },
     ];
@@ -86,7 +87,7 @@ export function findMatchingUploadConfig(input: UploadValidationInput, configFil
 
   return (
     getActiveUploadConfigs(configFiles).find(
-      (config) => config.FileExt === fileExtension && config.MimeType === mimeType,
+      (config) => config.FileExt === fileExtension && config.MimeTypes.includes(mimeType),
     ) ?? null
   );
 }
@@ -114,14 +115,17 @@ export function validateUploadFileData(input: UploadValidationInput, configFiles
   }
 
   const matchedConfig = activeConfigs.find(
-    (config) => config.FileExt === fileExtension && config.MimeType === mimeType,
+    (config) => config.FileExt === fileExtension && config.MimeTypes.includes(mimeType),
   );
 
   if (!matchedConfig) {
-    const hasActiveExtension = activeConfigs.some((config) => config.FileExt === fileExtension);
+    const mimeTypesForExtension = [...new Set(
+      activeConfigs.filter((config) => config.FileExt === fileExtension).flatMap((config) => config.MimeTypes),
+    )];
+    const hasActiveExtension = mimeTypesForExtension.length > 0;
 
     if (hasActiveExtension) {
-      return `MIME type "${mimeType}" does not match the active configuration for ".${fileExtension}" files.`;
+      return `MIME type "${mimeType}" does not match the active configuration for ".${fileExtension}" files. Allowed MIME types: ${mimeTypesForExtension.join(', ')}.`;
     }
 
     return `File extension ".${fileExtension}" is not enabled for upload.`;

@@ -9,6 +9,7 @@ import { BusyIndicator } from '@/components/busy-indicator';
 import { getInitialConfigFileFormValues } from '../helpers/form';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { updateConfigFileMutationOptions } from '../options/mutation';
+import { findInvalidMimeTypes, normalizeMimeTypesForStorage } from '../helpers/mime-types';
 
 interface ConfigFileEditProps {
   configFile: ConfigFileItem | null;
@@ -37,10 +38,16 @@ export function ConfigFileEdit({ configFile, open, onClose }: ConfigFileEditProp
     }
   }, [configFile, open]);
 
-  const normalizedMimeType = values.mimeType.trim();
+  const normalizedMimeType = normalizeMimeTypesForStorage(values.mimeTypes);
   const normalizedDescription = values.description.trim();
   const maxBytes = Number(values.maxBytes);
-  const isSaveDisabled = !normalizedMimeType || !normalizedDescription || !Number.isFinite(maxBytes) || maxBytes <= 0;
+  const invalidMimeTypes = findInvalidMimeTypes(values.mimeTypes);
+  const isSaveDisabled =
+    !normalizedMimeType ||
+    invalidMimeTypes.length > 0 ||
+    !normalizedDescription ||
+    !Number.isFinite(maxBytes) ||
+    maxBytes <= 0;
 
   const handleClose = function () {
     if (isPending) {
