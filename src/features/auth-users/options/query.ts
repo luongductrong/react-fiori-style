@@ -1,8 +1,9 @@
 import { API } from '../constants';
-import { ODATA_SERVICE } from '@/app-constant';
 import type { AxiosApiError } from '@/types/common';
 import { queryOptions } from '@tanstack/react-query';
 import { axiosInstance } from '@/libs/axios-instance';
+import { ODATA_PUBLIC_SERVICE, ODATA_SERVICE } from '@/app-constant';
+import type { CurrentPublicUserProfile, CurrentPublicUserProfileResponse } from '../types';
 import type { AuthUsersQueryParams, AuthUsersResponse, CurrentAuthUserResponse } from '../types';
 
 export function authUsersQueryOptions(params: AuthUsersQueryParams) {
@@ -31,7 +32,26 @@ export function currentAuthUserQueryOptions() {
       });
       return res;
     },
+    staleTime: 10 * 60 * 1000, // 10 minutes
+    gcTime: Infinity,
+  });
+}
+
+export function currentPublicUserProfileQueryOptions() {
+  return queryOptions<CurrentPublicUserProfile, AxiosApiError>({
+    queryKey: ['auth-users', 'current-public-user-profile'],
+    queryFn: async () => {
+      const response = await axiosInstance.get<CurrentPublicUserProfileResponse>(ODATA_PUBLIC_SERVICE.USER, {
+        params: {
+          $format: 'json',
+          'sap-client': ODATA_PUBLIC_SERVICE.SAP_CLIENT,
+        },
+      });
+
+      return response.d;
+    },
     staleTime: 10 * 60 * 1000,
     gcTime: Infinity,
+    refetchOnWindowFocus: false,
   });
 }

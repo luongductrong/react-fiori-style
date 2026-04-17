@@ -3,40 +3,59 @@ import { StrictMode } from 'react';
 import '@ui5/webcomponents/dist/Assets.js';
 import { Toaster } from '@/components/toast';
 import { createRoot } from 'react-dom/client';
+import { AppLayout } from '@/components/layouts/app-layout';
 import '@ui5/webcomponents-react/dist/json-imports/i18n.js';
-import { AuthUserLoader } from '@/features/auth-users/components';
+import { AdminLayout } from '@/components/layouts/admin-layout';
+import { PrivateRoute } from '@/components/layouts/private-route';
+import { HashRouter, Route, Routes, Navigate } from 'react-router';
 import { ErrorsMessageBox } from '@/components/errors-message-box';
 import { QueryProvider } from '@/context-providers/query-provider';
-import { HashRouter, Navigate, Route, Routes } from 'react-router';
 import { ThemeProvider } from '@ui5/webcomponents-react/ThemeProvider';
 import { AttachmentListView, AttachmentDetailView, VersionDetailView, ConfigFileListView } from '@/views';
-import { BoDetailView, BoListView, UserListView, ShellHomeView, AdminHomeView, DashboardView } from '@/views';
+import { BoDetailView, BoListView, UserListView, LaunchpadView, DashboardView, NotFoundView } from '@/views';
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
     <ThemeProvider>
       <QueryProvider>
         <Toaster />
-        <AuthUserLoader />
         <ErrorsMessageBox />
-        {/* TODO: Move to Layout */}
         <HashRouter>
           <Routes>
-            <Route path="/shell-home" element={<ShellHomeView />} />
-            <Route path="/admin" element={<AdminHomeView />} />
-            <Route path="/dashboard" element={<DashboardView />} />
-            {/*  */}
-            <Route path="/business-objects" element={<BoListView />} />
-            <Route path="/business-objects/:id" element={<BoDetailView />} />
-            {/*  */}
-            <Route path="/users" element={<UserListView />} />
-            <Route path="/configurations" element={<ConfigFileListView />} />
-            {/* Attachments */}
-            <Route path="/attachments" element={<AttachmentListView />} />
-            <Route path="/attachments/:id" element={<AttachmentDetailView />} />
-            <Route path="/attachments/:id/versions/:versionNo" element={<VersionDetailView />} />
-            {/* TODO: Handle 404 page */}
-            <Route path="*" element={<Navigate replace to="/shell-home" />} />
+            <Route element={<AppLayout />}>
+              {/* Launchpad */}
+              <Route path="/launchpad" element={<LaunchpadView />} />
+              {/* Dashboard */}
+              <Route
+                path="/dashboard"
+                element={
+                  <PrivateRoute>
+                    <AdminLayout />
+                  </PrivateRoute>
+                }
+              >
+                <Route index element={<DashboardView />} />
+                <Route path="users" element={<UserListView />} />
+                <Route path="configurations" element={<ConfigFileListView />} />
+              </Route>
+              {/* Business Objects */}
+              <Route path="/business-objects">
+                <Route index element={<BoListView />} />
+                <Route path=":id" element={<BoDetailView />} />
+              </Route>
+              {/* Attachments */}
+              <Route path="/attachments">
+                <Route index element={<AttachmentListView />} />
+                <Route path=":id">
+                  <Route index element={<AttachmentDetailView />} />
+                  <Route path="versions/:versionNo" element={<VersionDetailView />} />
+                </Route>
+              </Route>
+              {/* Redirect */}
+              <Route path="/" element={<Navigate to="/launchpad" replace />} />
+              {/* Not Found */}
+              <Route path="*" element={<NotFoundView />} />
+            </Route>
           </Routes>
         </HashRouter>
       </QueryProvider>

@@ -10,10 +10,7 @@ import { FlexBox } from '@ui5/webcomponents-react/FlexBox';
 import { BusyIndicator } from '@/components/busy-indicator';
 import { dashboardFileConfigListQueryOptions } from '../options/query';
 import { dashboardConfigOverviewQueryOptions } from '../options/query';
-
-function isActiveFlag(value: string | boolean | undefined) {
-  return value === 'X' || value === true;
-}
+import { formatMimeTypesForDisplay } from '@/features/config-files/helpers/mime-types';
 
 export function DashboardConfigurationCoverage({ className }: { className?: string }) {
   const [configOverviewQuery, fileConfigListQuery] = useQueries({
@@ -50,19 +47,17 @@ export function DashboardConfigurationCoverage({ className }: { className?: stri
         <Text className="text-sm">No configuration data available.</Text>
       ) : (
         <div className="space-y-2">
-          {items.slice(0, 8).map((item) => (
+          {items.map((item) => (
             <div key={item.FileExt} className="grid gap-3 rounded-2xl border p-3">
               <div className="flex items-start justify-between gap-3">
                 <div>
                   <Text className="block text-sm font-semibold">.{item.FileExt}</Text>
                   <Text className="block text-xs">{item.Description}</Text>
                 </div>
-                <Tag design={isActiveFlag(item.IsActive) ? 'Positive' : 'Negative'}>
-                  {isActiveFlag(item.IsActive) ? 'Active' : 'Inactive'}
-                </Tag>
+                <Tag design={item.IsActive ? 'Positive' : 'Negative'}>{item.IsActive ? 'Active' : 'Inactive'}</Tag>
               </div>
               <div className="grid gap-1 text-xs">
-                <span>{item.MimeType}</span>
+                <span>{formatMimeTypesForDisplay(item.MimeType) || '-'}</span>
                 <span>Max size {formatFileSize(item.MaxBytes)}</span>
               </div>
             </div>

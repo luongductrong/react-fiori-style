@@ -2,7 +2,7 @@ export type ConfigFileItem = {
   FileExt: string;
   MimeType: string;
   MaxBytes: number;
-  IsActive: string | boolean;
+  IsActive: boolean;
   Description: string;
   Type: 'DOCUMENT' | 'IMAGE';
   __EntityControl: {
@@ -22,13 +22,16 @@ export type ConfigFileListResponse = {
 export type ConfigFileListParams = {
   'sap-client': number;
   $count?: boolean;
+  $filter?: string;
+  $search?: string;
+  $orderby?: string;
 };
 
 export type CreateConfigFilePayload = {
   FileExt: string;
   MimeType: string;
   MaxBytes: number;
-  IsActive: 'X';
+  IsActive: ConfigFileItem['IsActive'];
   Description: string;
   Type: ConfigFileItem['Type'];
 };
@@ -40,7 +43,7 @@ export type UpdateConfigFilePayload = {
   MaxBytes: number;
   Description: string;
   Type: ConfigFileItem['Type'];
-  IsActive: 'X';
+  IsActive: ConfigFileItem['IsActive'];
 };
 
 export type UpdateConfigFileResponse = unknown;

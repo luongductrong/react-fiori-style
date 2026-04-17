@@ -17,10 +17,8 @@ import { BusyIndicator } from '@/components/busy-indicator';
 import '@ui5/webcomponents-icons/business-objects-mobile.js';
 import { MessageBox } from '@ui5/webcomponents-react/MessageBox';
 import { ObjectPage } from '@ui5/webcomponents-react/ObjectPage';
-import { Breadcrumbs } from '@ui5/webcomponents-react/Breadcrumbs';
 import { ToolbarButton } from '@ui5/webcomponents-react/ToolbarButton';
 import { NotFoundIllustrated } from '@/components/not-found-illustrated';
-import { BreadcrumbsItem } from '@ui5/webcomponents-react/BreadcrumbsItem';
 import { ObjectPageTitle } from '@ui5/webcomponents-react/ObjectPageTitle';
 import { useQuery, useQueryClient, useMutation } from '@tanstack/react-query';
 import { ObjectPageSection } from '@ui5/webcomponents-react/ObjectPageSection';
@@ -126,21 +124,6 @@ export function BoDetailView() {
         hidePinButton={true}
         titleArea={
           <ObjectPageTitle
-            breadcrumbs={
-              <Breadcrumbs
-                onItemClick={(e) => {
-                  const route = e.detail.item.dataset.route;
-                  if (route) {
-                    navigate(route);
-                  }
-                }}
-              >
-                <BreadcrumbsItem data-route="/business-objects">Business Objects</BreadcrumbsItem>
-                <BreadcrumbsItem>
-                  {isBizObjectFetching ? 'Loading...' : bizObject?.BoTitle || 'Unnamed Object'}
-                </BreadcrumbsItem>
-              </Breadcrumbs>
-            }
             header={
               <Title level="H2">{isBizObjectFetching ? 'Loading...' : bizObject?.BoTitle || 'Unnamed Object'}</Title>
             }

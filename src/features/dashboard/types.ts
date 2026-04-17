@@ -67,7 +67,7 @@ export type FileConfigOverviewItem = {
   FileExt: string;
   MimeType: string;
   MaxBytes: number;
-  IsActive: string | boolean;
+  IsActive: boolean;
   Description: string;
 };
 

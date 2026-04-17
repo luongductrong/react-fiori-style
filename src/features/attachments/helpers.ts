@@ -152,6 +152,7 @@ function buildFileName(fileName: string, extension: string) {
 // DELETE
 // REACTIVATE
 // LINK_BO
+// UNLINK_BO
 // CREATE_VERSION
 function displayAuditAction(action?: string) {
   switch (action) {
@@ -166,13 +167,10 @@ function displayAuditAction(action?: string) {
     case 'REACTIVATE':
       return 'Restore';
     case 'LINK_BO':
-    case 'LINK_TO_BO':
       return 'Link to Business Object';
     case 'UNLINK_BO':
-    case 'UNLINK_FROM_BO':
       return 'Unlink from Business Object';
     case 'CREATE_VERSION':
-    case 'UPLOAD_NEW_VERSION':
       return 'Upload New Version';
     default:
       return action ? `"${action}"` : '-';

@@ -1,9 +1,9 @@
 export { BoListView } from './bo-list';
+export { NotFoundView } from './not-found';
 export { BoDetailView } from './bo-detail';
 export { UserListView } from './user-list';
-export { DashboardView } from './dashboard-view';
-export { ShellHomeView } from './shell-home-view';
-export { AdminHomeView } from './admin-home-view';
+export { LaunchpadView } from './launchpad';
+export { DashboardView } from './dashboard';
 export { VersionDetailView } from './version-detail';
 export { AttachmentListView } from './attachment-list';
 export { ConfigFileListView } from './config-file-list';

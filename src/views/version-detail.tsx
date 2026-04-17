@@ -20,11 +20,9 @@ import { BusyIndicator } from '@/components/busy-indicator';
 import { downloadFile } from '@/features/attachments/helpers';
 import { FilePreview } from '@/features/attachments/components';
 import { ObjectPage } from '@ui5/webcomponents-react/ObjectPage';
-import { Breadcrumbs } from '@ui5/webcomponents-react/Breadcrumbs';
 import { ToolbarButton } from '@ui5/webcomponents-react/ToolbarButton';
 import { pushErrorMessages, pushApiErrorMessages } from '@/libs/errors';
 import { NotFoundIllustrated } from '@/components/not-found-illustrated';
-import { BreadcrumbsItem } from '@ui5/webcomponents-react/BreadcrumbsItem';
 import { ObjectPageTitle } from '@ui5/webcomponents-react/ObjectPageTitle';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { ObjectPageSection } from '@ui5/webcomponents-react/ObjectPageSection';
@@ -163,22 +161,6 @@ export function VersionDetailView() {
                   disabled={isFetching}
                 />
               </Toolbar>
-            }
-            breadcrumbs={
-              <Breadcrumbs
-                onItemClick={(e) => {
-                  const route = e.detail.item.dataset.route;
-                  if (route) {
-                    navigate(route);
-                  }
-                }}
-              >
-                <BreadcrumbsItem data-route="/attachments">Attachments</BreadcrumbsItem>
-                <BreadcrumbsItem data-route={`/attachments/${id}`}>
-                  {isFetching ? 'Loading...' : title?.value || 'Unnamed Object'}
-                </BreadcrumbsItem>
-                <BreadcrumbsItem>{isFetching ? 'Loading...' : version?.FileName || 'Unnamed Object'}</BreadcrumbsItem>
-              </Breadcrumbs>
             }
             header={<Title level="H2">{isFetching ? 'Loading...' : version?.FileName || 'Unnamed Object'}</Title>}
             subHeader={isFetching ? 'Loading...' : `Version ${version?.VersionNo || versionNo || '-'}`}

@@ -52,7 +52,7 @@ export function NotFoundIllustrated({ title, subtitle, breadcrumbText, breadcrum
           <Button design="Transparent" icon="nav-back" onClick={() => navigate(-1)}>
             Back
           </Button>
-          <Link to="/shell-home">
+          <Link to="/launchpad">
             <Button design="Transparent">Back to Home page</Button>
           </Link>
         </FlexBox>

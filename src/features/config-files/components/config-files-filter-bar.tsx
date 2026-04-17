@@ -28,7 +28,8 @@ export function ConfigFilesFilterBar({ onFilterChange, onSearchChange }: ConfigF
 
   const handleOnGo = function () {
     const typeFilter = type ? `Type eq '${type}'` : '';
-    const isActiveFilter = isActive === 'active' ? `IsActive eq 'X'` : isActive === 'inactive' ? `IsActive ne 'X'` : '';
+    const isActiveFilter =
+      isActive === 'active' ? 'IsActive eq true' : isActive === 'inactive' ? 'IsActive eq false' : '';
     const filter = [fileExtFilterString, mimeTypeFilterString, typeFilter, isActiveFilter, descriptionFilterString]
       .filter(Boolean)
       .join(' and ');
