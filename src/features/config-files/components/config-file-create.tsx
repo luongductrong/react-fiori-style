@@ -2,19 +2,30 @@ import * as React from 'react';
 import { toast } from '@/libs/toast';
 import { Bar } from '@ui5/webcomponents-react/Bar';
 import { ConfigFileForm } from './config-file-form';
+import { validateConfigFileForm } from '../validate';
 import { Dialog } from '@ui5/webcomponents-react/Dialog';
 import { Button } from '@ui5/webcomponents-react/Button';
 import { BusyIndicator } from '@/components/busy-indicator';
 import { getInitialConfigFileFormValues } from '../helpers/form';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { normalizeMimeTypesForStorage } from '../helpers/mime-types';
 import { createConfigFileMutationOptions } from '../options/mutation';
 import { ToolbarButton } from '@ui5/webcomponents-react/ToolbarButton';
-import { findInvalidMimeTypes, normalizeMimeTypesForStorage } from '../helpers/mime-types';
+import type { ConfigFileFormTouchedFields } from './config-file-form';
+
+const INITIAL_TOUCHED_FIELDS: ConfigFileFormTouchedFields = {
+  fileExt: false,
+  mimeTypes: false,
+  maxBytes: false,
+  description: false,
+};
 
 export function ConfigFileCreate() {
   const queryClient = useQueryClient();
   const [open, setOpen] = React.useState(false);
   const [values, setValues] = React.useState(getInitialConfigFileFormValues);
+  const [touchedFields, setTouchedFields] = React.useState(INITIAL_TOUCHED_FIELDS);
+  const [showAllValidation, setShowAllValidation] = React.useState(false);
 
   const { mutate: createConfigFile, isPending } = useMutation(
     createConfigFileMutationOptions({
@@ -23,6 +34,8 @@ export function ConfigFileCreate() {
         queryClient.invalidateQueries({ queryKey: ['config-files'] });
         setOpen(false);
         setValues(getInitialConfigFileFormValues());
+        setTouchedFields(INITIAL_TOUCHED_FIELDS);
+        setShowAllValidation(false);
       },
     }),
   );
@@ -31,14 +44,14 @@ export function ConfigFileCreate() {
   const normalizedMimeType = normalizeMimeTypesForStorage(values.mimeTypes);
   const normalizedDescription = values.description.trim();
   const maxBytes = Number(values.maxBytes);
-  const invalidMimeTypes = findInvalidMimeTypes(values.mimeTypes);
-  const isSaveDisabled =
-    !normalizedFileExt ||
-    !normalizedMimeType ||
-    invalidMimeTypes.length > 0 ||
-    !normalizedDescription ||
-    !Number.isFinite(maxBytes) ||
-    maxBytes <= 0;
+  const validation = React.useMemo(() => validateConfigFileForm(values), [values]);
+  const isSaveDisabled = Boolean(
+    validation.fileExt || validation.mimeTypes.error || validation.maxBytes || validation.description,
+  );
+
+  const handleFieldTouch = function (field: keyof ConfigFileFormTouchedFields) {
+    setTouchedFields((prev) => (prev[field] ? prev : { ...prev, [field]: true }));
+  };
 
   const handleClose = function () {
     if (isPending) {
@@ -47,10 +60,18 @@ export function ConfigFileCreate() {
 
     setOpen(false);
     setValues(getInitialConfigFileFormValues());
+    setTouchedFields(INITIAL_TOUCHED_FIELDS);
+    setShowAllValidation(false);
   };
 
   // TODO: limit file size
   const handleSubmit = function () {
+    setShowAllValidation(true);
+
+    if (isSaveDisabled) {
+      return;
+    }
+
     createConfigFile({
       FileExt: normalizedFileExt,
       MimeType: normalizedMimeType,
@@ -87,7 +108,14 @@ export function ConfigFileCreate() {
         }
         onClose={handleClose}
       >
-        <ConfigFileForm value={values} onChange={setValues} />
+        <ConfigFileForm
+          value={values}
+          validation={validation}
+          touchedFields={touchedFields}
+          showAllValidation={showAllValidation}
+          onFieldTouch={handleFieldTouch}
+          onChange={setValues}
+        />
         <BusyIndicator type="pending" show={isPending} />
       </Dialog>
     </React.Fragment>
