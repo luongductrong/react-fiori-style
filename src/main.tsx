@@ -10,7 +10,7 @@ import { QueryProvider } from '@/context-providers/query-provider';
 import { HashRouter, Navigate, Route, Routes } from 'react-router';
 import { ThemeProvider } from '@ui5/webcomponents-react/ThemeProvider';
 import { AttachmentListView, AttachmentDetailView, VersionDetailView, ConfigFileListView } from '@/views';
-import { BoDetailView, BoListView, UserListView, ShellHomeView, AdminHomeView, DashboardView } from '@/views';
+import { BoDetailView, BoListView, UserListView, LaunchpadView, AdminHomeView, DashboardView } from '@/views';
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
@@ -21,7 +21,7 @@ createRoot(document.getElementById('root')!).render(
         {/* TODO: Move to Layout */}
         <HashRouter>
           <Routes>
-            <Route path="/shell-home" element={<ShellHomeView />} />
+            <Route path="/launchpad" element={<LaunchpadView />} />
             <Route
               path="/admin"
               element={
@@ -63,7 +63,7 @@ createRoot(document.getElementById('root')!).render(
             <Route path="/attachments/:id" element={<AttachmentDetailView />} />
             <Route path="/attachments/:id/versions/:versionNo" element={<VersionDetailView />} />
             {/* TODO: Handle 404 page */}
-            <Route path="*" element={<Navigate replace to="/shell-home" />} />
+            <Route path="*" element={<Navigate replace to="/launchpad" />} />
           </Routes>
         </HashRouter>
       </QueryProvider>

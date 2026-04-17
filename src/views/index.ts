@@ -1,6 +1,7 @@
 export { BoListView } from './bo-list';
 export { BoDetailView } from './bo-detail';
 export { UserListView } from './user-list';
+export { LaunchpadView } from './launchpad';
 export { DashboardView } from './dashboard-view';
 export { ShellHomeView } from './shell-home-view';
 export { AdminHomeView } from './admin-home-view';
