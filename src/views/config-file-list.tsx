@@ -19,19 +19,14 @@ import { AnalyticalTable } from '@ui5/webcomponents-react/AnalyticalTable';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { DynamicPageHeader } from '@ui5/webcomponents-react/DynamicPageHeader';
 import { configFilesQueryOptions } from '@/features/config-files/options/query';
-import { formatMimeTypesForDisplay } from '@/features/config-files/helpers/mime-types';
+import { ConfigFileCreate, ConfigFileEdit } from '@/features/config-files/components';
+import { ConfigFileView, ConfigFilesFilterBar } from '@/features/config-files/components';
 import { enableConfigFileMutationOptions } from '@/features/config-files/options/mutation';
 import type { AnalyticalTableCellInstance } from '@ui5/webcomponents-react/AnalyticalTable';
 import { disableConfigFileMutationOptions } from '@/features/config-files/options/mutation';
-import { ConfigFileCreate, ConfigFileEdit, ConfigFilesFilterBar } from '@/features/config-files/components';
 
 const rawColumns = [
   { Header: 'File Ext', accessor: 'FileExt' },
-  {
-    Header: 'Mime Types',
-    accessor: 'MimeType',
-    Cell: (props: AnalyticalTableCellInstance) => formatMimeTypesForDisplay(props.value) || '-',
-  },
   {
     Header: 'Type',
     accessor: 'Type',
@@ -57,6 +52,7 @@ export function ConfigFileListView() {
   const queryClient = useQueryClient();
   const [search, setSearch] = React.useState('');
   const [configFileToEdit, setConfigFileToEdit] = React.useState<ConfigFileItem | null>(null);
+  const [configFileToView, setConfigFileToView] = React.useState<ConfigFileItem | null>(null);
   // TODO: BE enable search for config files, users
   const [filter, setFilter] = React.useState('');
   const configFileListParams = React.useMemo(
@@ -104,6 +100,15 @@ export function ConfigFileListView() {
         Header: 'Actions',
         Cell: (props: AnalyticalTableCellInstance) => (
           <FlexBox alignItems="Center" className="gap-2">
+            <Button
+              design="Transparent"
+              className="h-6.5"
+              onClick={() => {
+                setConfigFileToView(props.row.original);
+              }}
+            >
+              View
+            </Button>
             <Button
               design="Transparent"
               className="h-6.5"
@@ -193,6 +198,13 @@ export function ConfigFileListView() {
         configFile={configFileToEdit}
         onClose={() => {
           setConfigFileToEdit(null);
+        }}
+      />
+      <ConfigFileView
+        open={!!configFileToView}
+        configFile={configFileToView}
+        onClose={() => {
+          setConfigFileToView(null);
         }}
       />
       <AnalyticalTable
