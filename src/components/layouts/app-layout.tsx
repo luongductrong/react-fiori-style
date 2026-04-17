@@ -1,6 +1,5 @@
 import { Outlet, useLocation } from 'react-router';
 import { AppHeader } from '@/components/layouts/app-header';
-import { useCurrentAuthUser } from '@/features/auth-users/hooks';
 
 function getHeaderTitle(pathname: string) {
   if (pathname === '/launchpad') {
@@ -36,11 +35,10 @@ function getHeaderTitle(pathname: string) {
 
 export function AppLayout() {
   const location = useLocation();
-  const { data } = useCurrentAuthUser();
 
   return (
     <div className="min-h-screen bg-background">
-      <AppHeader primaryTitle={getHeaderTitle(location.pathname)} username={data?.username} />
+      <AppHeader primaryTitle={getHeaderTitle(location.pathname)} />
       <Outlet />
     </div>
   );

@@ -1,11 +1,13 @@
 import * as React from 'react';
 import { ODATA_BASE_URL } from '@/app-env';
 import { useNavigate } from 'react-router';
+import { useQuery } from '@tanstack/react-query';
 import { ODATA_PUBLIC_SERVICE } from '@/app-constant';
 import { Avatar } from '@ui5/webcomponents-react/Avatar';
 import { UserMenuAccount } from '@ui5/webcomponents-react/UserMenuAccount';
 import { UserMenu, type UserMenuDomRef } from '@ui5/webcomponents-react/UserMenu';
 import { ShellBar, type ShellBarPropTypes } from '@ui5/webcomponents-react/ShellBar';
+import { currentPublicUserProfileQueryOptions } from '@/features/auth-users/options/query';
 
 interface AppHeaderProps {
   primaryTitle?: string;
@@ -14,7 +16,6 @@ interface AppHeaderProps {
 }
 
 const SAP_LOGO_URL = 'https://ui5.github.io/webcomponents/images/sap-logo-svg.svg';
-const MOCK_ACCOUNT_SUBTITLE = 'current.user@sap.com';
 
 function getAvatarInitials(username: string) {
   const tokens = username.trim().split(/\s+/).filter(Boolean);
@@ -42,8 +43,15 @@ export function AppHeader({ primaryTitle = 'Corporate Portal', secondaryTitle, u
   const userMenuRef = React.useRef<UserMenuDomRef>(null);
   const [headerHeight, setHeaderHeight] = React.useState(0);
   const [isUserMenuOpen, setIsUserMenuOpen] = React.useState(false);
+  const { data: publicUserProfile } = useQuery(currentPublicUserProfileQueryOptions());
 
-  const displayName = username?.trim() || 'Current User';
+  const displayName =
+    [publicUserProfile?.FirstName, publicUserProfile?.LastName].filter(Boolean).join(' ').trim() ||
+    publicUserProfile?.Name?.trim() ||
+    publicUserProfile?.Id?.trim() ||
+    username?.trim() ||
+    'Current User';
+  const accountSubtitle = publicUserProfile?.Id?.trim() || username?.trim() || 'Current User';
   const avatarInitials = React.useMemo(() => getAvatarInitials(displayName), [displayName]);
 
   React.useLayoutEffect(() => {
@@ -113,11 +121,7 @@ export function AppHeader({ primaryTitle = 'Corporate Portal', secondaryTitle, u
       <UserMenu
         ref={userMenuRef}
         accounts={
-          <UserMenuAccount
-            avatarInitials={avatarInitials}
-            subtitleText={MOCK_ACCOUNT_SUBTITLE}
-            titleText={displayName}
-          />
+          <UserMenuAccount avatarInitials={avatarInitials} subtitleText={accountSubtitle} titleText={displayName} />
         }
         onClose={() => {
           setIsUserMenuOpen(false);

@@ -12,6 +12,7 @@ export const ODATA_SERVICE = {
 
 export const ODATA_PUBLIC_SERVICE = {
   LOG_OUT_ACTION: '/sap/public/bc/icf/logoff',
+  USER: "/sap/opu/odata/sap/ESH_SEARCH_SRV/Users('<current>')",
   SAP_CLIENT: '324',
 };
 
