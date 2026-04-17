@@ -86,7 +86,6 @@ export function AttachmentDetailView() {
 
   const { mutate: restoreAttachment, isPending: isRestoring } = useMutation(
     restoreAttachmentMutationOptions({
-      fileId: id!,
       onSuccess: () => {
         toast('Attachment restored successfully');
         queryClient.invalidateQueries({
@@ -194,7 +193,7 @@ export function AttachmentDetailView() {
                     <ToolbarButton
                       design="Default"
                       text="Restore"
-                      onClick={() => restoreAttachment()}
+                      onClick={() => restoreAttachment(id!)}
                       disabled={attachment.IsActive || isRestoring}
                     />
                   )}

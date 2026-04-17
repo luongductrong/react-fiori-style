@@ -20,25 +20,22 @@ import { useInfiniteQuery, useMutation, useQueryClient } from '@tanstack/react-q
 import { restoreAttachmentMutationOptions } from '@/features/attachments/options/mutation';
 import { AnalyticalTable, type AnalyticalTableCellInstance } from '@ui5/webcomponents-react/AnalyticalTable';
 
-function RestoreAttachmentButton({ attachment }: { attachment: AttachmentListItem }) {
-  const queryClient = useQueryClient();
-  const { mutate: restoreAttachment, isPending: isRestoring } = useMutation(
-    restoreAttachmentMutationOptions({
-      fileId: attachment.FileId,
-      onSuccess: () => {
-        toast('Attachment restored successfully');
-        queryClient.invalidateQueries({ queryKey: ['attachments'] });
-      },
-    }),
-  );
-
+function RestoreAttachmentButton({
+  attachment,
+  disabled,
+  onRestore,
+}: {
+  attachment: AttachmentListItem;
+  disabled: boolean;
+  onRestore: (_fileId: string) => void;
+}) {
   return (
     <Button
       design="Transparent"
       className="h-6.5"
-      disabled={attachment.IsActive || !attachment.__OperationControl?.Reactivate || isRestoring}
+      disabled={attachment.IsActive || !attachment.__OperationControl?.Reactivate || disabled}
       onClick={() => {
-        restoreAttachment();
+        onRestore(attachment.FileId);
       }}
     >
       Restore
@@ -47,6 +44,7 @@ function RestoreAttachmentButton({ attachment }: { attachment: AttachmentListIte
 }
 
 export function DeletedAttachmentListView() {
+  const queryClient = useQueryClient();
   const [search, setSearch] = React.useState('');
   const [filter, setFilter] = React.useState('');
 
@@ -70,6 +68,25 @@ export function DeletedAttachmentListView() {
   const attachments = data?.pages.flatMap((page) => page.value) ?? [];
   const lastPage = data ? data.pages[data.pages.length - 1] : undefined;
   const totalCount = lastPage?.['@odata.count'] ?? 0;
+  const {
+    mutate: restoreAttachment,
+    isPending: isRestoring,
+    variables: restoringFileId,
+  } = useMutation(
+    restoreAttachmentMutationOptions({
+      onSuccess: () => {
+        toast('Attachment restored successfully');
+        queryClient.invalidateQueries({ queryKey: ['attachments'] });
+      },
+    }),
+  );
+
+  const handleRestore = React.useCallback(
+    (fileId: string) => {
+      restoreAttachment(fileId);
+    },
+    [restoreAttachment],
+  );
 
   const columns = React.useMemo(
     () => [
@@ -100,10 +117,20 @@ export function DeletedAttachmentListView() {
       },
       {
         Header: 'Actions',
-        Cell: (props: AnalyticalTableCellInstance) => <RestoreAttachmentButton attachment={props.row.original} />,
+        Cell: (props: AnalyticalTableCellInstance) => {
+          const attachment = props.row.original as AttachmentListItem;
+
+          return (
+            <RestoreAttachmentButton
+              attachment={attachment}
+              disabled={isRestoring && restoringFileId === attachment.FileId}
+              onRestore={handleRestore}
+            />
+          );
+        },
       },
     ],
-    [],
+    [handleRestore, isRestoring, restoringFileId],
   );
 
   React.useEffect(() => {
@@ -141,7 +168,7 @@ export function DeletedAttachmentListView() {
         columns={columns}
         sortable
         groupable
-        loading={isFetching || isFetchingNextPage}
+        loading={isFetching || isFetchingNextPage || isRestoring}
         noDataText={
           filter || search ? 'No deleted attachments match the current filters.' : 'No deleted attachments found.'
         }

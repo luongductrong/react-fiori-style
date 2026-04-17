@@ -12,7 +12,7 @@ export const Toaster = () => {
       key={toast.id}
       open
       className="px-2 py-1"
-      duration={toast.options?.duration ?? 3000}
+      duration={toast.options?.duration ?? 5000}
       placement={toast.options?.placement ?? 'BottomCenter'}
       onClose={clearToast}
     >

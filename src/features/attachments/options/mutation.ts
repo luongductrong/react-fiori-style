@@ -19,6 +19,11 @@ type CreateAttachmentParams = {
   onError?: (_error: unknown) => void;
 };
 
+type RestoreAttachmentParams = {
+  onSuccess?: () => void;
+  onError?: (_error: unknown) => void;
+};
+
 type LinkBoMutationParams = {
   onSuccess?: () => void;
   onError?: (_error: unknown) => void;
@@ -88,9 +93,9 @@ export function deleteAttachmentMutationOptions({ fileId, onSuccess, onError }: 
   });
 }
 
-export function restoreAttachmentMutationOptions({ fileId, onSuccess, onError }: Params) {
+export function restoreAttachmentMutationOptions({ onSuccess, onError }: RestoreAttachmentParams) {
   return mutationOptions({
-    mutationFn: async () => {
+    mutationFn: async (fileId: string) => {
       let token = getCsrfToken();
 
       if (!token) {

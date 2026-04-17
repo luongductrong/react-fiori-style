@@ -91,6 +91,7 @@ export function ConfigFileListView() {
       ...rawColumns,
       {
         Header: 'Actions',
+        width: 212,
         Cell: (props: AnalyticalTableCellInstance) => (
           <FlexBox alignItems="Center" className="gap-2">
             <Button
