@@ -98,7 +98,7 @@ export function AttachmentDetailView() {
   const isAdmin = currentAuthUser?.isAdmin ?? false;
   const username = currentAuthUser?.username ?? null;
   const isOwner = username === attachment?.Ernam;
-  const canModifyLockedAttachment = !attachment?.EditLock || (!isAuthPending && isOwner);
+  const canModifyLockedAttachment = !attachment?.EditLock || (!isAuthPending && (isOwner || isAdmin));
   const canEditAttachment = Boolean(
     attachment?.IsActive && attachment.__EntityControl?.Updatable && canModifyLockedAttachment,
   );

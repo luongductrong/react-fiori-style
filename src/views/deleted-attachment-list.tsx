@@ -55,6 +55,7 @@ export function DeletedAttachmentListView() {
       $top: 10,
       $count: true,
       $select: API.select,
+      $orderby: 'Erdat desc,Erzet desc',
       $filter: filter ? `IsActive eq false and ${filter}` : 'IsActive eq false',
       $search: search || undefined,
     }),

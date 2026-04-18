@@ -1,7 +1,7 @@
 export const API = {
   endpoint: '/Attachments',
   select:
-    'CurrentVersion,Erdat,Ernam,FileId,IsActive,Title,__EntityControl/Deletable,__EntityControl/Updatable,__OperationControl/Reactivate',
+    'CurrentVersion,Erdat,Erzet,Ernam,FileId,IsActive,Title,__EntityControl/Deletable,__EntityControl/Updatable,__OperationControl/Reactivate',
   detailExpand: '_CurrentVersion($select=FileContent,FileId,FileName,FileExtension,MimeType,VersionNo)',
   versionDetailSelect: 'Erdat,Ernam,Erzet,FileContent,FileExtension,FileId,FileName,FileSize,MimeType,VersionNo',
   versionsEndpoint: (fileId: string) => `/Attachments(${fileId})/_Versions`,

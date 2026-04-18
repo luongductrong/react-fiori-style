@@ -44,6 +44,7 @@ export function AttachmentAudit({ fileId }: { fileId: string }) {
       'sap-client': 324,
       $count: true,
       $select: 'Action,Erdat,Ernam,Erzet,FileId,Note,Uname',
+      $orderby: 'Erdat desc,Erzet desc',
       // TODO: ask BE what is the different between Uname and Ernam
       $skip: 0,
       $top: 5,

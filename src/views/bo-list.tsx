@@ -62,6 +62,7 @@ export function BoListView() {
       $top: ROWS_PER_PAGE,
       $count: true,
       $select: API.select,
+      $orderby: 'Erdat desc,Erzet desc',
       $filter: filter || undefined,
       $search: search || undefined,
     }),

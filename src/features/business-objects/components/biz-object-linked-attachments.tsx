@@ -69,6 +69,7 @@ export function BizObjectLinkedAttachments({ boId, disabled }: BizObjectLinkedAt
       'sap-client': 324,
       $count: true,
       $expand: '_Attach',
+      $orderby: 'Erdat desc,Erzet desc',
       $skip: 0,
       $top: 5,
     }),

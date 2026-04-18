@@ -42,6 +42,7 @@ export function AttachmentListView() {
       $top: 10,
       $count: true,
       $select: API.select,
+      $orderby: 'Erdat desc,Erzet desc',
       // If user is admin, show all attachments, otherwise show only active attachments
       $filter: isAdmin ? filter || undefined : filter ? `IsActive eq true and ${filter}` : 'IsActive eq true',
       $search: search || undefined,
@@ -87,8 +88,9 @@ export function AttachmentListView() {
           ]
         : []),
       {
-        Header: 'Created On',
-        accessor: 'Erdat',
+        Header: 'Created At',
+        id: 'createdAt',
+        Cell: (props: AnalyticalTableCellInstance) => `${props.row.original.Erdat} ${props.row.original.Erzet}`,
       },
       {
         Header: 'Created By',

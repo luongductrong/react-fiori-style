@@ -32,6 +32,7 @@ export type AttachmentListParams = {
   $top: number;
   $filter?: string;
   $search?: string;
+  $orderby?: string;
 };
 
 export type AttachmentDetailParams = {
@@ -110,6 +111,7 @@ export type AttachmentAuditsParams = {
   $select: string;
   $skip: number;
   $top: number;
+  $orderby?: string;
 };
 
 export type VersionDetail = {
@@ -203,6 +205,7 @@ export type AttachmentBizObjectsParams = {
   $skip?: number;
   $top?: number;
   $expand?: string;
+  $orderby?: string;
 };
 
 export type GooglePickerDocument = {

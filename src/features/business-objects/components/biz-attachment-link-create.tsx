@@ -76,6 +76,7 @@ function BizAttachmentLinkCreateImpl({ boId, linkedAttachmentIds, disabled }: Bi
       $top: 10,
       $count: true,
       $select: 'FileId,Title,CurrentVersion,Erdat,Ernam,Erzet,IsActive', // TODO: move to constants
+      $orderby: 'Erdat desc,Erzet desc',
       $filter: filter ? `IsActive eq true and ${filter}` : 'IsActive eq true', // Make sure to only fetch active attachments
     }),
     enabled: open,

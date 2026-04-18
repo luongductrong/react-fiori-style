@@ -25,6 +25,7 @@ export type BizObjectListParams = {
   $top?: number;
   $filter?: string;
   $search?: string;
+  $orderby?: string;
 };
 
 export type BizObjectListResponse = {
@@ -45,6 +46,7 @@ export type BizObjectLinkedAttachmentParams = {
   $skip?: number;
   $top?: number;
   $expand?: string;
+  $orderby?: string;
 };
 
 export type BizObjectLinkedAttachmentItem = {

@@ -85,6 +85,7 @@ function AttachmentBizLinkCreateImpl({ fileId, linkedBizObjectIds, disabled }: A
       $count: true,
       $select:
         'BoId,BoType,BoTitle,Status,Erdat,Erzet,Ernam,Aedat,Aezet,Aenam,__EntityControl/Deletable,__EntityControl/Updatable',
+      $orderby: 'Erdat desc,Erzet desc',
       $filter: filter || undefined,
       $search: search || undefined,
     }),
