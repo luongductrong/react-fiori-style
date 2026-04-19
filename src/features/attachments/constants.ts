@@ -16,11 +16,11 @@ export const API = {
 export const MUTATION_API = {
   deleteAttachment: (fileId: string) => `/Attachments(FileId=${fileId})`,
   restoreAttachment: (fileId: string) =>
-    `/Attachments(FileId=${fileId})/com.sap.gateway.srvd.zui_attach_srv.v0001.Reactivate`,
+    `/Attachments(FileId=${fileId})/com.sap.gateway.srvd.zsd_attach.v0001.Reactivate`,
   rollbackVersion: (fileId: string) => `/Attachments(${fileId})`,
   updateAttachmentTitle: (fileId: string) => `/Attachments(${fileId})`,
   createAttachment: '/Attachments',
   uploadVersion: '/AttachmentVersions',
-  linkBo: () => `/BizObjectAttachmentLink`,
-  unlinkBo: (boId: string, fileId: string) => `/BizObjectAttachmentLink(BoId=${boId},FileId=${fileId})`,
+  linkBo: () => `/BusinessObjectAttachmentLinks`,
+  unlinkBo: (boId: string, fileId: string) => `/BusinessObjectAttachmentLinks(BoId=${boId},FileId=${fileId})`,
 };
