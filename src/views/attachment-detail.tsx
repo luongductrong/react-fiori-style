@@ -4,7 +4,6 @@ import { toast } from '@/libs/toast';
 import '@ui5/webcomponents-icons/decline.js';
 import '@ui5/webcomponents-icons/refresh.js';
 import '@ui5/webcomponents-icons/attachment.js';
-import { getError } from '@/libs/error-message';
 import { Icon } from '@ui5/webcomponents-react/Icon';
 import { Text } from '@ui5/webcomponents-react/Text';
 import { useParams, useNavigate } from 'react-router';
@@ -22,7 +21,6 @@ import { MessageBox } from '@ui5/webcomponents-react/MessageBox';
 import { validateFileTitle } from '@/features/attachments/validate';
 import { AttachmentBizList } from '@/features/attachments/components';
 import { ToolbarButton } from '@ui5/webcomponents-react/ToolbarButton';
-import { pushErrorMessages, pushApiErrorMessages } from '@/libs/errors';
 import { NotFoundIllustrated } from '@/components/not-found-illustrated';
 import { ObjectPageTitle } from '@ui5/webcomponents-react/ObjectPageTitle';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
@@ -31,6 +29,7 @@ import { attachmentDetailQueryOptions } from '@/features/attachments/options/que
 import { deleteAttachmentMutationOptions } from '@/features/attachments/options/mutation';
 import { restoreAttachmentMutationOptions } from '@/features/attachments/options/mutation';
 import { updateAttachmentTitleMutationOptions } from '@/features/attachments/options/mutation';
+import { pushErrorMessages, pushApiErrorMessages, getError } from '@/libs/helpers/error-messages';
 import { AttachmentVersionList, AttachmentAudit, FilePreview } from '@/features/attachments/components';
 import { AttachmentForm, type AttachmentFormValues } from '@/features/attachments/components/attachment-form';
 

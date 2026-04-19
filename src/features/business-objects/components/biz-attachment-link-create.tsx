@@ -1,12 +1,12 @@
 import * as React from 'react';
 import { toast } from '@/libs/toast';
 import { Bar } from '@ui5/webcomponents-react/Bar';
-import { pushApiErrorMessages } from '@/libs/errors';
 import { Title } from '@ui5/webcomponents-react/Title';
 import { Dialog } from '@ui5/webcomponents-react/Dialog';
 import { Button } from '@ui5/webcomponents-react/Button';
 import { Toolbar } from '@ui5/webcomponents-react/Toolbar';
 import { BusyIndicator } from '@/components/busy-indicator';
+import { pushApiErrorMessages } from '@/libs/helpers/error-messages';
 import { ToolbarButton } from '@ui5/webcomponents-react/ToolbarButton';
 import { ToolbarSpacer } from '@ui5/webcomponents-react/ToolbarSpacer';
 import { linkAttachmentToBoMutationOptions } from '../options/mutation';

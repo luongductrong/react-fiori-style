@@ -11,13 +11,13 @@ import { useCurrentAuthUser } from '@/features/auth-users/hooks';
 import { DynamicPage } from '@ui5/webcomponents-react/DynamicPage';
 import { ToolbarSpacer } from '@ui5/webcomponents-react/ToolbarSpacer';
 import { ToolbarButton } from '@ui5/webcomponents-react/ToolbarButton';
-import { pushApiErrorMessages, pushErrorMessages } from '@/libs/errors';
 import { AnalyticalTable } from '@ui5/webcomponents-react/AnalyticalTable';
 import { authUsersQueryOptions } from '@/features/auth-users/options/query';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { DynamicPageHeader } from '@ui5/webcomponents-react/DynamicPageHeader';
 import { AuthUserCreate, AuthUsersFilterBar } from '@/features/auth-users/components';
 import { deleteAuthUserMutationOptions } from '@/features/auth-users/options/mutation';
+import { pushApiErrorMessages, pushErrorMessages } from '@/libs/helpers/error-messages';
 import type { AnalyticalTableCellInstance } from '@ui5/webcomponents-react/AnalyticalTable';
 
 const rawColumns = [

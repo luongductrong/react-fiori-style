@@ -1,9 +1,9 @@
 import * as React from 'react';
 import { toast } from '@/libs/toast';
 import { useQuery } from '@tanstack/react-query';
-import { pushErrorMessages } from '@/libs/errors';
 import { useAuthStore } from '@/stores/auth-store';
 import { GOOGLE_APP_ID, GOOGLE_CLIENT_ID } from '@/app-env';
+import { pushErrorMessages } from '@/libs/helpers/error-messages';
 import type { ConfigFileItem } from '@/features/config-files/types';
 import type { UploadedFileData, GooglePickerDocument } from '../types';
 import { configFilesQueryOptions } from '@/features/config-files/options/query';

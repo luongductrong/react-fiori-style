@@ -8,7 +8,6 @@ import '@ui5/webcomponents-icons/decline.js';
 import '@ui5/webcomponents-icons/refresh.js';
 import { formatFileSize } from '@/libs/utils';
 import '@ui5/webcomponents-icons/document.js';
-import { getError } from '@/libs/error-message';
 import { Text } from '@ui5/webcomponents-react/Text';
 import { Icon } from '@ui5/webcomponents-react/Icon';
 import { API } from '@/features/attachments/constants';
@@ -21,7 +20,6 @@ import { downloadFile } from '@/features/attachments/helpers';
 import { FilePreview } from '@/features/attachments/components';
 import { ObjectPage } from '@ui5/webcomponents-react/ObjectPage';
 import { ToolbarButton } from '@ui5/webcomponents-react/ToolbarButton';
-import { pushErrorMessages, pushApiErrorMessages } from '@/libs/errors';
 import { NotFoundIllustrated } from '@/components/not-found-illustrated';
 import { ObjectPageTitle } from '@ui5/webcomponents-react/ObjectPageTitle';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
@@ -30,6 +28,7 @@ import { attachmentTitleQueryOptions } from '@/features/attachments/options/quer
 import { rollbackVersionMutationOptions } from '@/features/attachments/options/mutation';
 import { attachmentVersionDetailQueryOptions } from '@/features/attachments/options/query';
 import { attachmentCurrentVersionQueryOptions } from '@/features/attachments/options/query';
+import { pushErrorMessages, pushApiErrorMessages, getError } from '@/libs/helpers/error-messages';
 
 export function VersionDetailView() {
   const { id, versionNo } = useParams();

@@ -1,8 +1,8 @@
 import * as React from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { pushApiErrorMessages } from '@/libs/errors';
 import type { CurrentAuthUserState } from '../types';
 import { currentAuthUserQueryOptions } from '../options/query';
+import { pushApiErrorMessages } from '@/libs/helpers/error-messages';
 
 const ADMIN_ROLE = 'ADMIN';
 

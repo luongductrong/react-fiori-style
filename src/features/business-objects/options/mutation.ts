@@ -1,9 +1,9 @@
 import { ODATA_SERVICE } from '@/app-constant';
 import { API, MUTATION_API } from '../constants';
-import { pushApiErrorMessages } from '@/libs/errors';
 import { axiosInstance } from '@/libs/axios-instance';
 import { mutationOptions } from '@tanstack/react-query';
 import { fetchCsrfToken, getCsrfToken } from '@/libs/helpers';
+import { pushApiErrorMessages } from '@/libs/helpers/error-messages';
 import type { CreateBizObjectPayload, CreateBizObjectResponse } from '../types';
 import type { LinkAttachmentPayload, UpdateBizObjectPayload, UnlinkAttachmentParams } from '../types';
 

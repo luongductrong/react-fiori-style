@@ -1,12 +1,12 @@
 import * as React from 'react';
 import { displayAuditAction } from '../helpers';
 import { Bar } from '@ui5/webcomponents-react/Bar';
-import { pushApiErrorMessages } from '@/libs/errors';
 import { Title } from '@ui5/webcomponents-react/Title';
 import { Button } from '@ui5/webcomponents-react/Button';
 import { useInfiniteQuery } from '@tanstack/react-query';
 import { Toolbar } from '@ui5/webcomponents-react/Toolbar';
 import { attachmentAuditsQueryOptions } from '../options/query';
+import { pushApiErrorMessages } from '@/libs/helpers/error-messages';
 import { ToolbarSpacer } from '@ui5/webcomponents-react/ToolbarSpacer';
 import { AnalyticalTable, type AnalyticalTableCellInstance } from '@ui5/webcomponents-react/AnalyticalTable';
 

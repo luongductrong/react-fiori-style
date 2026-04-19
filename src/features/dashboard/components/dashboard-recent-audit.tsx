@@ -5,9 +5,9 @@ import { SectionCard } from './section-card';
 import { useQuery } from '@tanstack/react-query';
 import { Tag } from '@ui5/webcomponents-react/Tag';
 import { Text } from '@ui5/webcomponents-react/Text';
-import { pushApiErrorMessages } from '@/libs/errors';
 import { BusyIndicator } from '@/components/busy-indicator';
 import { Link as UI5Link } from '@ui5/webcomponents-react/Link';
+import { pushApiErrorMessages } from '@/libs/helpers/error-messages';
 import { dashboardRecentAuditLogsQueryOptions } from '../options/query';
 
 function displayAuditAction(action?: string) {
