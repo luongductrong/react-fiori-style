@@ -3,16 +3,16 @@ import { getFileExtension } from '../helpers/upload-file';
 import type { ConfigFileItem } from '@/features/config-files/types';
 import { parseMimeTypes } from '@/features/config-files/helpers/mime-types';
 
-export type UploadValidationInput = {
+type UploadValidationInput = {
   fileName?: string;
   fileExtension?: string;
   mimeType?: string;
   fileSize?: number;
 };
 
-export type UploadConfigType = ConfigFileItem['Type'];
+type UploadConfigType = ConfigFileItem['Type'];
 
-export type ActiveUploadConfig = {
+type ActiveUploadConfig = {
   FileExt: string;
   MimeTypes: string[];
   MaxBytes: number;
@@ -145,10 +145,11 @@ function validateUploadFileData(input: UploadValidationInput, configFiles?: Conf
   return '';
 }
 
+export type { UploadConfigType };
 export {
-  resolveUploadTypeByExtension,
-  getAllowedUploadExtensions,
   buildUploadAcceptValue,
-  findMatchingUploadConfig,
   validateUploadFileData,
+  findMatchingUploadConfig,
+  getAllowedUploadExtensions,
+  resolveUploadTypeByExtension,
 };

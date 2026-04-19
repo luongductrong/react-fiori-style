@@ -52,7 +52,7 @@ export function AppHeader({ primaryTitle = 'Corporate Portal', secondaryTitle, u
     publicUserProfile?.Id?.trim() ||
     username?.trim() ||
     'User';
-  const accountSubtitle = publicUserProfile?.Id?.trim() || username?.trim() || 'User';
+  const accountSubtitle = publicUserProfile?.Id?.trim() || username?.trim() || '';
   const avatarInitials = React.useMemo(() => getAvatarInitials(displayName), [displayName]);
   const shouldShowBackButton = location.pathname !== '/launchpad';
 
@@ -145,9 +145,9 @@ export function AppHeader({ primaryTitle = 'Corporate Portal', secondaryTitle, u
         accounts={
           <UserMenuAccount
             avatarInitials={avatarInitials}
-            subtitleText={accountSubtitle}
-            titleText={displayName}
-            description={authUser?.value[0]?.Role === 'ADMIN' ? 'Administrator' : undefined}
+            subtitleText={accountSubtitle || undefined}
+            titleText={displayName + (authUser?.value[0]?.Role === 'ADMIN' ? ' (Administrator)' : '')}
+            description={navigator.language ? 'Device Language: ' + navigator.language : ''}
           />
         }
         onClose={() => {

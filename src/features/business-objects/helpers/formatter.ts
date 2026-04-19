@@ -1,6 +1,6 @@
-import type { BoType, BoStatus } from './constants';
+import type { BoType, BoStatus } from '../constants';
 
-export function displayBoType(boType?: BoType | string | null | undefined) {
+function displayBoType(boType?: BoType | string | null | undefined) {
   switch (boType) {
     case 'PORDER':
       return 'Purchase Order';
@@ -13,7 +13,7 @@ export function displayBoType(boType?: BoType | string | null | undefined) {
   }
 }
 
-export function displayBoStatus(boStatus?: BoStatus | string | null | undefined) {
+function displayBoStatus(boStatus?: BoStatus | string | null | undefined) {
   switch (boStatus) {
     case 'NEW':
       return 'New';
@@ -25,3 +25,5 @@ export function displayBoStatus(boStatus?: BoStatus | string | null | undefined)
       return boStatus ? `"${boStatus}"` : '-';
   }
 }
+
+export { displayBoType, displayBoStatus };

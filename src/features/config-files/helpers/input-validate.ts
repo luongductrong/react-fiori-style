@@ -1,20 +1,20 @@
 import { formatFileSize } from '@/libs/utils';
 import { MAX_FILE_SIZE } from '@/app-constant';
-import { findInvalidMimeTypes, normalizeMimeTypeToken } from './helpers/mime-types';
+import { findInvalidMimeTypes, normalizeMimeTypeToken } from './mime-types';
 
-export type ConfigFileMimeTypesValidation = {
+type ConfigFileMimeTypesValidation = {
   error: string;
   invalidMimeTypes: string[];
 };
 
-export type ConfigFileFormValidation = {
+type ConfigFileFormValidation = {
   fileExt: string;
   mimeTypes: ConfigFileMimeTypesValidation;
   maxBytes: string;
   description: string;
 };
 
-export const EMPTY_CONFIG_FILE_FORM_VALIDATION: ConfigFileFormValidation = {
+const EMPTY_CONFIG_FILE_FORM_VALIDATION: ConfigFileFormValidation = {
   fileExt: '',
   mimeTypes: {
     error: '',
@@ -31,7 +31,7 @@ type ConfigFileValidationInput = {
   description: string;
 };
 
-export function validateConfigFileExtension(value: string) {
+function validateConfigFileExtension(value: string) {
   const normalizedValue = value.trim().replace(/^\./, '');
 
   if (!normalizedValue) {
@@ -41,7 +41,7 @@ export function validateConfigFileExtension(value: string) {
   return '';
 }
 
-export function validateConfigFileMimeTypes(values: string[]): ConfigFileMimeTypesValidation {
+function validateConfigFileMimeTypes(values: string[]): ConfigFileMimeTypesValidation {
   const normalizedValues = values.map(normalizeMimeTypeToken).filter(Boolean);
 
   if (normalizedValues.length === 0) {
@@ -66,7 +66,7 @@ export function validateConfigFileMimeTypes(values: string[]): ConfigFileMimeTyp
   };
 }
 
-export function validateConfigFileMaxBytes(value: string) {
+function validateConfigFileMaxBytes(value: string) {
   const trimmedValue = value.trim();
 
   if (!trimmedValue) {
@@ -90,7 +90,7 @@ export function validateConfigFileMaxBytes(value: string) {
   return '';
 }
 
-export function validateConfigFileDescription(value: string) {
+function validateConfigFileDescription(value: string) {
   if (!value.trim()) {
     return 'Description cannot be empty.';
   }
@@ -98,7 +98,7 @@ export function validateConfigFileDescription(value: string) {
   return '';
 }
 
-export function validateConfigFileForm(values: ConfigFileValidationInput): ConfigFileFormValidation {
+function validateConfigFileForm(values: ConfigFileValidationInput): ConfigFileFormValidation {
   return {
     fileExt: validateConfigFileExtension(values.fileExt),
     mimeTypes: validateConfigFileMimeTypes(values.mimeTypes),
@@ -106,6 +106,10 @@ export function validateConfigFileForm(values: ConfigFileValidationInput): Confi
     description: validateConfigFileDescription(values.description),
   };
 }
+
+export { validateConfigFileForm };
+export type { ConfigFileFormValidation };
+export { EMPTY_CONFIG_FILE_FORM_VALIDATION };
 
 /**
  * Validation rules for Config File form:

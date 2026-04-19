@@ -1,4 +1,4 @@
-import { formatCount } from '../helpers';
+import { formatCount } from '@/libs/utils';
 import { Text } from '@ui5/webcomponents-react/Text';
 import type { AdminDashboardStatsItem } from '../types';
 

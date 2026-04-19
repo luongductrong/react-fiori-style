@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { cn } from '@/libs/utils';
-import { formatCount } from '../helpers';
+import { formatCount } from '@/libs/utils';
 import { SectionCard } from './section-card';
 import { formatFileSize } from '@/libs/utils';
 import { useQuery } from '@tanstack/react-query';

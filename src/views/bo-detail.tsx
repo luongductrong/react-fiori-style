@@ -22,12 +22,12 @@ import { getError, pushApiErrorMessages } from '@/libs/helpers/error-messages';
 import { useQuery, useQueryClient, useMutation } from '@tanstack/react-query';
 import { ObjectPageSection } from '@ui5/webcomponents-react/ObjectPageSection';
 import { BizObjectLinkedAttachments } from '@/features/business-objects/components';
-import { displayBoStatus, displayBoType } from '@/features/business-objects/helpers';
 import { BizForm, type BizFormValues } from '@/features/business-objects/components';
 import { API, type BoType, type BoStatus } from '@/features/business-objects/constants';
 import { bizObjectDetailQueryOptions } from '@/features/business-objects/options/query';
 import { updateBizObjectMutationOptions } from '@/features/business-objects/options/mutation';
 import { deleteBizObjectMutationOptions } from '@/features/business-objects/options/mutation';
+import { displayBoStatus, displayBoType } from '@/features/business-objects/helpers/formatter';
 
 export function BoDetailView() {
   const { id } = useParams();

@@ -22,7 +22,7 @@ import { ToolbarButton } from '@ui5/webcomponents-react/ToolbarButton';
 import { DynamicPageHeader } from '@ui5/webcomponents-react/DynamicPageHeader';
 import { IllustratedMessage } from '@ui5/webcomponents-react/IllustratedMessage';
 import { bizObjectsQueryOptions } from '@/features/business-objects/options/query';
-import { displayBoType, displayBoStatus } from '@/features/business-objects/helpers';
+import { displayBoType, displayBoStatus } from '@/features/business-objects/helpers/formatter';
 import { BizObjectCard, BizObjectsFilterBar, BizCreate } from '@/features/business-objects/components';
 import { AnalyticalTable, type AnalyticalTableCellInstance } from '@ui5/webcomponents-react/AnalyticalTable';
 

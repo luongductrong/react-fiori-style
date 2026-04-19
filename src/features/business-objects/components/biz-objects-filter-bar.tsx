@@ -3,9 +3,9 @@ import { BO_STATUS, BO_TYPES } from '../constants';
 import { Input } from '@ui5/webcomponents-react/Input';
 import { Select } from '@ui5/webcomponents-react/Select';
 import { Option } from '@ui5/webcomponents-react/Option';
-import { displayBoStatus, displayBoType } from '../helpers';
 import { FilterBar } from '@ui5/webcomponents-react/FilterBar';
 import { SearchHelpDialog } from '@/components/search-help-dialog';
+import { displayBoStatus, displayBoType } from '../helpers/formatter';
 import { FilterGroupItem } from '@ui5/webcomponents-react/FilterGroupItem';
 
 interface BizObjectsFilterBarProps {

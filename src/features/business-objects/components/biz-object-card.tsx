@@ -4,8 +4,8 @@ import type { BizObjectItem } from '../types';
 import { Card } from '@ui5/webcomponents-react/Card';
 import { Icon } from '@ui5/webcomponents-react/Icon';
 import { List } from '@ui5/webcomponents-react/List';
-import { displayBoStatus, displayBoType } from '../helpers';
 import { CardHeader } from '@ui5/webcomponents-react/CardHeader';
+import { displayBoStatus, displayBoType } from '../helpers/formatter';
 import { ListItemStandard } from '@ui5/webcomponents-react/ListItemStandard';
 
 type BizObjectCardProps = {

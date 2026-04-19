@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { StatCard } from './stat-card';
-import { formatCount } from '../helpers';
+import { formatCount } from '@/libs/utils';
 import { useQueries } from '@tanstack/react-query';
 import { BusyIndicator } from '@/components/busy-indicator';
 import { pushApiErrorMessages } from '@/libs/helpers/error-messages';

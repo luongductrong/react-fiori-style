@@ -13,8 +13,8 @@ import { pushApiErrorMessages } from '@/libs/helpers/error-messages';
 import { AttachmentBizLinkCreate } from './attachment-biz-link-create';
 import { ToolbarSpacer } from '@ui5/webcomponents-react/ToolbarSpacer';
 import { unlinkBoFromAttachmentMutationOptions } from '../options/mutation';
-import { displayBoStatus, displayBoType } from '@/features/business-objects/helpers';
 import { useInfiniteQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { displayBoStatus, displayBoType } from '@/features/business-objects/helpers/formatter';
 import { AnalyticalTable, type AnalyticalTableCellInstance } from '@ui5/webcomponents-react/AnalyticalTable';
 
 export function AttachmentBizList({ fileId, disabled }: { fileId: string; disabled: boolean }) {

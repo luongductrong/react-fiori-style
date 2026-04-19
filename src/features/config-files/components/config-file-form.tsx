@@ -11,7 +11,7 @@ import { Select } from '@ui5/webcomponents-react/Select';
 import { Option } from '@ui5/webcomponents-react/Option';
 import { FlexBox } from '@ui5/webcomponents-react/FlexBox';
 import { normalizeMimeTypeToken } from '../helpers/mime-types';
-import { EMPTY_CONFIG_FILE_FORM_VALIDATION, type ConfigFileFormValidation } from '../validate';
+import { EMPTY_CONFIG_FILE_FORM_VALIDATION, type ConfigFileFormValidation } from '../helpers/input-validate';
 
 export type ConfigFileFormValues = {
   fileExt: string;

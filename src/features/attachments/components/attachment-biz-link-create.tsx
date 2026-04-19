@@ -11,8 +11,8 @@ import { ToolbarSpacer } from '@ui5/webcomponents-react/ToolbarSpacer';
 import { linkBoToAttachmentMutationOptions } from '../options/mutation';
 import { BizObjectsFilterBar } from '@/features/business-objects/components';
 import { bizObjectsQueryOptions } from '@/features/business-objects/options/query';
-import { displayBoStatus, displayBoType } from '@/features/business-objects/helpers';
 import { useInfiniteQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { displayBoStatus, displayBoType } from '@/features/business-objects/helpers/formatter';
 import { AnalyticalTable, type AnalyticalTableCellInstance } from '@ui5/webcomponents-react/AnalyticalTable';
 
 interface AttachmentBizLinkCreateProps {

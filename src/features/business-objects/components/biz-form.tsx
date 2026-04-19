@@ -5,7 +5,7 @@ import { Input } from '@ui5/webcomponents-react/Input';
 import { Label } from '@ui5/webcomponents-react/Label';
 import { Option } from '@ui5/webcomponents-react/Option';
 import { Select } from '@ui5/webcomponents-react/Select';
-import { displayBoType, displayBoStatus } from '../helpers';
+import { displayBoType, displayBoStatus } from '../helpers/formatter';
 
 export type BizFormValues = {
   title: string;
