@@ -3,11 +3,11 @@ export { ODATA_BASE_URL, ODATA_SAP_CLIENT } from '@/app-env';
 export const DEFAULT_VIEW_MODE: 'table' | 'grid' = 'table';
 
 export const ODATA_SERVICE = {
-  ATTACHMENT: '/sap/opu/odata4/sap/zui_attach_bind/srvd/sap/zui_attach_srv/0001',
-  AUTH: '/sap/opu/odata4/sap/zui_att_auth_bind/srvd/sap/zui_att_auth_srv/0001',
-  BIZ: '/sap/opu/odata4/sap/zui_bizobj_bind/srvd/sap/zui_bizobj_srv/0001',
-  CONFIG_FILE: '/sap/opu/odata4/sap/zui_att_cfg_ui/srvd/sap/zui_att_cfg/0001',
-  DASHBOARD: '/sap/opu/odata4/sap/zui_att_admin_dash/srvd/sap/zui_att_admin_dash/0001',
+  ATTACHMENT: '/sap/opu/odata4/sap/zui_attach_o4/srvd/sap/zsd_attach/0001',
+  AUTH: '/sap/opu/odata4/sap/zui_att_auth_o4/srvd/sap/zsd_att_auth/0001',
+  BIZ: '/sap/opu/odata4/sap/zui_bizobj_o4/srvd/sap/zsd_bizobj/0001',
+  CONFIG_FILE: '/sap/opu/odata4/sap/zui_att_cfg_o4/srvd/sap/zsd_att_cfg/0001',
+  DASHBOARD: '/sap/opu/odata4/sap/zui_dashboard_o4/srvd/sap/zsd_dashboard/0001',
 };
 
 export const ODATA_PUBLIC_SERVICE = {
