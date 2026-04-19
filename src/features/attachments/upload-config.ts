@@ -38,11 +38,11 @@ export function resolveUploadTypeByExtension(
   fileExtension?: string,
   configFiles?: ConfigFileItem[],
   fallbackType: UploadConfigType = 'DOCUMENT',
-) {
+): UploadConfigType | undefined {
   const normalizedExtension = normalizeExtension(fileExtension);
 
   if (!normalizedExtension) {
-    return fallbackType;
+    return undefined;
   }
 
   const config = (configFiles ?? []).find((item) => normalizeExtension(item.FileExt) === normalizedExtension);

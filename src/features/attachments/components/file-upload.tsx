@@ -198,7 +198,7 @@ function FileUploadImpl({ fileId, currentExtension, disabled }: FileUploadProps)
         design="Transparent"
         text="Upload"
         onClick={() => setOpen('local')}
-        disabled={disabled || !fileId || !currentExtension}
+        disabled={disabled || !fileId}
         className="h-8"
       />
       <Dialog
