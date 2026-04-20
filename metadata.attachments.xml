@@ -57,9 +57,9 @@
     <edmx:Include Namespace="com.sap.vocabularies.Session.v1" Alias="SAP__session" />
   </edmx:Reference>
   <edmx:DataServices>
-    <Schema Namespace="com.sap.gateway.srvd.zui_attach_srv.v0001" Alias="SAP__self">
+    <Schema Namespace="com.sap.gateway.srvd.zsd_attach.v0001" Alias="SAP__self">
       <Annotation Term="SAP__core.SchemaVersion" String="1.0.0" />
-      <EntityType Name="AuditType">
+      <EntityType Name="AuditLogsType">
         <Key>
           <PropertyRef Name="FileId" />
           <PropertyRef Name="Erdat" />
@@ -74,7 +74,7 @@
         <Property Name="Note" Type="Edm.String" Nullable="false" MaxLength="255" />
         <Property Name="Ernam" Type="Edm.String" Nullable="false" MaxLength="12" />
         <NavigationProperty Name="_Attachment"
-          Type="com.sap.gateway.srvd.zui_attach_srv.v0001.AttachmentsType" Nullable="false"
+          Type="com.sap.gateway.srvd.zsd_attach.v0001.AttachmentsType" Nullable="false"
           Partner="_Audit">
           <ReferentialConstraint Property="FileId" ReferencedProperty="FileId" />
         </NavigationProperty>
@@ -94,17 +94,16 @@
         <Property Name="Erdat" Type="Edm.Date" />
         <Property Name="Erzet" Type="Edm.TimeOfDay" Nullable="false" />
         <Property Name="Ernam" Type="Edm.String" Nullable="false" MaxLength="12" />
-        <Property Name="__EntityControl"
-          Type="com.sap.gateway.srvd.zui_attach_srv.v0001.EntityControl" />
+        <Property Name="__EntityControl" Type="com.sap.gateway.srvd.zsd_attach.v0001.EntityControl" />
         <Property Name="SAP__Messages"
-          Type="Collection(com.sap.gateway.srvd.zui_attach_srv.v0001.SAP__Message)" Nullable="false" />
+          Type="Collection(com.sap.gateway.srvd.zsd_attach.v0001.SAP__Message)" Nullable="false" />
         <NavigationProperty Name="_Attachment"
-          Type="com.sap.gateway.srvd.zui_attach_srv.v0001.AttachmentsType" Nullable="false"
+          Type="com.sap.gateway.srvd.zsd_attach.v0001.AttachmentsType" Nullable="false"
           Partner="_Versions">
           <ReferentialConstraint Property="FileId" ReferencedProperty="FileId" />
         </NavigationProperty>
       </EntityType>
-      <EntityType Name="BizObjectAttachmentLinkType">
+      <EntityType Name="BusinessObjectAttachmentLinksType">
         <Key>
           <PropertyRef Name="BoId" />
           <PropertyRef Name="FileId" />
@@ -114,21 +113,20 @@
         <Property Name="Erdat" Type="Edm.Date" />
         <Property Name="Erzet" Type="Edm.TimeOfDay" Nullable="false" />
         <Property Name="Ernam" Type="Edm.String" Nullable="false" MaxLength="12" />
-        <Property Name="__EntityControl"
-          Type="com.sap.gateway.srvd.zui_attach_srv.v0001.EntityControl" />
+        <Property Name="__EntityControl" Type="com.sap.gateway.srvd.zsd_attach.v0001.EntityControl" />
         <Property Name="SAP__Messages"
-          Type="Collection(com.sap.gateway.srvd.zui_attach_srv.v0001.SAP__Message)" Nullable="false" />
+          Type="Collection(com.sap.gateway.srvd.zsd_attach.v0001.SAP__Message)" Nullable="false" />
         <NavigationProperty Name="_Attach"
-          Type="com.sap.gateway.srvd.zui_attach_srv.v0001.AttachmentsType" Nullable="false">
+          Type="com.sap.gateway.srvd.zsd_attach.v0001.AttachmentsType" Nullable="false">
           <ReferentialConstraint Property="FileId" ReferencedProperty="FileId" />
         </NavigationProperty>
         <NavigationProperty Name="_Bo"
-          Type="com.sap.gateway.srvd.zui_attach_srv.v0001.BizObjectType" Nullable="false"
+          Type="com.sap.gateway.srvd.zsd_attach.v0001.BusinessObjectsType" Nullable="false"
           Partner="_Links">
           <ReferentialConstraint Property="BoId" ReferencedProperty="BoId" />
         </NavigationProperty>
       </EntityType>
-      <EntityType Name="BizObjectType">
+      <EntityType Name="BusinessObjectsType">
         <Key>
           <PropertyRef Name="BoId" />
         </Key>
@@ -142,12 +140,11 @@
         <Property Name="Aedat" Type="Edm.Date" />
         <Property Name="Aezet" Type="Edm.TimeOfDay" Nullable="false" />
         <Property Name="Aenam" Type="Edm.String" Nullable="false" MaxLength="12" />
-        <Property Name="__EntityControl"
-          Type="com.sap.gateway.srvd.zui_attach_srv.v0001.EntityControl" />
+        <Property Name="__EntityControl" Type="com.sap.gateway.srvd.zsd_attach.v0001.EntityControl" />
         <Property Name="SAP__Messages"
-          Type="Collection(com.sap.gateway.srvd.zui_attach_srv.v0001.SAP__Message)" Nullable="false" />
+          Type="Collection(com.sap.gateway.srvd.zsd_attach.v0001.SAP__Message)" Nullable="false" />
         <NavigationProperty Name="_Links"
-          Type="Collection(com.sap.gateway.srvd.zui_attach_srv.v0001.BizObjectAttachmentLinkType)"
+          Type="Collection(com.sap.gateway.srvd.zsd_attach.v0001.BusinessObjectAttachmentLinksType)"
           Partner="_Bo">
           <OnDelete Action="Cascade" />
         </NavigationProperty>
@@ -168,25 +165,23 @@
         <Property Name="Aenam" Type="Edm.String" Nullable="false" MaxLength="12" />
         <Property Name="EditLock" Type="Edm.Boolean" Nullable="false" />
         <Property Name="__CreateByAssociationControl"
-          Type="com.sap.gateway.srvd.zui_attach_srv.v0001.AttachmentsCbAControl" />
-        <Property Name="__EntityControl"
-          Type="com.sap.gateway.srvd.zui_attach_srv.v0001.EntityControl" />
+          Type="com.sap.gateway.srvd.zsd_attach.v0001.AttachmentsCbAControl" />
+        <Property Name="__EntityControl" Type="com.sap.gateway.srvd.zsd_attach.v0001.EntityControl" />
         <Property Name="__OperationControl"
-          Type="com.sap.gateway.srvd.zui_attach_srv.v0001.AttachmentsOperationControl" />
+          Type="com.sap.gateway.srvd.zsd_attach.v0001.AttachmentsOperationControl" />
         <Property Name="SAP__Messages"
-          Type="Collection(com.sap.gateway.srvd.zui_attach_srv.v0001.SAP__Message)" Nullable="false" />
+          Type="Collection(com.sap.gateway.srvd.zsd_attach.v0001.SAP__Message)" Nullable="false" />
         <NavigationProperty Name="_Audit"
-          Type="Collection(com.sap.gateway.srvd.zui_attach_srv.v0001.AuditType)"
+          Type="Collection(com.sap.gateway.srvd.zsd_attach.v0001.AuditLogsType)"
           Partner="_Attachment">
           <OnDelete Action="Cascade" />
         </NavigationProperty>
         <NavigationProperty Name="_CurrentVersion"
-          Type="com.sap.gateway.srvd.zui_attach_srv.v0001.AttachmentVersionsType"
-          Partner="_Attachment" />
+          Type="com.sap.gateway.srvd.zsd_attach.v0001.AttachmentVersionsType" Partner="_Attachment" />
         <NavigationProperty Name="_Links"
-          Type="Collection(com.sap.gateway.srvd.zui_attach_srv.v0001.BizObjectAttachmentLinkType)" />
+          Type="Collection(com.sap.gateway.srvd.zsd_attach.v0001.BusinessObjectAttachmentLinksType)" />
         <NavigationProperty Name="_Versions"
-          Type="Collection(com.sap.gateway.srvd.zui_attach_srv.v0001.AttachmentVersionsType)"
+          Type="Collection(com.sap.gateway.srvd.zsd_attach.v0001.AttachmentVersionsType)"
           Partner="_Attachment">
           <OnDelete Action="Cascade" />
         </NavigationProperty>
@@ -211,77 +206,76 @@
         <Property Name="longtextUrl" Type="Edm.String" />
       </ComplexType>
       <Action Name="Reactivate" EntitySetPath="_it" IsBound="true">
-        <Parameter Name="_it" Type="com.sap.gateway.srvd.zui_attach_srv.v0001.AttachmentsType"
+        <Parameter Name="_it" Type="com.sap.gateway.srvd.zsd_attach.v0001.AttachmentsType"
           Nullable="false" />
-        <ReturnType Type="com.sap.gateway.srvd.zui_attach_srv.v0001.AttachmentsType"
-          Nullable="false" />
+        <ReturnType Type="com.sap.gateway.srvd.zsd_attach.v0001.AttachmentsType" Nullable="false" />
       </Action>
       <EntityContainer Name="Container">
         <EntitySet Name="Attachments"
-          EntityType="com.sap.gateway.srvd.zui_attach_srv.v0001.AttachmentsType">
-          <NavigationPropertyBinding Path="_Audit" Target="Audit" />
+          EntityType="com.sap.gateway.srvd.zsd_attach.v0001.AttachmentsType">
+          <NavigationPropertyBinding Path="_Audit" Target="AuditLogs" />
           <NavigationPropertyBinding Path="_CurrentVersion" Target="AttachmentVersions" />
-          <NavigationPropertyBinding Path="_Links" Target="BizObjectAttachmentLink" />
+          <NavigationPropertyBinding Path="_Links" Target="BusinessObjectAttachmentLinks" />
           <NavigationPropertyBinding Path="_Versions" Target="AttachmentVersions" />
         </EntitySet>
         <EntitySet Name="AttachmentVersions"
-          EntityType="com.sap.gateway.srvd.zui_attach_srv.v0001.AttachmentVersionsType">
+          EntityType="com.sap.gateway.srvd.zsd_attach.v0001.AttachmentVersionsType">
           <NavigationPropertyBinding Path="_Attachment" Target="Attachments" />
         </EntitySet>
-        <EntitySet Name="Audit" EntityType="com.sap.gateway.srvd.zui_attach_srv.v0001.AuditType">
+        <EntitySet Name="AuditLogs" EntityType="com.sap.gateway.srvd.zsd_attach.v0001.AuditLogsType">
           <NavigationPropertyBinding Path="_Attachment" Target="Attachments" />
         </EntitySet>
-        <EntitySet Name="BizObject"
-          EntityType="com.sap.gateway.srvd.zui_attach_srv.v0001.BizObjectType">
-          <NavigationPropertyBinding Path="_Links" Target="BizObjectAttachmentLink" />
-        </EntitySet>
-        <EntitySet Name="BizObjectAttachmentLink"
-          EntityType="com.sap.gateway.srvd.zui_attach_srv.v0001.BizObjectAttachmentLinkType">
+        <EntitySet Name="BusinessObjectAttachmentLinks"
+          EntityType="com.sap.gateway.srvd.zsd_attach.v0001.BusinessObjectAttachmentLinksType">
           <NavigationPropertyBinding Path="_Attach" Target="Attachments" />
-          <NavigationPropertyBinding Path="_Bo" Target="BizObject" />
+          <NavigationPropertyBinding Path="_Bo" Target="BusinessObjects" />
+        </EntitySet>
+        <EntitySet Name="BusinessObjects"
+          EntityType="com.sap.gateway.srvd.zsd_attach.v0001.BusinessObjectsType">
+          <NavigationPropertyBinding Path="_Links" Target="BusinessObjectAttachmentLinks" />
         </EntitySet>
       </EntityContainer>
-      <Annotations Target="SAP__self.AuditType/FileId">
+      <Annotations Target="SAP__self.AuditLogsType/FileId">
         <Annotation Term="SAP__core.Computed" />
         <Annotation Term="SAP__common.Label" String="UUID" />
         <Annotation Term="SAP__common.QuickInfo" String="16 Byte UUID in 16 Bytes (Raw Format)" />
       </Annotations>
-      <Annotations Target="SAP__self.AuditType/Erdat">
+      <Annotations Target="SAP__self.AuditLogsType/Erdat">
         <Annotation Term="SAP__core.Computed" />
         <Annotation Term="SAP__common.Label" String="Created On" />
         <Annotation Term="SAP__common.QuickInfo" String="Record Created On" />
       </Annotations>
-      <Annotations Target="SAP__self.AuditType/Erzet">
+      <Annotations Target="SAP__self.AuditLogsType/Erzet">
         <Annotation Term="SAP__core.Computed" />
         <Annotation Term="SAP__common.Label" String="Time" />
         <Annotation Term="SAP__common.QuickInfo" String="Entry time" />
       </Annotations>
-      <Annotations Target="SAP__self.AuditType/Uname">
+      <Annotations Target="SAP__self.AuditLogsType/Uname">
         <Annotation Term="SAP__core.Computed" />
         <Annotation Term="SAP__common.IsUpperCase" />
         <Annotation Term="SAP__common.Label" String="User" />
         <Annotation Term="SAP__common.Heading" String="User Name" />
         <Annotation Term="SAP__common.QuickInfo" String="User Name in User Master Record" />
       </Annotations>
-      <Annotations Target="SAP__self.AuditType/Action">
+      <Annotations Target="SAP__self.AuditLogsType/Action">
         <Annotation Term="SAP__core.Computed" />
         <Annotation Term="SAP__common.Label" String="Action" />
         <Annotation Term="SAP__common.QuickInfo" String="ZGSP26SAP20_ACTION" />
       </Annotations>
-      <Annotations Target="SAP__self.AuditType/Note">
+      <Annotations Target="SAP__self.AuditLogsType/Note">
         <Annotation Term="SAP__core.Computed" />
         <Annotation Term="SAP__common.IsUpperCase" />
         <Annotation Term="SAP__common.Label" String="Note" />
         <Annotation Term="SAP__common.QuickInfo" String="ZGSP26SAP20_NOTE" />
       </Annotations>
-      <Annotations Target="SAP__self.AuditType/Ernam">
+      <Annotations Target="SAP__self.AuditLogsType/Ernam">
         <Annotation Term="SAP__core.Computed" />
         <Annotation Term="SAP__common.IsUpperCase" />
         <Annotation Term="SAP__common.Label" String="Created By" />
         <Annotation Term="SAP__common.QuickInfo"
           String="Name of Person Responsible for Creating the Object" />
       </Annotations>
-      <Annotations Target="SAP__self.Container/Audit">
+      <Annotations Target="SAP__self.Container/AuditLogs">
         <Annotation Term="SAP__capabilities.NavigationRestrictions">
           <Record>
             <PropertyValue Property="RestrictedProperties">
@@ -347,7 +341,7 @@
           </Record>
         </Annotation>
       </Annotations>
-      <Annotations Target="SAP__self.AuditType">
+      <Annotations Target="SAP__self.AuditLogsType">
         <Annotation Term="SAP__common.Label" String="Attachment Audit - Projection Views" />
       </Annotations>
       <Annotations Target="SAP__self.AttachmentVersionsType/FileId">
@@ -435,24 +429,24 @@
         <Annotation Term="SAP__common.Label" String="Attachment Version - Projection Views" />
         <Annotation Term="SAP__common.Messages" Path="SAP__Messages" />
       </Annotations>
-      <Annotations Target="SAP__self.BizObjectAttachmentLinkType/BoId">
+      <Annotations Target="SAP__self.BusinessObjectAttachmentLinksType/BoId">
         <Annotation Term="SAP__core.Computed" />
         <Annotation Term="SAP__common.Label" String="BO ID" />
         <Annotation Term="SAP__common.Heading" String="Business Object ID" />
         <Annotation Term="SAP__common.QuickInfo" String="ZGSP26SAP20_BO_ID" />
       </Annotations>
-      <Annotations Target="SAP__self.BizObjectAttachmentLinkType/Ernam">
+      <Annotations Target="SAP__self.BusinessObjectAttachmentLinksType/Ernam">
         <Annotation Term="SAP__common.IsUpperCase" />
         <Annotation Term="SAP__common.Label" String="Created By" />
         <Annotation Term="SAP__common.QuickInfo"
           String="Name of Person Responsible for Creating the Object" />
       </Annotations>
-      <Annotations Target="SAP__self.BizObjectAttachmentLinkType/__EntityControl">
+      <Annotations Target="SAP__self.BusinessObjectAttachmentLinksType/__EntityControl">
         <Annotation Term="SAP__core.Computed" />
         <Annotation Term="SAP__UI.HiddenFilter" />
         <Annotation Term="SAP__UI.Hidden" />
       </Annotations>
-      <Annotations Target="SAP__self.Container/BizObjectAttachmentLink">
+      <Annotations Target="SAP__self.Container/BusinessObjectAttachmentLinks">
         <Annotation Term="SAP__capabilities.NavigationRestrictions">
           <Record>
             <PropertyValue Property="RestrictedProperties">
@@ -519,31 +513,31 @@
           <Collection />
         </Annotation>
       </Annotations>
-      <Annotations Target="SAP__self.BizObjectAttachmentLinkType">
+      <Annotations Target="SAP__self.BusinessObjectAttachmentLinksType">
         <Annotation Term="SAP__common.Label"
           String="Business Object - Link Attachment - Projection View" />
         <Annotation Term="SAP__common.Messages" Path="SAP__Messages" />
       </Annotations>
-      <Annotations Target="SAP__self.BizObjectType/Ernam">
+      <Annotations Target="SAP__self.BusinessObjectsType/Ernam">
         <Annotation Term="SAP__common.IsUpperCase" />
         <Annotation Term="SAP__common.Label" String="Created By" />
         <Annotation Term="SAP__common.QuickInfo"
           String="Name of Person Responsible for Creating the Object" />
       </Annotations>
-      <Annotations Target="SAP__self.BizObjectType/Aenam">
+      <Annotations Target="SAP__self.BusinessObjectsType/Aenam">
         <Annotation Term="SAP__common.IsUpperCase" />
         <Annotation Term="SAP__common.Label" String="Changed By" />
         <Annotation Term="SAP__common.QuickInfo" String="Name of Person Who Changed Object" />
       </Annotations>
-      <Annotations Target="SAP__self.BizObjectType/__EntityControl">
+      <Annotations Target="SAP__self.BusinessObjectsType/__EntityControl">
         <Annotation Term="SAP__core.Computed" />
         <Annotation Term="SAP__UI.HiddenFilter" />
         <Annotation Term="SAP__UI.Hidden" />
       </Annotations>
-      <Annotations Target="SAP__self.BizObjectType/_Links">
+      <Annotations Target="SAP__self.BusinessObjectsType/_Links">
         <Annotation Term="SAP__common.Composition" />
       </Annotations>
-      <Annotations Target="SAP__self.Container/BizObject">
+      <Annotations Target="SAP__self.Container/BusinessObjects">
         <Annotation Term="SAP__capabilities.NavigationRestrictions">
           <Record>
             <PropertyValue Property="RestrictedProperties">
@@ -604,7 +598,7 @@
           <Collection />
         </Annotation>
       </Annotations>
-      <Annotations Target="SAP__self.BizObjectType">
+      <Annotations Target="SAP__self.BusinessObjectsType">
         <Annotation Term="SAP__common.Label" String="Business Object - Projection View" />
         <Annotation Term="SAP__common.Messages" Path="SAP__Messages" />
       </Annotations>
@@ -823,8 +817,8 @@
         <Annotation Term="SAP__common.QuickInfo" String="ZGSP26SAP20_MIME_TYPE" />
       </Annotations>
       <Annotations Target="SAP__self.AttachmentVersionsType/FileSize">
-        <Annotation Term="SAP__common.Label" String="INT4" />
-        <Annotation Term="SAP__common.QuickInfo" String="4 Byte Signed Integer" />
+        <Annotation Term="SAP__common.Label" String="File Size" />
+        <Annotation Term="SAP__common.QuickInfo" String="ZGSP26SAP20 Data Element File Size" />
       </Annotations>
       <Annotations Target="SAP__self.AttachmentVersionsType/FileContent">
         <Annotation Term="SAP__common.Label" String="File Content" />
@@ -838,52 +832,52 @@
         <Annotation Term="SAP__common.Label" String="Time" />
         <Annotation Term="SAP__common.QuickInfo" String="Entry time" />
       </Annotations>
-      <Annotations Target="SAP__self.BizObjectAttachmentLinkType/FileId">
+      <Annotations Target="SAP__self.BusinessObjectAttachmentLinksType/FileId">
         <Annotation Term="SAP__common.Label" String="UUID" />
         <Annotation Term="SAP__common.QuickInfo" String="16 Byte UUID in 16 Bytes (Raw Format)" />
       </Annotations>
-      <Annotations Target="SAP__self.BizObjectAttachmentLinkType/Erdat">
+      <Annotations Target="SAP__self.BusinessObjectAttachmentLinksType/Erdat">
         <Annotation Term="SAP__common.Label" String="Created On" />
         <Annotation Term="SAP__common.QuickInfo" String="Record Created On" />
       </Annotations>
-      <Annotations Target="SAP__self.BizObjectAttachmentLinkType/Erzet">
+      <Annotations Target="SAP__self.BusinessObjectAttachmentLinksType/Erzet">
         <Annotation Term="SAP__common.Label" String="Time" />
         <Annotation Term="SAP__common.QuickInfo" String="Entry time" />
       </Annotations>
-      <Annotations Target="SAP__self.BizObjectType/BoId">
+      <Annotations Target="SAP__self.BusinessObjectsType/BoId">
         <Annotation Term="SAP__common.Label" String="BO ID" />
         <Annotation Term="SAP__common.Heading" String="Business Object ID" />
         <Annotation Term="SAP__common.QuickInfo" String="ZGSP26SAP20_BO_ID" />
       </Annotations>
-      <Annotations Target="SAP__self.BizObjectType/BoType">
+      <Annotations Target="SAP__self.BusinessObjectsType/BoType">
         <Annotation Term="SAP__common.Label" String="BO Type" />
         <Annotation Term="SAP__common.Heading" String="Business Object Type" />
         <Annotation Term="SAP__common.QuickInfo" String="ZGSP26SAP20_BO_TYPE" />
       </Annotations>
-      <Annotations Target="SAP__self.BizObjectType/BoTitle">
+      <Annotations Target="SAP__self.BusinessObjectsType/BoTitle">
         <Annotation Term="SAP__common.Label" String="BO Title" />
         <Annotation Term="SAP__common.Heading" String="Business Object Title" />
         <Annotation Term="SAP__common.QuickInfo" String="ZGSP26SAP20_BO_TITLE" />
       </Annotations>
-      <Annotations Target="SAP__self.BizObjectType/Status">
+      <Annotations Target="SAP__self.BusinessObjectsType/Status">
         <Annotation Term="SAP__common.Label" String="BO Status" />
         <Annotation Term="SAP__common.Heading" String="Business Object Status" />
         <Annotation Term="SAP__common.QuickInfo" String="ZGSP26SAP20_BO_STATUS" />
       </Annotations>
-      <Annotations Target="SAP__self.BizObjectType/Erdat">
+      <Annotations Target="SAP__self.BusinessObjectsType/Erdat">
         <Annotation Term="SAP__common.Label" String="Created On" />
         <Annotation Term="SAP__common.QuickInfo" String="Record Created On" />
       </Annotations>
-      <Annotations Target="SAP__self.BizObjectType/Erzet">
+      <Annotations Target="SAP__self.BusinessObjectsType/Erzet">
         <Annotation Term="SAP__common.Label" String="Time" />
         <Annotation Term="SAP__common.QuickInfo" String="Entry time" />
       </Annotations>
-      <Annotations Target="SAP__self.BizObjectType/Aedat">
+      <Annotations Target="SAP__self.BusinessObjectsType/Aedat">
         <Annotation Term="SAP__common.Label" String="Changed On" />
         <Annotation Term="SAP__common.Heading" String="Chngd On" />
         <Annotation Term="SAP__common.QuickInfo" String="Last Changed On" />
       </Annotations>
-      <Annotations Target="SAP__self.BizObjectType/Aezet">
+      <Annotations Target="SAP__self.BusinessObjectsType/Aezet">
         <Annotation Term="SAP__common.Label" String="Changed at" />
         <Annotation Term="SAP__common.Heading" String="TimeOfChng" />
         <Annotation Term="SAP__common.QuickInfo" String="Time last change was made" />

@@ -57,15 +57,8 @@
     <edmx:Include Namespace="com.sap.vocabularies.Session.v1" Alias="SAP__session" />
   </edmx:Reference>
   <edmx:DataServices>
-    <Schema Namespace="com.sap.gateway.srvd.zui_att_admin_dash.v0001" Alias="SAP__self">
+    <Schema Namespace="com.sap.gateway.srvd.zsd_dashboard.v0001" Alias="SAP__self">
       <Annotation Term="SAP__core.SchemaVersion" String="1.0.0" />
-      <EntityType Name="UserRoleOverviewType">
-        <Key>
-          <PropertyRef Name="Role" />
-        </Key>
-        <Property Name="Role" Type="Edm.String" Nullable="false" MaxLength="10" />
-        <Property Name="UserCount" Type="Edm.Int32" Nullable="false" />
-      </EntityType>
       <EntityType Name="ConfigOverviewType">
         <Key>
           <PropertyRef Name="OverviewKey" />
@@ -145,9 +138,9 @@
           <PropertyRef Name="FileExt" />
         </Key>
         <Property Name="FileExt" Type="Edm.String" Nullable="false" MaxLength="10" />
-        <Property Name="MimeType" Type="Edm.String" Nullable="false" MaxLength="128" />
+        <Property Name="MimeType" Type="Edm.String" Nullable="false" MaxLength="256" />
         <Property Name="MaxBytes" Type="Edm.Int32" Nullable="false" />
-        <Property Name="IsActive" Type="Edm.String" Nullable="false" MaxLength="1" />
+        <Property Name="IsActive" Type="Edm.Boolean" Nullable="false" />
         <Property Name="Description" Type="Edm.String" Nullable="false" MaxLength="100" />
       </EntityType>
       <EntityType Name="LinkOverviewType">
@@ -167,76 +160,24 @@
       </EntityType>
       <EntityContainer Name="Container">
         <EntitySet Name="AdminDashboardStats"
-          EntityType="com.sap.gateway.srvd.zui_att_admin_dash.v0001.AdminDashboardStatsType" />
+          EntityType="com.sap.gateway.srvd.zsd_dashboard.v0001.AdminDashboardStatsType" />
         <EntitySet Name="AttachmentOverview"
-          EntityType="com.sap.gateway.srvd.zui_att_admin_dash.v0001.AttachmentOverviewType" />
+          EntityType="com.sap.gateway.srvd.zsd_dashboard.v0001.AttachmentOverviewType" />
         <EntitySet Name="AttachmentStatsByType"
-          EntityType="com.sap.gateway.srvd.zui_att_admin_dash.v0001.AttachmentStatsByTypeType" />
+          EntityType="com.sap.gateway.srvd.zsd_dashboard.v0001.AttachmentStatsByTypeType" />
         <EntitySet Name="AuthOverview"
-          EntityType="com.sap.gateway.srvd.zui_att_admin_dash.v0001.AuthOverviewType" />
+          EntityType="com.sap.gateway.srvd.zsd_dashboard.v0001.AuthOverviewType" />
         <EntitySet Name="BusinessObjectOverview"
-          EntityType="com.sap.gateway.srvd.zui_att_admin_dash.v0001.BusinessObjectOverviewType" />
+          EntityType="com.sap.gateway.srvd.zsd_dashboard.v0001.BusinessObjectOverviewType" />
         <EntitySet Name="ConfigOverview"
-          EntityType="com.sap.gateway.srvd.zui_att_admin_dash.v0001.ConfigOverviewType" />
+          EntityType="com.sap.gateway.srvd.zsd_dashboard.v0001.ConfigOverviewType" />
         <EntitySet Name="FileConfigList"
-          EntityType="com.sap.gateway.srvd.zui_att_admin_dash.v0001.FileConfigListType" />
+          EntityType="com.sap.gateway.srvd.zsd_dashboard.v0001.FileConfigListType" />
         <EntitySet Name="LinkOverview"
-          EntityType="com.sap.gateway.srvd.zui_att_admin_dash.v0001.LinkOverviewType" />
+          EntityType="com.sap.gateway.srvd.zsd_dashboard.v0001.LinkOverviewType" />
         <EntitySet Name="RecentAuditLogs"
-          EntityType="com.sap.gateway.srvd.zui_att_admin_dash.v0001.RecentAuditLogsType" />
-        <EntitySet Name="UserRoleOverview"
-          EntityType="com.sap.gateway.srvd.zui_att_admin_dash.v0001.UserRoleOverviewType" />
+          EntityType="com.sap.gateway.srvd.zsd_dashboard.v0001.RecentAuditLogsType" />
       </EntityContainer>
-      <Annotations Target="SAP__self.UserRoleOverviewType/Role">
-        <Annotation Term="SAP__common.IsUpperCase" />
-        <Annotation Term="SAP__common.Label" String="Role" />
-        <Annotation Term="SAP__common.QuickInfo" String="ZGSP26SAP20_ROLE" />
-      </Annotations>
-      <Annotations Target="SAP__self.UserRoleOverviewType">
-        <Annotation Term="SAP__common.Label" String="User Role Overview" />
-      </Annotations>
-      <Annotations Target="SAP__self.Container/UserRoleOverview">
-        <Annotation Term="SAP__capabilities.SearchRestrictions">
-          <Record>
-            <PropertyValue Property="Searchable" Bool="false" />
-          </Record>
-        </Annotation>
-        <Annotation Term="SAP__capabilities.InsertRestrictions">
-          <Record>
-            <PropertyValue Property="Insertable" Bool="false" />
-          </Record>
-        </Annotation>
-        <Annotation Term="SAP__capabilities.DeleteRestrictions">
-          <Record>
-            <PropertyValue Property="Deletable" Bool="false" />
-          </Record>
-        </Annotation>
-        <Annotation Term="SAP__capabilities.UpdateRestrictions">
-          <Record>
-            <PropertyValue Property="Updatable" Bool="false" />
-            <PropertyValue Property="QueryOptions">
-              <Record>
-                <PropertyValue Property="SelectSupported" Bool="true" />
-              </Record>
-            </PropertyValue>
-          </Record>
-        </Annotation>
-        <Annotation Term="SAP__core.OptimisticConcurrency">
-          <Collection />
-        </Annotation>
-        <Annotation Term="SAP__capabilities.FilterRestrictions">
-          <Record>
-            <PropertyValue Property="FilterExpressionRestrictions">
-              <Collection>
-                <Record>
-                  <PropertyValue Property="Property" PropertyPath="Role" />
-                  <PropertyValue Property="AllowedExpressions" String="MultiValue" />
-                </Record>
-              </Collection>
-            </PropertyValue>
-          </Record>
-        </Annotation>
-      </Annotations>
       <Annotations Target="SAP__self.ConfigOverviewType">
         <Annotation Term="SAP__common.Label" String="Config Overview Stats" />
       </Annotations>
@@ -472,6 +413,11 @@
           <Collection />
         </Annotation>
       </Annotations>
+      <Annotations Target="SAP__self.FileConfigListType/IsActive">
+        <Annotation Term="SAP__common.IsUpperCase" />
+        <Annotation Term="SAP__common.Label" String="Active" />
+        <Annotation Term="SAP__common.QuickInfo" String="ZGSP26SAP20_IS_ACTIVE" />
+      </Annotations>
       <Annotations Target="SAP__self.FileConfigListType">
         <Annotation Term="SAP__common.Label" String="File Config Overview" />
       </Annotations>
@@ -503,6 +449,18 @@
         </Annotation>
         <Annotation Term="SAP__core.OptimisticConcurrency">
           <Collection />
+        </Annotation>
+        <Annotation Term="SAP__capabilities.FilterRestrictions">
+          <Record>
+            <PropertyValue Property="FilterExpressionRestrictions">
+              <Collection>
+                <Record>
+                  <PropertyValue Property="Property" PropertyPath="IsActive" />
+                  <PropertyValue Property="AllowedExpressions" String="MultiValue" />
+                </Record>
+              </Collection>
+            </PropertyValue>
+          </Record>
         </Annotation>
       </Annotations>
       <Annotations Target="SAP__self.LinkOverviewType">
