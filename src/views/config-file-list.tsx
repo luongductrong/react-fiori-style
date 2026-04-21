@@ -5,6 +5,7 @@ import { formatFileSize } from '@/libs/utils';
 import { useViewStore } from '@/stores/view-store';
 import { Title } from '@ui5/webcomponents-react/Title';
 import { Button } from '@ui5/webcomponents-react/Button';
+import { ViewSettings } from '@/components/view-settings';
 import { Toolbar } from '@ui5/webcomponents-react/Toolbar';
 import { FlexBox } from '@ui5/webcomponents-react/FlexBox';
 import { DynamicPage } from '@ui5/webcomponents-react/DynamicPage';
@@ -16,12 +17,12 @@ import { AnalyticalTable } from '@ui5/webcomponents-react/AnalyticalTable';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { DynamicPageHeader } from '@ui5/webcomponents-react/DynamicPageHeader';
 import { configFilesQueryOptions } from '@/features/config-files/options/query';
-import type { ConfigFileListFieldId } from '@/features/config-files/view-config';
+import { ConfigFileCreate, ConfigFileEdit } from '@/features/config-files/components';
 import { ConfigFileView, ConfigFilesFilterBar } from '@/features/config-files/components';
 import { enableConfigFileMutationOptions } from '@/features/config-files/options/mutation';
 import type { AnalyticalTableCellInstance } from '@ui5/webcomponents-react/AnalyticalTable';
 import { disableConfigFileMutationOptions } from '@/features/config-files/options/mutation';
-import { ConfigFileCreate, ConfigFileEdit, ConfigFileViewSettings } from '@/features/config-files/components';
+import { CONFIG_FILE_LIST_FIELDS, type ConfigFileListFieldId } from '@/features/config-files/view-config';
 
 type ConfigFileListColumn = {
   id: ConfigFileListFieldId;
@@ -54,6 +55,7 @@ const ALL_COLUMNS = [
 export function ConfigFileListView() {
   const queryClient = useQueryClient();
   const selectedFieldIds = useViewStore((state) => state.configFileListVisibleFieldIds);
+  const setSelectedFieldIds = useViewStore((state) => state.setConfigFileListVisibleFieldIds);
   const [search, setSearch] = React.useState('');
   const [configFileToEdit, setConfigFileToEdit] = React.useState<ConfigFileItem | null>(null);
   const [configFileToView, setConfigFileToView] = React.useState<ConfigFileItem | null>(null);
@@ -209,7 +211,11 @@ export function ConfigFileListView() {
                 refetch();
               }}
             />
-            <ConfigFileViewSettings />
+            <ViewSettings
+              fields={CONFIG_FILE_LIST_FIELDS}
+              selectedIds={selectedFieldIds}
+              setSelectedIds={setSelectedFieldIds}
+            />
           </Toolbar>
         }
         data={selectedFieldIds.length > 0 ? configFiles : []}

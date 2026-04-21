@@ -11,6 +11,7 @@ import { Grid } from '@ui5/webcomponents-react/Grid';
 import { Title } from '@ui5/webcomponents-react/Title';
 import { Button } from '@ui5/webcomponents-react/Button';
 import { useInfiniteQuery } from '@tanstack/react-query';
+import { ViewSettings } from '@/components/view-settings';
 import { FlexBox } from '@ui5/webcomponents-react/FlexBox';
 import { Toolbar } from '@ui5/webcomponents-react/Toolbar';
 import '@ui5/webcomponents-icons/navigation-right-arrow.js';
@@ -21,11 +22,10 @@ import { DynamicPage } from '@ui5/webcomponents-react/DynamicPage';
 import { pushApiErrorMessages } from '@/libs/helpers/error-messages';
 import { ToolbarButton } from '@ui5/webcomponents-react/ToolbarButton';
 import { ToolbarSpacer } from '@ui5/webcomponents-react/ToolbarSpacer';
-import { AttachmentViewSettings } from '@/features/attachments/components';
 import { attachmentsQueryOptions } from '@/features/attachments/options/query';
 import { DynamicPageHeader } from '@ui5/webcomponents-react/DynamicPageHeader';
-import { type AttachmentListFieldId } from '@/features/attachments/view-config';
 import { IllustratedMessage } from '@ui5/webcomponents-react/IllustratedMessage';
+import { ATTACHMENT_LIST_FIELDS, type AttachmentListFieldId } from '@/features/attachments/view-config';
 import { AttachmentsFilterBar, AttachmentCard, AttachmentCreate } from '@/features/attachments/components';
 import { AnalyticalTable, type AnalyticalTableCellInstance } from '@ui5/webcomponents-react/AnalyticalTable';
 
@@ -65,6 +65,7 @@ export function AttachmentListView() {
   const viewMode = useAppStore((state) => state.viewMode);
   const setViewMode = useAppStore((state) => state.setViewMode);
   const selectedFieldIds = useViewStore((state) => state.attachmentListVisibleFieldIds);
+  const setSelectedFieldIds = useViewStore((state) => state.setAttachmentListVisibleFieldIds);
   const [search, setSearch] = React.useState<string>('');
   const [filter, setFilter] = React.useState<string>('');
   const attachmentListSelect = React.useMemo(() => selectedFieldIds.join(','), [selectedFieldIds]);
@@ -150,7 +151,11 @@ export function AttachmentListView() {
                 tooltip="Toggle grid view"
                 onClick={() => setViewMode('grid')}
               />
-              <AttachmentViewSettings />
+              <ViewSettings
+                fields={ATTACHMENT_LIST_FIELDS}
+                selectedIds={selectedFieldIds}
+                setSelectedIds={setSelectedFieldIds}
+              />
             </Toolbar>
           }
           data={selectedFieldIds.length > 0 ? attachments : []}
@@ -189,7 +194,11 @@ export function AttachmentListView() {
               tooltip="Toggle list view"
               onClick={() => setViewMode('table')}
             />
-            <AttachmentViewSettings />
+            <ViewSettings
+              fields={ATTACHMENT_LIST_FIELDS}
+              selectedIds={selectedFieldIds}
+              setSelectedIds={setSelectedFieldIds}
+            />
           </Toolbar>
           {attachments.length === 0 && selectedFieldIds.length > 0 && <IllustratedMessage name="NoData" />}
           {selectedFieldIds.length === 0 && (

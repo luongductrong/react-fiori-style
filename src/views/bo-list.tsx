@@ -11,6 +11,7 @@ import { Grid } from '@ui5/webcomponents-react/Grid';
 import { Title } from '@ui5/webcomponents-react/Title';
 import { useInfiniteQuery } from '@tanstack/react-query';
 import { Button } from '@ui5/webcomponents-react/Button';
+import { ViewSettings } from '@/components/view-settings';
 import { FlexBox } from '@ui5/webcomponents-react/FlexBox';
 import { Toolbar } from '@ui5/webcomponents-react/Toolbar';
 import '@ui5/webcomponents-icons/navigation-right-arrow.js';
@@ -20,13 +21,13 @@ import { DynamicPage } from '@ui5/webcomponents-react/DynamicPage';
 import { pushApiErrorMessages } from '@/libs/helpers/error-messages';
 import { ToolbarSpacer } from '@ui5/webcomponents-react/ToolbarSpacer';
 import { ToolbarButton } from '@ui5/webcomponents-react/ToolbarButton';
-import { type BoListFieldId } from '@/features/business-objects/view-config';
 import { DynamicPageHeader } from '@ui5/webcomponents-react/DynamicPageHeader';
 import { IllustratedMessage } from '@ui5/webcomponents-react/IllustratedMessage';
 import { bizObjectsQueryOptions } from '@/features/business-objects/options/query';
+import { BO_LIST_FIELDS, type BoListFieldId } from '@/features/business-objects/view-config';
 import { displayBoType, displayBoStatus } from '@/features/business-objects/helpers/formatter';
+import { BizObjectCard, BizObjectsFilterBar, BizCreate } from '@/features/business-objects/components';
 import { AnalyticalTable, type AnalyticalTableCellInstance } from '@ui5/webcomponents-react/AnalyticalTable';
-import { BizObjectCard, BizObjectsFilterBar, BizCreate, BoViewSettings } from '@/features/business-objects/components';
 
 type BoListColumn = {
   id: BoListFieldId;
@@ -71,6 +72,7 @@ export function BoListView() {
   const viewMode = useAppStore((state) => state.viewMode);
   const setViewMode = useAppStore((state) => state.setViewMode);
   const boListVisibleFieldIds = useViewStore((state) => state.boListVisibleFieldIds);
+  const setBoListVisibleFieldIds = useViewStore((state) => state.setBoListVisibleFieldIds);
   const visibleColumns = React.useMemo(
     () => ALL_COLUMNS.filter((col) => boListVisibleFieldIds.includes(col.id)),
     [boListVisibleFieldIds],
@@ -151,7 +153,11 @@ export function BoListView() {
                 tooltip="Toggle grid view"
                 onClick={() => setViewMode('grid')}
               />
-              <BoViewSettings />
+              <ViewSettings
+                fields={BO_LIST_FIELDS}
+                selectedIds={boListVisibleFieldIds}
+                setSelectedIds={setBoListVisibleFieldIds}
+              />
             </Toolbar>
           }
           data={boListVisibleFieldIds.length > 0 ? bizObjects : []}
@@ -189,7 +195,11 @@ export function BoListView() {
               tooltip="Toggle list view"
               onClick={() => setViewMode('table')}
             />
-            <BoViewSettings />
+            <ViewSettings
+              fields={BO_LIST_FIELDS}
+              selectedIds={boListVisibleFieldIds}
+              setSelectedIds={setBoListVisibleFieldIds}
+            />
           </Toolbar>
           {bizObjects.length === 0 && boListVisibleFieldIds.length > 0 && <IllustratedMessage name="NoData" />}
           {boListVisibleFieldIds.length === 0 && (

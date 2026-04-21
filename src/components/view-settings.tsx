@@ -1,7 +1,6 @@
 import * as React from 'react';
 import '@ui5/webcomponents-icons/search.js';
 import { Bar } from '@ui5/webcomponents-react/Bar';
-import { useViewStore } from '@/stores/view-store';
 import '@ui5/webcomponents-icons/action-settings.js';
 import { Text } from '@ui5/webcomponents-react/Text';
 import { Icon } from '@ui5/webcomponents-react/Icon';
@@ -12,11 +11,19 @@ import { Button } from '@ui5/webcomponents-react/Button';
 import { FlexBox } from '@ui5/webcomponents-react/FlexBox';
 import { CheckBox } from '@ui5/webcomponents-react/CheckBox';
 import { ToolbarButton } from '@ui5/webcomponents-react/ToolbarButton';
-import { VERSION_LIST_FIELDS } from '@/features/attachments/view-config';
-import type { AttachmentVersionListFieldId } from '@/features/attachments/view-config';
-import type { AttachmentVersionListFieldOption } from '@/features/attachments/view-config';
 
-function matchesSearch(field: AttachmentVersionListFieldOption, search: string) {
+export type ViewSettingsFieldOption<TFieldId extends string = string> = {
+  id: TFieldId;
+  label: string;
+};
+
+export interface ViewSettingsProps<TFieldId extends string = string> {
+  fields: readonly ViewSettingsFieldOption<TFieldId>[];
+  selectedIds: readonly TFieldId[];
+  setSelectedIds: (selectedIds: TFieldId[]) => void;
+}
+
+function matchesSearch<TFieldId extends string>(field: ViewSettingsFieldOption<TFieldId>, search: string) {
   const normalizedSearch = search.trim().toLowerCase();
 
   if (!normalizedSearch) {
@@ -26,27 +33,31 @@ function matchesSearch(field: AttachmentVersionListFieldOption, search: string) 
   return field.label.toLowerCase().includes(normalizedSearch) || field.id.toLowerCase().includes(normalizedSearch);
 }
 
-interface AttachmentVersionViewSettingsProps {
-  onSelectChange?: (selectedIds: AttachmentVersionListFieldId[]) => void;
-}
-
-export function AttachmentVersionViewSettings({ onSelectChange }: AttachmentVersionViewSettingsProps) {
-  const selectedIds = useViewStore((state) => state.versionListVisibleFieldIds);
-  const setSelectedIds = useViewStore((state) => state.setVersionListVisibleFieldIds);
+export function ViewSettings<TFieldId extends string = string>({
+  fields,
+  selectedIds,
+  setSelectedIds,
+}: ViewSettingsProps<TFieldId>) {
   const [open, setOpen] = React.useState(false);
   const [search, setSearch] = React.useState('');
   const [showSelectedOnly, setShowSelectedOnly] = React.useState(false);
-  const [draftSelectedIds, setDraftSelectedIds] = React.useState<AttachmentVersionListFieldId[]>(selectedIds);
+  const [draftSelectedIds, setDraftSelectedIds] = React.useState<TFieldId[]>(() => [...selectedIds]);
+
+  React.useEffect(() => {
+    if (!open) {
+      setDraftSelectedIds([...selectedIds]);
+    }
+  }, [open, selectedIds]);
 
   const selectedFieldIds = React.useMemo(() => new Set(draftSelectedIds), [draftSelectedIds]);
   const visibleFields = React.useMemo(() => {
-    return VERSION_LIST_FIELDS.filter((field) => matchesSearch(field, search)).filter(
-      (field) => !showSelectedOnly || selectedFieldIds.has(field.id),
-    );
-  }, [search, selectedFieldIds, showSelectedOnly]);
+    return fields
+      .filter((field) => matchesSearch(field, search))
+      .filter((field) => !showSelectedOnly || selectedFieldIds.has(field.id));
+  }, [fields, search, selectedFieldIds, showSelectedOnly]);
   const visibleFieldIds = React.useMemo(() => visibleFields.map((field) => field.id), [visibleFields]);
   const selectedCount = draftSelectedIds.length;
-  const totalCount = VERSION_LIST_FIELDS.length;
+  const totalCount = fields.length;
   const allVisibleSelected = visibleFields.length > 0 && visibleFields.every((field) => selectedFieldIds.has(field.id));
 
   const resetDialogUi = function () {
@@ -55,7 +66,7 @@ export function AttachmentVersionViewSettings({ onSelectChange }: AttachmentVers
   };
 
   const restoreSavedSelection = function () {
-    setDraftSelectedIds(selectedIds);
+    setDraftSelectedIds([...selectedIds]);
   };
 
   const handleOpen = function () {
@@ -76,13 +87,14 @@ export function AttachmentVersionViewSettings({ onSelectChange }: AttachmentVers
   };
 
   const handleConfirm = function () {
-    setSelectedIds(draftSelectedIds);
-    onSelectChange?.(draftSelectedIds);
+    const nextSelectedIds = [...draftSelectedIds];
+
+    setSelectedIds(nextSelectedIds);
     resetDialogUi();
     setOpen(false);
   };
 
-  const handleFieldToggle = function (fieldId: AttachmentVersionListFieldId, checked: boolean) {
+  const handleFieldToggle = function (fieldId: TFieldId, checked: boolean) {
     setDraftSelectedIds((prev) => {
       if (checked) {
         return prev.includes(fieldId) ? prev : [...prev, fieldId];
@@ -95,9 +107,9 @@ export function AttachmentVersionViewSettings({ onSelectChange }: AttachmentVers
   const handleVisibleFieldsToggle = function (checked: boolean) {
     setDraftSelectedIds((prev) => {
       if (checked) {
-        return VERSION_LIST_FIELDS.filter((field) => prev.includes(field.id) || visibleFieldIds.includes(field.id)).map(
-          (field) => field.id,
-        );
+        return fields
+          .filter((field) => prev.includes(field.id) || visibleFieldIds.includes(field.id))
+          .map((field) => field.id);
       }
 
       return prev.filter((id) => !visibleFieldIds.includes(id));

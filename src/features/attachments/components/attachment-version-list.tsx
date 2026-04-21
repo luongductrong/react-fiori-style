@@ -7,14 +7,14 @@ import { Bar } from '@ui5/webcomponents-react/Bar';
 import { Title } from '@ui5/webcomponents-react/Title';
 import { useInfiniteQuery } from '@tanstack/react-query';
 import { Button } from '@ui5/webcomponents-react/Button';
+import { ViewSettings } from '@/components/view-settings';
 import { Toolbar } from '@ui5/webcomponents-react/Toolbar';
 import '@ui5/webcomponents-icons/navigation-right-arrow.js';
 import { Link as UI5Link } from '@ui5/webcomponents-react/Link';
 import { attachmentVersionsQueryOptions } from '../options/query';
-import type { AttachmentVersionListFieldId } from '../view-config';
 import { pushApiErrorMessages } from '@/libs/helpers/error-messages';
 import { ToolbarSpacer } from '@ui5/webcomponents-react/ToolbarSpacer';
-import { AttachmentVersionViewSettings } from './attachment-version-view-settings';
+import { VERSION_LIST_FIELDS, type AttachmentVersionListFieldId } from '../view-config';
 import { AnalyticalTable, type AnalyticalTableCellInstance } from '@ui5/webcomponents-react/AnalyticalTable';
 
 interface AttachmentVersionListProps {
@@ -79,6 +79,7 @@ export function AttachmentVersionList({
   currentExtension,
 }: AttachmentVersionListProps) {
   const selectedFieldIds = useViewStore((state) => state.versionListVisibleFieldIds);
+  const setSelectedFieldIds = useViewStore((state) => state.setVersionListVisibleFieldIds);
   const attachmentVersionListSelect = React.useMemo(
     () => Array.from(new Set([...selectedFieldIds, 'VersionNo'])).join(','),
     [selectedFieldIds],
@@ -153,7 +154,11 @@ export function AttachmentVersionList({
             <ToolbarSpacer />
             {/* ToolbarButton - FileUpload */}
             <FileUpload fileId={fileId} currentExtension={currentExtension} disabled={disabled} />
-            <AttachmentVersionViewSettings />
+            <ViewSettings
+              fields={VERSION_LIST_FIELDS}
+              selectedIds={selectedFieldIds}
+              setSelectedIds={setSelectedFieldIds}
+            />
           </Toolbar>
         }
         data={selectedFieldIds.length > 0 ? versions : []}

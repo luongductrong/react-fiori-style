@@ -6,4 +6,3 @@ export { AttachmentCreate } from './attachment-create';
 export { AttachmentBizList } from './attachment-biz-list';
 export { AttachmentsFilterBar } from './attachments-filter-bar';
 export { AttachmentVersionList } from './attachment-version-list';
-export { AttachmentViewSettings } from './attachments-view-settings';

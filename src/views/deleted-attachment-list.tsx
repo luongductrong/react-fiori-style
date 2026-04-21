@@ -6,6 +6,7 @@ import { Bar } from '@ui5/webcomponents-react/Bar';
 import { useViewStore } from '@/stores/view-store';
 import { Title } from '@ui5/webcomponents-react/Title';
 import { Button } from '@ui5/webcomponents-react/Button';
+import { ViewSettings } from '@/components/view-settings';
 import { Toolbar } from '@ui5/webcomponents-react/Toolbar';
 import { Link as UI5Link } from '@ui5/webcomponents-react/Link';
 import { DynamicPage } from '@ui5/webcomponents-react/DynamicPage';
@@ -13,12 +14,12 @@ import type { AttachmentItem } from '@/features/attachments/types';
 import { pushApiErrorMessages } from '@/libs/helpers/error-messages';
 import { ToolbarSpacer } from '@ui5/webcomponents-react/ToolbarSpacer';
 import { ToolbarButton } from '@ui5/webcomponents-react/ToolbarButton';
+import { AttachmentsFilterBar } from '@/features/attachments/components';
 import { attachmentsQueryOptions } from '@/features/attachments/options/query';
 import { DynamicPageHeader } from '@ui5/webcomponents-react/DynamicPageHeader';
-import type { AttachmentListFieldId } from '@/features/attachments/view-config';
 import { useInfiniteQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { restoreAttachmentMutationOptions } from '@/features/attachments/options/mutation';
-import { AttachmentViewSettings, AttachmentsFilterBar } from '@/features/attachments/components';
+import { ATTACHMENT_LIST_FIELDS, type AttachmentListFieldId } from '@/features/attachments/view-config';
 import { AnalyticalTable, type AnalyticalTableCellInstance } from '@ui5/webcomponents-react/AnalyticalTable';
 
 type AttachmentListColumn = {
@@ -78,6 +79,7 @@ function RestoreAttachmentButton({
 export function DeletedAttachmentListView() {
   const queryClient = useQueryClient();
   const selectedFieldIds = useViewStore((state) => state.attachmentListVisibleFieldIds);
+  const setSelectedFieldIds = useViewStore((state) => state.setAttachmentListVisibleFieldIds);
   const [search, setSearch] = React.useState('');
   const [filter, setFilter] = React.useState('');
   const attachmentListSelect = React.useMemo(
@@ -182,7 +184,11 @@ export function DeletedAttachmentListView() {
                 refetch();
               }}
             />
-            <AttachmentViewSettings />
+            <ViewSettings
+              fields={ATTACHMENT_LIST_FIELDS}
+              selectedIds={selectedFieldIds}
+              setSelectedIds={setSelectedFieldIds}
+            />
           </Toolbar>
         }
         data={selectedFieldIds.length > 0 ? attachments : []}
