@@ -2,13 +2,13 @@ import * as React from 'react';
 import { Link } from 'react-router';
 import { toast } from '@/libs/helpers/toast';
 import '@ui5/webcomponents-icons/refresh.js';
-import { Bar } from '@ui5/webcomponents-react/Bar';
 import { useViewStore } from '@/stores/view-store';
 import { Title } from '@ui5/webcomponents-react/Title';
 import { Button } from '@ui5/webcomponents-react/Button';
 import { ViewSettings } from '@/components/view-settings';
 import { Toolbar } from '@ui5/webcomponents-react/Toolbar';
 import { Link as UI5Link } from '@ui5/webcomponents-react/Link';
+import { LoadMoreTrigger } from '@/components/load-more-trigger';
 import { DynamicPage } from '@ui5/webcomponents-react/DynamicPage';
 import type { AttachmentItem } from '@/features/attachments/types';
 import { pushApiErrorMessages } from '@/libs/helpers/error-messages';
@@ -122,7 +122,7 @@ export function DeletedAttachmentListView() {
   const attachmentListParams = React.useMemo(
     () => ({
       $skip: 0,
-      $top: 10,
+      $top: 20,
       $count: true,
       $select: attachmentListSelect,
       $orderby: 'Erdat desc,Erzet desc',
@@ -235,19 +235,12 @@ export function DeletedAttachmentListView() {
         scaleWidthMode="Smart"
         visibleRowCountMode="Auto"
       />
-      {hasNextPage && (
-        <Bar>
-          <Button
-            design="Transparent"
-            disabled={isFetchingNextPage}
-            onClick={() => {
-              fetchNextPage();
-            }}
-          >
-            More [{attachments.length}/{totalCount}]
-          </Button>
-        </Bar>
-      )}
+      <LoadMoreTrigger
+        hasMore={hasNextPage}
+        isLoading={isFetchingNextPage}
+        enabled={selectedFieldIds.length > 0}
+        onLoadMore={() => fetchNextPage()}
+      />
     </DynamicPage>
   );
 }

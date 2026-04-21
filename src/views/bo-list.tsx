@@ -1,11 +1,9 @@
 import * as React from 'react';
-import { cn } from '@/libs/utils';
 import '@ui5/webcomponents-icons/list.js';
 import '@ui5/webcomponents-icons/refresh.js';
 import '@ui5/webcomponents-icons/table-view.js';
 import { useAppStore } from '@/stores/app-store';
 import { Link, useNavigate } from 'react-router';
-import { Bar } from '@ui5/webcomponents-react/Bar';
 import { useViewStore } from '@/stores/view-store';
 import { Grid } from '@ui5/webcomponents-react/Grid';
 import { Title } from '@ui5/webcomponents-react/Title';
@@ -17,6 +15,7 @@ import { Toolbar } from '@ui5/webcomponents-react/Toolbar';
 import '@ui5/webcomponents-icons/navigation-right-arrow.js';
 import '@ui5/webcomponents-fiori/dist/illustrations/NoData.js';
 import { Link as UI5Link } from '@ui5/webcomponents-react/Link';
+import { LoadMoreTrigger } from '@/components/load-more-trigger';
 import { DynamicPage } from '@ui5/webcomponents-react/DynamicPage';
 import { pushApiErrorMessages } from '@/libs/helpers/error-messages';
 import { ToolbarSpacer } from '@ui5/webcomponents-react/ToolbarSpacer';
@@ -87,8 +86,6 @@ const ALL_COLUMNS = [
   { Header: 'Changed By', accessor: 'Aenam', id: 'Aenam' },
 ] as const satisfies readonly BoListColumn[];
 
-const ROWS_PER_PAGE = 10; // TODO: Move to constants
-
 export function BoListView() {
   const navigate = useNavigate();
   const viewMode = useAppStore((state) => state.viewMode);
@@ -99,14 +96,17 @@ export function BoListView() {
     () => ALL_COLUMNS.filter((col) => boListVisibleFieldIds.includes(col.id)),
     [boListVisibleFieldIds],
   );
-  const boListSelect = React.useMemo(() => buildSelectWithDateTimeFields(boListVisibleFieldIds), [boListVisibleFieldIds]);
+  const boListSelect = React.useMemo(
+    () => buildSelectWithDateTimeFields(boListVisibleFieldIds),
+    [boListVisibleFieldIds],
+  );
   const [search, setSearch] = React.useState('');
   const [filter, setFilter] = React.useState('');
 
   const { data, isFetching, isFetchingNextPage, error, refetch, hasNextPage, fetchNextPage } = useInfiniteQuery({
     ...bizObjectsQueryOptions({
       $skip: 0,
-      $top: ROWS_PER_PAGE,
+      $top: 20,
       $count: true,
       $select: boListSelect,
       $orderby: 'Erdat desc,Erzet desc',
@@ -238,13 +238,12 @@ export function BoListView() {
           </Grid>
         </FlexBox>
       )}
-      {hasNextPage && (
-        <Bar className={cn({ 'rounded-xl mt-4': viewMode === 'grid' })}>
-          <Button onClick={() => fetchNextPage()} disabled={isFetchingNextPage} design="Transparent">
-            More [{bizObjects.length}/{totalCount}]
-          </Button>
-        </Bar>
-      )}
+      <LoadMoreTrigger
+        hasMore={hasNextPage}
+        isLoading={isFetchingNextPage}
+        enabled={boListVisibleFieldIds.length > 0}
+        onLoadMore={() => fetchNextPage()}
+      />
     </DynamicPage>
   );
 }

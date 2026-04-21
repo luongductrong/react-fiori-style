@@ -1,12 +1,10 @@
 import * as React from 'react';
-import { cn } from '@/libs/utils';
 import '@ui5/webcomponents-icons/list.js';
 import '@ui5/webcomponents-icons/refresh.js';
 import '@ui5/webcomponents-icons/table-view.js';
 import { Link, useNavigate } from 'react-router';
 import { useAppStore } from '@/stores/app-store';
 import { useViewStore } from '@/stores/view-store';
-import { Bar } from '@ui5/webcomponents-react/Bar';
 import { Grid } from '@ui5/webcomponents-react/Grid';
 import { Title } from '@ui5/webcomponents-react/Title';
 import { Button } from '@ui5/webcomponents-react/Button';
@@ -18,6 +16,7 @@ import '@ui5/webcomponents-icons/navigation-right-arrow.js';
 import '@ui5/webcomponents-icons/navigation-right-arrow.js';
 import '@ui5/webcomponents-fiori/dist/illustrations/NoData.js';
 import { Link as UI5Link } from '@ui5/webcomponents-react/Link';
+import { LoadMoreTrigger } from '@/components/load-more-trigger';
 import { DynamicPage } from '@ui5/webcomponents-react/DynamicPage';
 import { pushApiErrorMessages } from '@/libs/helpers/error-messages';
 import { ToolbarButton } from '@ui5/webcomponents-react/ToolbarButton';
@@ -104,7 +103,7 @@ export function AttachmentListView() {
   const attachmentListParams = React.useMemo(
     () => ({
       $skip: 0,
-      $top: 10,
+      $top: 20,
       $count: true,
       $select: attachmentListSelect,
       $orderby: 'Erdat desc,Erzet desc',
@@ -243,13 +242,12 @@ export function AttachmentListView() {
           </Grid>
         </FlexBox>
       )}
-      {hasNextPage && (
-        <Bar className={cn({ 'rounded-xl mt-4': viewMode === 'grid' })}>
-          <Button onClick={() => fetchNextPage()} disabled={isFetchingNextPage} design="Transparent">
-            More [{attachments.length}/{totalCount}]
-          </Button>
-        </Bar>
-      )}
+      <LoadMoreTrigger
+        hasMore={hasNextPage}
+        isLoading={isFetching || isFetchingNextPage}
+        enabled={selectedFieldIds.length > 0}
+        onLoadMore={() => fetchNextPage()}
+      />
     </DynamicPage>
   );
 }
