@@ -11,26 +11,30 @@ interface ConfigFilesFilterBarProps {
   onSearchChange: (search: string) => void;
 }
 
+const DEFAULT_FILTER_KEYS = ['FileExt', 'Type', 'Description', 'IsActive'];
+
 export function ConfigFilesFilterBar({ onFilterChange, onSearchChange }: ConfigFilesFilterBarProps) {
   const [count, setCount] = React.useState(0);
   const [type, setType] = React.useState('');
   const [isActive, setIsActive] = React.useState('');
-  const [filterKeys, setFilterKeys] = React.useState<string[]>([
-    'FileExt',
-    'MimeType',
-    'Type',
-    'IsActive',
-    'Description',
-  ]);
+  const [filterKeys, setFilterKeys] = React.useState<string[]>(DEFAULT_FILTER_KEYS);
   const [fileExtFilterString, setFileExtFilterString] = React.useState('');
   const [mimeTypeFilterString, setMimeTypeFilterString] = React.useState('');
   const [descriptionFilterString, setDescriptionFilterString] = React.useState('');
+  const [maxBytesFilterString, setMaxBytesFilterString] = React.useState('');
 
   const handleOnGo = function () {
     const typeFilter = type ? `Type eq '${type}'` : '';
     const isActiveFilter =
       isActive === 'active' ? 'IsActive eq true' : isActive === 'inactive' ? 'IsActive eq false' : '';
-    const filter = [fileExtFilterString, mimeTypeFilterString, typeFilter, isActiveFilter, descriptionFilterString]
+    const filter = [
+      fileExtFilterString,
+      mimeTypeFilterString,
+      typeFilter,
+      descriptionFilterString,
+      maxBytesFilterString,
+      isActiveFilter,
+    ]
       .filter(Boolean)
       .join(' and ');
     onFilterChange(filter);
@@ -40,10 +44,11 @@ export function ConfigFilesFilterBar({ onFilterChange, onSearchChange }: ConfigF
     setCount((prev) => prev + 1);
     setType('');
     setIsActive('');
-    setFilterKeys(['FileExt', 'MimeType', 'Type', 'IsActive', 'Description']);
+    setFilterKeys(DEFAULT_FILTER_KEYS);
     setFileExtFilterString('');
     setMimeTypeFilterString('');
     setDescriptionFilterString('');
+    setMaxBytesFilterString('');
     onSearchChange('');
     onFilterChange('');
   };
@@ -59,7 +64,12 @@ export function ConfigFilesFilterBar({ onFilterChange, onSearchChange }: ConfigF
       onRestore={handleClear}
       search={<Input className="*:h-full h-6.5" onChange={(e) => onSearchChange(e.target.value)} />}
     >
-      <FilterGroupItem filterKey="FileExt" label="File Ext" hiddenInFilterBar={!filterKeys.includes('FileExt')}>
+      <FilterGroupItem
+        filterKey="FileExt"
+        label="File Ext"
+        hiddenInFilterBar={!filterKeys.includes('FileExt')}
+        active={!!fileExtFilterString}
+      >
         <SearchHelpDialog
           key={count}
           label="File Ext"
@@ -68,11 +78,17 @@ export function ConfigFilesFilterBar({ onFilterChange, onSearchChange }: ConfigF
           afterFilterStringBuild={setFileExtFilterString}
         />
       </FilterGroupItem>
-      <FilterGroupItem filterKey="MimeType" label="Mime Type" hiddenInFilterBar={!filterKeys.includes('MimeType')}>
+      <FilterGroupItem
+        filterKey="MimeType"
+        label="Mime Type"
+        hiddenInFilterBar={!filterKeys.includes('MimeType')}
+        active={!!mimeTypeFilterString}
+      >
         <SearchHelpDialog
           key={count}
           label="Mime Type"
           field="MimeType"
+          options={['contains']}
           afterFilterStringBuild={setMimeTypeFilterString}
         />
       </FilterGroupItem>
@@ -80,23 +96,43 @@ export function ConfigFilesFilterBar({ onFilterChange, onSearchChange }: ConfigF
         filterKey="Description"
         label="Description"
         hiddenInFilterBar={!filterKeys.includes('Description')}
+        active={!!descriptionFilterString}
       >
         <SearchHelpDialog
           key={count}
           label="Description"
           field="Description"
-          options={['equal to']}
           afterFilterStringBuild={setDescriptionFilterString}
         />
       </FilterGroupItem>
-      <FilterGroupItem filterKey="Type" label="Type" hiddenInFilterBar={!filterKeys.includes('Type')}>
+      <FilterGroupItem filterKey="Type" label="Type" hiddenInFilterBar={!filterKeys.includes('Type')} active={!!type}>
         <Select value={type} onChange={(event) => setType(event.target.value)} className="h-6.5">
           <Option value="">All</Option>
           <Option value="DOCUMENT">Document</Option>
           <Option value="IMAGE">Image</Option>
         </Select>
       </FilterGroupItem>
-      <FilterGroupItem filterKey="IsActive" label="Active" hiddenInFilterBar={!filterKeys.includes('IsActive')}>
+      <FilterGroupItem
+        filterKey="MaxBytes"
+        label="Max Size"
+        hiddenInFilterBar={!filterKeys.includes('MaxBytes')}
+        active={!!maxBytesFilterString}
+      >
+        <SearchHelpDialog
+          key={count}
+          label="Max Size"
+          field="MaxBytes"
+          options={['equal to']}
+          useApostrophe={false}
+          afterFilterStringBuild={setMaxBytesFilterString}
+        />
+      </FilterGroupItem>
+      <FilterGroupItem
+        filterKey="IsActive"
+        label="Active"
+        hiddenInFilterBar={!filterKeys.includes('IsActive')}
+        active={!!isActive}
+      >
         <Select value={isActive} onChange={(event) => setIsActive(event.target.value)} className="h-6.5">
           <Option value="">All</Option>
           <Option value="active">Yes</Option>
