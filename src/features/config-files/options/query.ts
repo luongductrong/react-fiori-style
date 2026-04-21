@@ -18,5 +18,3 @@ export function configFilesQueryOptions(params: ConfigFileListParams) {
     refetchOnWindowFocus: false,
   });
 }
-
-// TODO: Check if non-ADMIN can access

@@ -247,5 +247,3 @@ export function BoListView() {
     </DynamicPage>
   );
 }
-// TODO: Handle time zone display
-// TODO: Handle default orderby

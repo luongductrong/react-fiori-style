@@ -245,5 +245,3 @@ export function VersionDetailView() {
     </div>
   );
 }
-
-// TODO: Author check for Edit Lock

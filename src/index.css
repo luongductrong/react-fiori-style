@@ -24,7 +24,6 @@
 @layer base {
   ui5-button,
   ui5-tokenizer,
-  /* ui5-icon, */ /* TODO: Fix it */
   ui5-title,
   ui5-multi-input,
   ui5-label,

@@ -114,7 +114,6 @@ export function GoogleDrivePicker({ onPick, onPickCancel, onLoadingChange, requi
     } finally {
       onLoadingChange(false);
     }
-    // TODO: using axios + query (Importance: low)
   };
 
   return (

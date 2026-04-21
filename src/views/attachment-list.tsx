@@ -13,7 +13,6 @@ import { ViewSettings } from '@/components/view-settings';
 import { FlexBox } from '@ui5/webcomponents-react/FlexBox';
 import { Toolbar } from '@ui5/webcomponents-react/Toolbar';
 import '@ui5/webcomponents-icons/navigation-right-arrow.js';
-import '@ui5/webcomponents-icons/navigation-right-arrow.js';
 import '@ui5/webcomponents-fiori/dist/illustrations/NoData.js';
 import { Link as UI5Link } from '@ui5/webcomponents-react/Link';
 import { LoadMoreTrigger } from '@/components/load-more-trigger';

@@ -52,7 +52,6 @@ export function SearchHelpPreview({ tokens, onTokensDelete, insideDialog, icon, 
         <Title>{tokens.length > 0 ? `Conditions (${tokens.length})` : 'No Conditions Entered'}</Title>
         <FlexBox {...props} className={cn('gap-2 h-6.5', props.className)}>
           <MultiInput
-            onSelectionChange={function fQ() {}}
             onTokenDelete={handleTokenDelete}
             className="w-full h-full"
             type="Text"
@@ -79,7 +78,6 @@ export function SearchHelpPreview({ tokens, onTokensDelete, insideDialog, icon, 
 
   return (
     <MultiInput
-      onSelectionChange={function fQ() {}}
       onTokenDelete={handleTokenDelete}
       className="w-full h-6.5"
       type="Text"

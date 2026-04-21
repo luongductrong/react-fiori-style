@@ -64,7 +64,6 @@ export function ConfigFileCreate() {
     setShowAllValidation(false);
   };
 
-  // TODO: limit file size
   const handleSubmit = function () {
     setShowAllValidation(true);
 

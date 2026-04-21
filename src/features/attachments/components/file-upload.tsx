@@ -242,5 +242,3 @@ function FileUploadImpl({ fileId, currentExtension, disabled }: FileUploadProps)
     </React.Fragment>
   );
 }
-
-// TODO: Allows uploading attachments directly within the BO.

@@ -5,7 +5,6 @@ export const API = {
 
 export const MUTATION_API = {
   linkAttachment: () => `/BusinessObjectAttachmentLinks`,
-  // TODO: refactor/ change time when create/delete link
   unlinkAttachment: (boId: string, fileId: string) => `/BusinessObjectAttachmentLinks(BoId=${boId},FileId=${fileId})`,
 };
 

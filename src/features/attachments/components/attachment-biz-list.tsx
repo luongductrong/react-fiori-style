@@ -96,7 +96,6 @@ export function AttachmentBizList({ fileId, disabled }: { fileId: string; disabl
       $skip: 0,
       $top: 5,
       $orderby: 'Erdat desc,Erzet desc',
-      // TODO: Move to constants
       $expand: '_Bo',
     }),
   );

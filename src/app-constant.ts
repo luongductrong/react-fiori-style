@@ -58,9 +58,6 @@ export const EXTENSION_GROUPS = {
 type Extension = (typeof EXTENSIONS)[number];
 type MimeType = (typeof MIME_TYPES)[number];
 
-// TODO: Double check the white list of extensions and mime types with backend,
-// implement the logic to get the white list from backend and use it in the frontend
-
 export const GOOGLE_WORKSPACE_EXPORTS = {
   'application/vnd.google-apps.document': {
     extension: 'docx',

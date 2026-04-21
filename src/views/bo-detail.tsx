@@ -267,7 +267,6 @@ export function BoDetailView() {
         Are you sure you want to delete this business object? This action cannot be undone.
       </MessageBox>
       <BusyIndicator type="pending" show={isDeleting || isUpdating} />
-      {/* TODO: Handle time zone display */}
     </div>
   );
 }

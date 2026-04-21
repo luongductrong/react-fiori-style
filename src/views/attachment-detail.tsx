@@ -234,7 +234,6 @@ export function AttachmentDetailView() {
             }
             header={<Title level="H2">{isFetching ? 'Loading...' : attachment?.Title || 'Unnamed Object'}</Title>}
             subHeader={isFetching ? 'Loading...' : attachment?.FileId || 'Unnamed Object'}
-            // TODO: Allow subHeader selection
             navigationBar={
               <Button
                 accessibleName="Close"

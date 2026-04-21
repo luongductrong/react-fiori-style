@@ -284,5 +284,3 @@ export function AttachmentCreate() {
     </React.Fragment>
   );
 }
-
-// TODO: Allows uploading attachments directly within the BO.
