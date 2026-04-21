@@ -20,6 +20,7 @@ import { FilePreview } from '@/features/attachments/components';
 import { ObjectPage } from '@ui5/webcomponents-react/ObjectPage';
 import { ToolbarButton } from '@ui5/webcomponents-react/ToolbarButton';
 import { NotFoundIllustrated } from '@/components/not-found-illustrated';
+import { displayVersion } from '@/features/attachments/helpers/formatter';
 import { ObjectPageTitle } from '@ui5/webcomponents-react/ObjectPageTitle';
 import { downloadFile } from '@/features/attachments/helpers/download-file';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
@@ -57,7 +58,7 @@ export function VersionDetailView() {
         queryClient.invalidateQueries({
           queryKey: ['attachments', id],
         });
-        toast(`Version ${versionNo} is now current`);
+        toast(`Version ${displayVersion(versionNo, 'N/A')} is now current`);
       },
     }),
   );
@@ -149,7 +150,7 @@ export function VersionDetailView() {
               </Toolbar>
             }
             header={<Title level="H2">{isFetching ? 'Loading...' : version?.FileName || 'Unnamed Object'}</Title>}
-            subHeader={isFetching ? 'Loading...' : `Version ${version?.VersionNo || versionNo || '-'}`}
+            subHeader={isFetching ? 'Loading...' : `Version ${displayVersion(version?.VersionNo || versionNo, 'N/A')}`}
             navigationBar={
               <Button
                 accessibleName="Close"

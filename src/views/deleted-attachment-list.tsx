@@ -15,6 +15,7 @@ import { pushApiErrorMessages } from '@/libs/helpers/error-messages';
 import { ToolbarSpacer } from '@ui5/webcomponents-react/ToolbarSpacer';
 import { ToolbarButton } from '@ui5/webcomponents-react/ToolbarButton';
 import { AttachmentsFilterBar } from '@/features/attachments/components';
+import { displayVersion } from '@/features/attachments/helpers/formatter';
 import { attachmentsQueryOptions } from '@/features/attachments/options/query';
 import { DynamicPageHeader } from '@ui5/webcomponents-react/DynamicPageHeader';
 import { useInfiniteQuery, useMutation, useQueryClient } from '@tanstack/react-query';
@@ -38,7 +39,12 @@ const ALL_COLUMNS = [
     ),
   },
   { Header: 'Title', accessor: 'Title', id: 'Title' },
-  { Header: 'Version', accessor: 'CurrentVersion', id: 'CurrentVersion' },
+  {
+    Header: 'Version',
+    accessor: 'CurrentVersion',
+    id: 'CurrentVersion',
+    Cell: (props: AnalyticalTableCellInstance) => displayVersion(props.value),
+  },
   { Header: 'Created On', accessor: 'Erdat', id: 'Erdat' },
   { Header: 'Created At', accessor: 'Erzet', id: 'Erzet' },
   { Header: 'Created By', accessor: 'Ernam', id: 'Ernam' },

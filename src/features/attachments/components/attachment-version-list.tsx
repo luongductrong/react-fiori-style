@@ -4,6 +4,7 @@ import { formatFileSize } from '@/libs/utils';
 import { Link, useNavigate } from 'react-router';
 import { useViewStore } from '@/stores/view-store';
 import { Bar } from '@ui5/webcomponents-react/Bar';
+import { displayVersion } from '../helpers/formatter';
 import { Title } from '@ui5/webcomponents-react/Title';
 import { useInfiniteQuery } from '@tanstack/react-query';
 import { Button } from '@ui5/webcomponents-react/Button';
@@ -123,7 +124,7 @@ export function AttachmentVersionList({
             ...column,
             Cell: (props: AnalyticalTableCellInstance) => (
               <Link to={`/attachments/${fileId}/versions/${props.value}`}>
-                <UI5Link>{`${props.value ?? 'N/A'}${props.value === currentVersionNo ? ' (Current)' : ''}`}</UI5Link>
+                <UI5Link>{`${displayVersion(props.value)}${props.value === currentVersionNo ? ' (Current)' : ''}`}</UI5Link>
               </Link>
             ),
           };

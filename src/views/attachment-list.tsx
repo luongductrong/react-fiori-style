@@ -22,6 +22,7 @@ import { DynamicPage } from '@ui5/webcomponents-react/DynamicPage';
 import { pushApiErrorMessages } from '@/libs/helpers/error-messages';
 import { ToolbarButton } from '@ui5/webcomponents-react/ToolbarButton';
 import { ToolbarSpacer } from '@ui5/webcomponents-react/ToolbarSpacer';
+import { displayVersion } from '@/features/attachments/helpers/formatter';
 import { attachmentsQueryOptions } from '@/features/attachments/options/query';
 import { DynamicPageHeader } from '@ui5/webcomponents-react/DynamicPageHeader';
 import { IllustratedMessage } from '@ui5/webcomponents-react/IllustratedMessage';
@@ -45,7 +46,12 @@ const ALL_COLUMNS = [
     ),
   },
   { Header: 'Title', accessor: 'Title', id: 'Title' },
-  { Header: 'Version', accessor: 'CurrentVersion', id: 'CurrentVersion' },
+  {
+    Header: 'Version',
+    accessor: 'CurrentVersion',
+    id: 'CurrentVersion',
+    Cell: (props: AnalyticalTableCellInstance) => displayVersion(props.value),
+  },
   { Header: 'Created On', accessor: 'Erdat', id: 'Erdat' },
   { Header: 'Created At', accessor: 'Erzet', id: 'Erzet' },
   { Header: 'Created By', accessor: 'Ernam', id: 'Ernam' },

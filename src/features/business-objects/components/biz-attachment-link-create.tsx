@@ -12,6 +12,7 @@ import { pushApiErrorMessages } from '@/libs/helpers/error-messages';
 import { ToolbarButton } from '@ui5/webcomponents-react/ToolbarButton';
 import { ToolbarSpacer } from '@ui5/webcomponents-react/ToolbarSpacer';
 import { linkAttachmentToBoMutationOptions } from '../options/mutation';
+import { displayVersion } from '@/features/attachments/helpers/formatter';
 import { attachmentsQueryOptions } from '@/features/attachments/options/query';
 import { useInfiniteQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { AttachmentsFilterBar } from '@/features/attachments/components/attachments-filter-bar';
@@ -43,6 +44,7 @@ const ALL_COLUMNS = [
     Header: 'Version',
     accessor: 'CurrentVersion',
     id: 'CurrentVersion',
+    Cell: (props: AnalyticalTableCellInstance) => displayVersion(props.value),
   },
   {
     Header: 'Created On',

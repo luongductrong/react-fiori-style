@@ -14,6 +14,7 @@ import { MessageBox } from '@ui5/webcomponents-react/MessageBox';
 import { pushApiErrorMessages } from '@/libs/helpers/error-messages';
 import { ToolbarSpacer } from '@ui5/webcomponents-react/ToolbarSpacer';
 import { BizAttachmentLinkCreate } from './biz-attachment-link-create';
+import { displayVersion } from '@/features/attachments/helpers/formatter';
 import { bizObjectLinkedAttachmentsQueryOptions } from '../options/query';
 import { AnalyticalTable } from '@ui5/webcomponents-react/AnalyticalTable';
 import { unlinkAttachmentFromBoMutationOptions } from '../options/mutation';
@@ -50,6 +51,7 @@ const ALL_COLUMNS = [
     Header: 'Version',
     accessor: '_Attach.CurrentVersion',
     id: 'CurrentVersion',
+    Cell: (props: AnalyticalTableCellInstance) => displayVersion(props.value),
   },
   {
     Header: 'Edit Lock',

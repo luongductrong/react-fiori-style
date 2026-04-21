@@ -20,6 +20,7 @@ import { MessageBox } from '@ui5/webcomponents-react/MessageBox';
 import { AttachmentBizList } from '@/features/attachments/components';
 import { ToolbarButton } from '@ui5/webcomponents-react/ToolbarButton';
 import { NotFoundIllustrated } from '@/components/not-found-illustrated';
+import { displayVersion } from '@/features/attachments/helpers/formatter';
 import { ObjectPageTitle } from '@ui5/webcomponents-react/ObjectPageTitle';
 import { downloadFile } from '@/features/attachments/helpers/download-file';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
@@ -276,7 +277,7 @@ export function AttachmentDetailView() {
                   </div>
                   <div className="flex flex-col">
                     <Label showColon>Current Version</Label>
-                    <Text>{attachment?.CurrentVersion || '-'}</Text>
+                    <Text>{displayVersion(attachment?.CurrentVersion, '-')}</Text>
                   </div>
                   <div className="flex flex-col">
                     <Label showColon>Is Active</Label>

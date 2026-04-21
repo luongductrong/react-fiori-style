@@ -6,6 +6,7 @@ import { useViewStore } from '@/stores/view-store';
 import { Card } from '@ui5/webcomponents-react/Card';
 import { Icon } from '@ui5/webcomponents-react/Icon';
 import { List } from '@ui5/webcomponents-react/List';
+import { displayVersion } from '../helpers/formatter';
 import { CardHeader } from '@ui5/webcomponents-react/CardHeader';
 import { ListItemStandard } from '@ui5/webcomponents-react/ListItemStandard';
 
@@ -24,7 +25,7 @@ export function AttachmentCard({ data, loading }: AttachmentCardProps) {
   const titleText = selectedFieldIdSet.has('Title') ? data.Title || 'Attachment' : data.FileId || 'Attachment';
 
   const subtitleText = hasCurrentVersion
-    ? `Version ${data.CurrentVersion ?? '-'}`
+    ? `Version ${displayVersion(data.CurrentVersion, '-')}`
     : hasTitle && hasFileId
       ? data.FileId || '-'
       : undefined;

@@ -21,4 +21,18 @@ function displayAuditAction(action?: string) {
   }
 }
 
-export { displayAuditAction };
+function displayVersion(version?: string | number | null, fallback = '') {
+  if (version === null || version === undefined) {
+    return fallback;
+  }
+
+  const normalizedVersion = String(version).trim();
+
+  if (!normalizedVersion) {
+    return fallback;
+  }
+  // add leading zeros to version if it is a number
+  return /^\d+$/.test(normalizedVersion) ? normalizedVersion.padStart(3, '0') : normalizedVersion;
+}
+
+export { displayAuditAction, displayVersion };
