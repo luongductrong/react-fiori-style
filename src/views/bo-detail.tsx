@@ -21,9 +21,9 @@ import { ObjectPageTitle } from '@ui5/webcomponents-react/ObjectPageTitle';
 import { getError, pushApiErrorMessages } from '@/libs/helpers/error-messages';
 import { useQuery, useQueryClient, useMutation } from '@tanstack/react-query';
 import { ObjectPageSection } from '@ui5/webcomponents-react/ObjectPageSection';
+import { type BoType, type BoStatus } from '@/features/business-objects/constants';
 import { BizObjectLinkedAttachments } from '@/features/business-objects/components';
 import { BizForm, type BizFormValues } from '@/features/business-objects/components';
-import { API, type BoType, type BoStatus } from '@/features/business-objects/constants';
 import { bizObjectDetailQueryOptions } from '@/features/business-objects/options/query';
 import { updateBizObjectMutationOptions } from '@/features/business-objects/options/mutation';
 import { deleteBizObjectMutationOptions } from '@/features/business-objects/options/mutation';
@@ -46,11 +46,7 @@ export function BoDetailView() {
     error: bizObjectError,
     refetch,
     isFetching: isBizObjectFetching,
-  } = useQuery(
-    bizObjectDetailQueryOptions(id!, {
-      $select: API.select,
-    }),
-  );
+  } = useQuery(bizObjectDetailQueryOptions(id!, {}));
 
   const refetchBizObject = function () {
     queryClient.invalidateQueries({

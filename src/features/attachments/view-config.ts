@@ -25,7 +25,7 @@ export const ATTACHMENT_LIST_FIELDS = [
 
 export type AttachmentListFieldId = (typeof ATTACHMENT_LIST_FIELDS)[number]['id'];
 
-export const DEFAULT_LIST_SELECTED_FIELD_IDS: AttachmentListFieldId[] = [
+export const ATT_LIST_SELECTED_FIELD_IDS: AttachmentListFieldId[] = [
   'FileId',
   'Title',
   'CurrentVersion',

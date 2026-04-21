@@ -1,8 +1,6 @@
 export const API = {
   endpoint: '/BusinessObjects',
   linkAttachmentEndpoint: (boId: string) => `/BusinessObjects(BoId=${boId})/_Links`,
-  select:
-    'BoId,BoType,BoTitle,Status,Erdat,Erzet,Ernam,Aedat,Aezet,Aenam,__EntityControl/Deletable,__EntityControl/Updatable',
 };
 
 export const MUTATION_API = {

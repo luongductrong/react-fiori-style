@@ -1,74 +1,117 @@
 import * as React from 'react';
 import { cn } from '@/libs/utils';
-import { Link } from 'react-router';
 import '@ui5/webcomponents-icons/list.js';
 import '@ui5/webcomponents-icons/refresh.js';
 import '@ui5/webcomponents-icons/table-view.js';
 import { useAppStore } from '@/stores/app-store';
+import { Link, useNavigate } from 'react-router';
 import { Bar } from '@ui5/webcomponents-react/Bar';
+import { useViewStore } from '@/stores/view-store';
 import { Grid } from '@ui5/webcomponents-react/Grid';
 import { Title } from '@ui5/webcomponents-react/Title';
 import { useInfiniteQuery } from '@tanstack/react-query';
 import { Button } from '@ui5/webcomponents-react/Button';
 import { FlexBox } from '@ui5/webcomponents-react/FlexBox';
 import { Toolbar } from '@ui5/webcomponents-react/Toolbar';
-import { API } from '@/features/business-objects/constants';
+import '@ui5/webcomponents-icons/navigation-right-arrow.js';
 import '@ui5/webcomponents-fiori/dist/illustrations/NoData.js';
 import { Link as UI5Link } from '@ui5/webcomponents-react/Link';
 import { DynamicPage } from '@ui5/webcomponents-react/DynamicPage';
 import { pushApiErrorMessages } from '@/libs/helpers/error-messages';
 import { ToolbarSpacer } from '@ui5/webcomponents-react/ToolbarSpacer';
 import { ToolbarButton } from '@ui5/webcomponents-react/ToolbarButton';
+import { type BoListFieldId } from '@/features/business-objects/view-config';
 import { DynamicPageHeader } from '@ui5/webcomponents-react/DynamicPageHeader';
 import { IllustratedMessage } from '@ui5/webcomponents-react/IllustratedMessage';
 import { bizObjectsQueryOptions } from '@/features/business-objects/options/query';
 import { displayBoType, displayBoStatus } from '@/features/business-objects/helpers/formatter';
-import { BizObjectCard, BizObjectsFilterBar, BizCreate } from '@/features/business-objects/components';
 import { AnalyticalTable, type AnalyticalTableCellInstance } from '@ui5/webcomponents-react/AnalyticalTable';
+import { BizObjectCard, BizObjectsFilterBar, BizCreate, BoViewSettings } from '@/features/business-objects/components';
 
-const columns = [
+type BoListColumn = {
+  id: BoListFieldId;
+} & Record<string, unknown>;
+
+const ALL_COLUMNS = [
   {
     Header: 'ID',
     accessor: 'BoId',
+    id: 'BoId',
     Cell: (props: AnalyticalTableCellInstance) => (
       <Link to={`/business-objects/${props.value}`}>
         <UI5Link>{props.value}</UI5Link>
       </Link>
     ),
   },
-  { Header: 'Title', accessor: 'BoTitle' },
-  { Header: 'Type', accessor: 'BoType', Cell: (props: AnalyticalTableCellInstance) => displayBoType(props.value) },
-  { Header: 'Status', accessor: 'Status', Cell: (props: AnalyticalTableCellInstance) => displayBoStatus(props.value) },
+  { Header: 'Title', accessor: 'BoTitle', id: 'BoTitle' },
   {
-    Header: 'Created At',
-    id: 'created-at',
-    Cell: (props: AnalyticalTableCellInstance) => `${props.row.original.Erdat ?? ''} ${props.row.original.Erzet ?? ''}`,
+    Header: 'Type',
+    accessor: 'BoType',
+    id: 'BoType',
+    Cell: (props: AnalyticalTableCellInstance) => displayBoType(props.value),
   },
-  { Header: 'Created By', accessor: 'Ernam' },
-];
+  {
+    Header: 'Status',
+    accessor: 'Status',
+    id: 'Status',
+    Cell: (props: AnalyticalTableCellInstance) => displayBoStatus(props.value),
+  },
+  { Header: 'Created On', accessor: 'Erdat', id: 'Erdat' },
+  { Header: 'Created At', accessor: 'Erzet', id: 'Erzet' },
+  { Header: 'Created By', accessor: 'Ernam', id: 'Ernam' },
+  { Header: 'Changed On', accessor: 'Aedat', id: 'Aedat' },
+  { Header: 'Changed At', accessor: 'Aezet', id: 'Aezet' },
+  { Header: 'Changed By', accessor: 'Aenam', id: 'Aenam' },
+] as const satisfies readonly BoListColumn[];
 
 const ROWS_PER_PAGE = 10; // TODO: Move to constants
 
 export function BoListView() {
+  const navigate = useNavigate();
   const viewMode = useAppStore((state) => state.viewMode);
   const setViewMode = useAppStore((state) => state.setViewMode);
+  const boListVisibleFieldIds = useViewStore((state) => state.boListVisibleFieldIds);
+  const visibleColumns = React.useMemo(
+    () => ALL_COLUMNS.filter((col) => boListVisibleFieldIds.includes(col.id)),
+    [boListVisibleFieldIds],
+  );
+  const boListSelect = React.useMemo(() => boListVisibleFieldIds.join(','), [boListVisibleFieldIds]);
   const [search, setSearch] = React.useState('');
   const [filter, setFilter] = React.useState('');
 
-  const { data, isFetching, isFetchingNextPage, error, refetch, hasNextPage, fetchNextPage } = useInfiniteQuery(
-    bizObjectsQueryOptions({
+  const { data, isFetching, isFetchingNextPage, error, refetch, hasNextPage, fetchNextPage } = useInfiniteQuery({
+    ...bizObjectsQueryOptions({
       $skip: 0,
       $top: ROWS_PER_PAGE,
       $count: true,
-      $select: API.select,
+      $select: boListSelect,
       $orderby: 'Erdat desc,Erzet desc',
       $filter: filter || undefined,
       $search: search || undefined,
     }),
-  );
+    enabled: boListVisibleFieldIds.length > 0,
+  });
 
   const totalCount = data?.pages[data.pages.length - 1]['@odata.count'] ?? 0;
   const bizObjects = React.useMemo(() => data?.pages.flatMap((page) => page.value) ?? [], [data?.pages]);
+  const columns = React.useMemo(
+    () => [
+      ...visibleColumns,
+      {
+        Header: '',
+        id: 'navigation',
+        width: 60,
+        Cell: (props: AnalyticalTableCellInstance) => (
+          <Button
+            design="Transparent"
+            icon="navigation-right-arrow"
+            onClick={() => navigate(`/business-objects/${props.row.original.BoId}`)}
+          />
+        ),
+      },
+    ],
+    [navigate, visibleColumns],
+  );
 
   React.useEffect(() => {
     if (!error) {
@@ -108,6 +151,7 @@ export function BoListView() {
                 disabled={isFetching || bizObjects.length === 0}
                 onClick={() => setViewMode('grid')}
               />
+              <BoViewSettings />
             </Toolbar>
           }
           data={bizObjects}
@@ -140,6 +184,7 @@ export function BoListView() {
               onClick={() => setViewMode('table')}
               disabled={isFetching || bizObjects.length === 0}
             />
+            <BoViewSettings />
           </Toolbar>
           {bizObjects.length === 0 && <IllustratedMessage name="NoData" />}
           <Grid defaultSpan="XL3 L4 M6 S12" hSpacing="1.5rem" vSpacing="1.5rem" className="px-3 md:px-0">

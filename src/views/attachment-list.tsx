@@ -7,7 +7,6 @@ import { Link, useNavigate } from 'react-router';
 import { useAppStore } from '@/stores/app-store';
 import { useViewStore } from '@/stores/view-store';
 import { Bar } from '@ui5/webcomponents-react/Bar';
-import { Icon } from '@ui5/webcomponents-react/Icon';
 import { Grid } from '@ui5/webcomponents-react/Grid';
 import { Title } from '@ui5/webcomponents-react/Title';
 import { Button } from '@ui5/webcomponents-react/Button';
@@ -25,9 +24,41 @@ import { ToolbarSpacer } from '@ui5/webcomponents-react/ToolbarSpacer';
 import { AttachmentViewSettings } from '@/features/attachments/components';
 import { attachmentsQueryOptions } from '@/features/attachments/options/query';
 import { DynamicPageHeader } from '@ui5/webcomponents-react/DynamicPageHeader';
+import { type AttachmentListFieldId } from '@/features/attachments/view-config';
 import { IllustratedMessage } from '@ui5/webcomponents-react/IllustratedMessage';
 import { AttachmentsFilterBar, AttachmentCard, AttachmentCreate } from '@/features/attachments/components';
 import { AnalyticalTable, type AnalyticalTableCellInstance } from '@ui5/webcomponents-react/AnalyticalTable';
+
+type AttachmentListColumn = {
+  id: AttachmentListFieldId;
+} & Record<string, unknown>;
+
+const ALL_COLUMNS = [
+  {
+    Header: 'File ID',
+    accessor: 'FileId',
+    id: 'FileId',
+    Cell: (props: AnalyticalTableCellInstance) => (
+      <Link to={`/attachments/${props.value}`}>
+        <UI5Link>{props.value}</UI5Link>
+      </Link>
+    ),
+  },
+  { Header: 'Title', accessor: 'Title', id: 'Title' },
+  { Header: 'Version', accessor: 'CurrentVersion', id: 'CurrentVersion' },
+  { Header: 'Created On', accessor: 'Erdat', id: 'Erdat' },
+  { Header: 'Created At', accessor: 'Erzet', id: 'Erzet' },
+  { Header: 'Created By', accessor: 'Ernam', id: 'Ernam' },
+  { Header: 'Changed On', accessor: 'Aedat', id: 'Aedat' },
+  { Header: 'Changed At', accessor: 'Aezet', id: 'Aezet' },
+  { Header: 'Changed By', accessor: 'Aenam', id: 'Aenam' },
+  {
+    Header: 'Edit Lock',
+    accessor: 'EditLock',
+    id: 'EditLock',
+    Cell: (props: AnalyticalTableCellInstance) => (props.value ? 'Enabled' : 'Disabled'),
+  },
+] as const satisfies readonly AttachmentListColumn[];
 
 export function AttachmentListView() {
   const navigate = useNavigate();
@@ -36,8 +67,11 @@ export function AttachmentListView() {
   const selectedFieldIds = useViewStore((state) => state.attachmentListVisibleFieldIds);
   const [search, setSearch] = React.useState<string>('');
   const [filter, setFilter] = React.useState<string>('');
-  const selectedFieldIdSet = React.useMemo(() => new Set(selectedFieldIds), [selectedFieldIds]);
   const attachmentListSelect = React.useMemo(() => selectedFieldIds.join(','), [selectedFieldIds]);
+  const visibleColumns = React.useMemo(
+    () => ALL_COLUMNS.filter((col) => selectedFieldIds.includes(col.id)),
+    [selectedFieldIds],
+  );
   const attachmentListParams = React.useMemo(
     () => ({
       $skip: 0,
@@ -61,102 +95,21 @@ export function AttachmentListView() {
 
   const columns = React.useMemo(
     () => [
-      ...(selectedFieldIdSet.has('FileId')
-        ? [
-            {
-              Header: 'File ID',
-              accessor: 'FileId',
-              Cell: (props: AnalyticalTableCellInstance) => (
-                <Link to={`/attachments/${props.value}`}>
-                  <UI5Link>{props.value}</UI5Link>
-                </Link>
-              ),
-            },
-          ]
-        : []),
-      ...(selectedFieldIdSet.has('Title')
-        ? [
-            {
-              Header: 'Title',
-              accessor: 'Title',
-            },
-          ]
-        : []),
-      ...(selectedFieldIdSet.has('CurrentVersion')
-        ? [
-            {
-              Header: 'Version',
-              accessor: 'CurrentVersion',
-            },
-          ]
-        : []),
-      ...(selectedFieldIdSet.has('Erdat')
-        ? [
-            {
-              Header: 'Created On',
-              accessor: 'Erdat',
-            },
-          ]
-        : []),
-      ...(selectedFieldIdSet.has('Erzet')
-        ? [
-            {
-              Header: 'Created At',
-              accessor: 'Erzet',
-            },
-          ]
-        : []),
-      ...(selectedFieldIdSet.has('Ernam')
-        ? [
-            {
-              Header: 'Created By',
-              accessor: 'Ernam',
-            },
-          ]
-        : []),
-      ...(selectedFieldIdSet.has('Aedat')
-        ? [
-            {
-              Header: 'Changed On',
-              accessor: 'Aedat',
-            },
-          ]
-        : []),
-      ...(selectedFieldIdSet.has('Aezet')
-        ? [
-            {
-              Header: 'Changed At',
-              accessor: 'Aezet',
-            },
-          ]
-        : []),
-      ...(selectedFieldIdSet.has('Aenam')
-        ? [
-            {
-              Header: 'Changed By',
-              accessor: 'Aenam',
-            },
-          ]
-        : []),
-      ...(selectedFieldIdSet.has('EditLock')
-        ? [
-            {
-              Header: 'Edit Lock',
-              accessor: 'EditLock',
-              Cell: (props: AnalyticalTableCellInstance) => (props.value ? 'Enabled' : 'Disabled'),
-            },
-          ]
-        : []),
+      ...visibleColumns,
       {
         Header: '',
         id: 'navigation',
         width: 60,
         Cell: (props: AnalyticalTableCellInstance) => (
-          <Icon name="navigation-right-arrow" onClick={() => navigate(`/attachments/${props.row.original.FileId}`)} />
+          <Button
+            design="Transparent"
+            icon="navigation-right-arrow"
+            onClick={() => navigate(`/attachments/${props.row.original.FileId}`)}
+          />
         ),
       },
     ],
-    [selectedFieldIdSet, navigate],
+    [navigate, visibleColumns],
   );
 
   React.useEffect(() => {
@@ -233,6 +186,7 @@ export function AttachmentListView() {
               onClick={() => setViewMode('table')}
               disabled={isFetching || attachments.length === 0}
             />
+            <AttachmentViewSettings />
           </Toolbar>
           {attachments.length === 0 && <IllustratedMessage name="NoData" />}
           <Grid defaultSpan="XL3 L4 M6 S12" hSpacing="1.5rem" vSpacing="1.5rem" className="px-3 md:px-0">
