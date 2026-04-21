@@ -2,234 +2,342 @@
 
 ## 1. Project Snapshot
 
-This repository is a `React + TypeScript + Vite` frontend for SAP attachment management.
+This repository is a `React + TypeScript + Vite` frontend for SAP-based file attachment operations.
 
-It is no longer just a single demo screen. The current application already contains routed flows for:
+It is no longer attachment-only. The current app is a multi-domain portal with:
 
-- browsing attachments
-- switching between table and grid list views
-- creating a new attachment
-- viewing attachment details
-- uploading a new version
-- viewing a specific version
-- reviewing audit and version history
+- business flows (attachments and business objects)
+- admin flows (dashboard, auth users, configuration files, deleted attachments)
+- role-based navigation from a launchpad (`/launchpad`)
 
-There is also a styled landing/login-like screen at `/`, but it is currently only a UI shell and is not wired to backend authentication yet.
-
-Agents should treat this repo as an active application with an attachment domain module already in place, not as an empty scaffold.
+The app already runs real OData-backed workflows with feature modules and route composition in place.
 
 ## 2. Tech Stack
 
 - UI runtime: `React 18`, `ReactDOM 18`
-- Language: `TypeScript` with `strict` mode
+- Language: `TypeScript` (`strict`)
 - Build tool: `Vite`
 - Styling: `Tailwind CSS v4`
 - SAP UI layer: `@ui5/webcomponents`, `@ui5/webcomponents-fiori`, `@ui5/webcomponents-react`
-- Routing: `react-router` with `HashRouter`
+- Routing: `react-router` + `HashRouter` (no `react-router-dom`)
 - Server state: `@tanstack/react-query`
-- Local UI state: `zustand`
-- Forms: `react-hook-form`
+- Local state: `zustand`
 - HTTP client: `axios` + `qs`
+- External upload integration: `@googleworkspace/drive-picker-react`
 - Deployment: `@ui5/cli`, `@sap/ux-ui5-tooling`, `fiori deploy`
 
 ## 3. Current App Architecture
 
-The current app is organized around route-level views and an attachment feature module.
+The runtime is route-driven and feature-oriented.
 
-Important files and folders:
+Important files:
 
 - `src/main.tsx`
-  React entry point. Imports UI5 assets, wraps the app with `ThemeProvider` and `QueryProvider`, and defines the router directly.
-  There is no central `src/App.tsx` in the current app flow.
+  Entry point and full router definition.
+  Wraps app with `ThemeProvider`, `QueryProvider`, global `Toaster`, global `ErrorsMessageBox`, and `HashRouter`.
+
+- `src/components/layouts/app-layout.tsx`
+  Main shell layout with `AppHeader` and route outlet.
+
+- `src/components/layouts/app-header.tsx`
+  Top shell bar with back navigation, SAP logo, current user profile menu, and logout.
+
+- `src/components/layouts/admin-layout.tsx`
+  Left-side admin navigation for dashboard sub-routes.
+
+- `src/components/layouts/private-route.tsx`
+  Protects admin routes by checking `isAdmin` from auth query.
 
 - `src/views/`
   Route-level pages:
-  - `home-view.tsx`
-  - `attachments-view.tsx`
-  - `attachment-new-view.tsx`
-  - `attachments-detail-view.tsx`
-  - `upload-version-view.tsx`
-  - `version-detail-view.tsx`
+  - `launchpad.tsx`
+  - `dashboard.tsx`
+  - `attachment-list.tsx`
+  - `attachment-detail.tsx`
+  - `version-detail.tsx`
+  - `bo-list.tsx`
+  - `bo-detail.tsx`
+  - `user-list.tsx`
+  - `config-file-list.tsx`
+  - `deleted-attachment-list.tsx`
+  - `not-found.tsx`
 
-- `src/features/attachments/`
-  Main domain module for attachment logic. Contains:
-  - `types.ts` for OData response/payload types
-  - `constants.ts` for attachment endpoints
-  - `options/query.ts` for React Query query factories
-  - `options/mutation.ts` for React Query mutation factories
-  - `components/` for attachment UI pieces
-  - `helpers.ts` and `hooks/use-file-preview.ts` for file preview/download behavior
+- `src/features/`
+  Domain modules:
+  - `attachments/`
+  - `business-objects/`
+  - `auth-users/`
+  - `config-files/`
+  - `dashboard/`
 
 - `src/context-providers/query-provider.tsx`
-  Creates the `QueryClient` and loads React Query Devtools only in development.
+  React Query client setup and devtools lazy-load in development.
 
 - `src/libs/axios-instance.ts`
-  Shared Axios client. Handles base URL, query param serialization, response normalization, and CSRF token capture from response headers.
+  Shared HTTP client:
+  - base URL selection
+  - automatic `sap-client` query param injection
+  - CSRF token capture from response headers
+  - returns `response.data` (not full Axios response)
 
-- `src/libs/helpers.ts`
-  CSRF token helpers used by mutations.
-
-- `src/stores/app-stores.ts`
-  Zustand store for app-level UI state. Right now it stores the attachment list `viewMode` (`table` or `grid`).
-
-- `src/app-env.ts`
-  Environment resolution for dev/prod and OData origin selection.
-
-- `src/app-constant.ts`
-  Central service root constants for `ATTACHMENT`, `AUTH`, and `BIZ`.
-
-- `metadata.xml`
-  Backend metadata reference. Use this before adding fields, navigation paths, or actions.
-
-- `ui5-deploy.yaml`
-  ABAP deployment configuration.
+- `src/stores/`
+  Zustand stores:
+  - `app-store.ts` (view mode, toast, global error list)
+  - `auth-store.ts` (CSRF token, Google access token)
+  - `view-store.ts` (visible columns for attachment/BO lists)
 
 ## 4. Current Routes
 
-Routes are defined in `src/main.tsx`.
+Routes are defined in `src/main.tsx` and use hash-based URLs.
+
+- `/launchpad`
+  `LaunchpadView`
+  Entry screen with business tiles and conditional admin section.
+
+- `/dashboard`
+  `PrivateRoute -> AdminLayout`
+  Admin-only parent route.
+
+- `/dashboard` (index)
+  `DashboardView`
+
+- `/dashboard/users`
+  `UserListView`
+
+- `/dashboard/configurations`
+  `ConfigFileListView`
+
+- `/dashboard/deleted-attachments`
+  `DeletedAttachmentListView`
+
+- `/business-objects`
+  `BoListView`
+
+- `/business-objects/:id`
+  `BoDetailView`
+
+- `/attachments`
+  `AttachmentListView`
+
+- `/attachments/:id`
+  `AttachmentDetailView`
+
+- `/attachments/:id/versions/:versionNo`
+  `VersionDetailView`
 
 - `/`
-  `HomeView`
-  A styled login-like screen built with Tailwind and `react-hook-form`. It currently validates inputs and shows a toast only.
-
-- `/Attachments`
-  `AttachmentsView`
-  Main attachment list page. Uses React Query to load attachments and supports table/grid presentation.
-
-- `/Attachments/New`
-  `AttachmentNewView`
-  Creates a new attachment.
-
-- `/Attachments/:id`
-  `AttachmentsDetailView`
-  Shows attachment metadata, preview, version list, audit list, title editing, deletion, and current-version download.
-
-- `/Attachments/:id/Upload`
-  `UploadVersionView`
-  Uploads a new attachment version.
-
-- `/Attachments/:id/Versions/:versionNo`
-  `VersionDetailView`
-  Displays version details, preview, download, and rollback/set-current-version behavior.
+  Redirects to `/launchpad`
 
 - `*`
-  Redirects to `/Attachments`
+  `NotFoundView`
 
-## 5. Environment and API Rules
+## 5. Environment and Runtime Config Rules
 
-Environment behavior is split between `src/app-env.ts`, `src/app-constant.ts`, and `vite.config.ts`.
+Environment is handled in `src/app-env.ts` and `src/app-constant.ts`.
 
-- `VITE_ODATA_ORIGIN` is required.
-- In development, the frontend calls `/api` and Vite proxies that path to `VITE_ODATA_ORIGIN`.
-- In production, the frontend calls `VITE_ODATA_ORIGIN` directly.
-- `base: "./"` in `vite.config.ts` is important for SAP deployment and should not be changed casually.
-- `HashRouter` is intentional and helps avoid server-side route rewrite issues in the SAP hosting environment.
+Required environment variables:
 
-Current OData service roots are:
+- `VITE_ODATA_ORIGIN`
+- `VITE_ODATA_SAP_CLIENT`
+- `VITE_GOOGLE_APP_ID`
+- `VITE_GOOGLE_CLIENT_ID`
 
-- `ATTACHMENT`
-- `AUTH`
-- `BIZ`
+Behavior:
 
-At the moment, only the attachment service is actively used in the frontend code.
+- In development, frontend calls `/api` and Vite proxies to `VITE_ODATA_ORIGIN`.
+- In production, frontend calls `VITE_ODATA_ORIGIN` directly.
+- `base: './'` in `vite.config.ts` is deployment-critical for SAP hosting.
+- `HashRouter` is intentional and should not be replaced casually.
 
-Attachment entity/action references verified from `metadata.xml`:
+## 6. Service Roots and Metadata Sources
 
-- Entity sets:
-  - `Attachments`
-  - `AttachmentVersions`
-  - `Audit`
-- Bound actions:
-  - `reactivate`
-  - `deactivate`
-  - `link_to_bo`
-  - `download_version`
+Service roots are centralized in `src/app-constant.ts`:
 
-When changing OData calls:
+- `ODATA_SERVICE.ATTACHMENT`
+- `ODATA_SERVICE.AUTH`
+- `ODATA_SERVICE.BIZ`
+- `ODATA_SERVICE.CONFIG_FILE`
+- `ODATA_SERVICE.DASHBOARD`
 
-- check `metadata.xml` first
-- keep service roots centralized in `src/app-constant.ts`
-- keep attachment-specific endpoints centralized in `src/features/attachments/constants.ts`
-- do not hardcode new SAP hosts in views or feature files
+Public service paths in use:
 
-## 6. Data Layer Conventions
+- `ODATA_PUBLIC_SERVICE.LOG_OUT_ACTION`
+- `ODATA_PUBLIC_SERVICE.USER`
 
-The repo already has a clear pattern for data access. Follow it instead of calling Axios directly from view components.
+Metadata is split by domain (no single `metadata.xml` now):
 
-- Read operations belong in `src/features/attachments/options/query.ts`
-- Write operations belong in `src/features/attachments/options/mutation.ts`
-- Shared transport concerns belong in `src/libs/axios-instance.ts` and `src/libs/helpers.ts`
-- Strong TypeScript payload/response types belong in `src/features/attachments/types.ts`
+- `metadata.attachments.xml`
+- `metadata.auth-users.xml`
+- `metadata.business-objects.xml`
+- `metadata.config-files.xml`
+- `metadata.dashboard.xml`
 
-Important behavior to remember:
+When adding or changing OData calls, verify the corresponding metadata file first.
 
-- `axiosInstance` returns `response.data`, not the full Axios response
-- query keys are already structured around attachment resources; preserve that pattern when invalidating or extending cache logic
-- CSRF token handling is session-based and already wired into the shared helpers/mutations
-- `sap-client` is currently passed explicitly as `324` in attachment queries and mutations; if this ever becomes configurable, centralize it instead of duplicating more literals
+## 7. Domain Module Conventions
 
-## 7. UI Conventions
+Each feature follows this structure:
 
-- For business screens, prefer `@ui5/webcomponents-react`
-- Use Tailwind mainly for layout and lightweight styling adjustments
-- Keep route views focused on page composition; move reusable attachment UI into `src/features/attachments/components`
-- Reuse existing preview/download helpers instead of reimplementing base64, PDF, text, or image preview logic
-- Preserve the current Fiori-oriented structure unless the task explicitly asks for a redesign
+- `constants.ts` for endpoints/actions
+- `types.ts` for payload and response contracts
+- `options/query.ts` for React Query reads
+- `options/mutation.ts` for React Query writes
+- `components/` for reusable feature UI
+- `helpers/` and `hooks/` for feature utilities
 
-Note:
+Do not call Axios directly inside route views unless there is a strong reason.
 
-- `HomeView` is the main exception to the UI5-heavy pattern. It is currently a custom Tailwind-based shell rather than a fully integrated SAP login flow.
+### 7.1 Attachments
 
-## 8. Current State and Known Gaps
+Location: `src/features/attachments/`
 
-Before modifying the app, assume these points are true:
+Current coverage:
 
-- The attachment domain is already modularized; avoid moving logic back into a monolithic page component
-- The filter bar in `AttachmentsView` is still mostly a placeholder UI and is not yet wired into a full filtering workflow
-- `AUTH` and `BIZ` service constants exist but are not yet integrated into actual screens
-- No dedicated test framework is configured
-- `.gitignore` still contains `*test*`, so test files may be hidden or ignored if you add them without adjusting naming or ignore rules
-- Deployment is already configured for an ABAP target; avoid changing deployment config unless explicitly requested
+- list (table/grid)
+- filter/search
+- create attachment
+- upload version
+- detail + preview
+- version detail + set current version
+- link/unlink business object
+- delete/restore
+- audit history
+- local file + Google Drive picker upload paths
 
-## 9. Working Rules for Agents
+### 7.2 Business Objects
 
-- Start by checking `src/main.tsx`, `src/app-env.ts`, `src/app-constant.ts`, and the relevant feature module before changing behavior
-- If you add new attachment functionality, keep it under `src/features/attachments/` unless there is a strong reason to create a new feature module
-- If you add a new OData call, verify the entity shape and action contract in `metadata.xml` first
-- If you change routes, preserve the current hash-based routing strategy unless the deployment model is also being changed
-- If you introduce more shared app state, extend the Zustand store deliberately rather than adding duplicated local state across views
-- If you touch mutation flows, review cache invalidation and CSRF handling together
-- Do not modify `ui5-deploy.yaml` or environment host behavior unless the task explicitly requires it
+Location: `src/features/business-objects/`
 
-## 10. Run, Build, and Deploy
+Current coverage:
+
+- BO list (table/grid)
+- create, edit, delete BO
+- BO detail
+- linked attachments list
+- link/unlink attachment from BO side
+
+### 7.3 Auth Users
+
+Location: `src/features/auth-users/`
+
+Current coverage:
+
+- admin user list
+- create/delete auth users
+- current user role check (`CurrentUserRole`)
+- current SAP public profile fetch for header display
+
+### 7.4 Config Files
+
+Location: `src/features/config-files/`
+
+Current coverage:
+
+- list configuration entries
+- create/view/edit
+- enable/disable via bound actions
+- upload rule source for file extension/mime/max-size checks
+
+### 7.5 Dashboard
+
+Location: `src/features/dashboard/`
+
+Current coverage:
+
+- overview cards
+- operational/system composition sections
+- configuration coverage
+- recent audit panel
+- refresh via query invalidation
+
+## 8. Auth, Role, and Access Rules
+
+- Admin gating is implemented in `PrivateRoute`.
+- `useCurrentAuthUser` normalizes role and checks `ADMIN`.
+- Non-admin access to `/dashboard/*` is redirected to `/launchpad`.
+- Launchpad shows admin tiles only for admin users.
+- User self-delete is blocked in user management UI.
+
+## 9. Data Layer Rules
+
+Follow existing transport pattern:
+
+- Use `axiosInstance` from `src/libs/axios-instance.ts`.
+- CSRF token helpers are in `src/libs/helpers/csrf-token.ts`.
+- Mutation flows should fetch CSRF token when missing.
+- Use `pushApiErrorMessages` for consistent global error handling.
+
+React Query patterns currently used:
+
+- list screens use query key groups per domain (`['attachments', ...]`, `['biz-objects', ...]`, etc.)
+- many list queries use infinite pagination with manual `More`
+- stale/gc policies are already tuned per query file
+
+## 10. UI and Interaction Conventions
+
+- Prefer `@ui5/webcomponents-react` for business screens.
+- Use Tailwind mainly for layout and spacing.
+- Keep view files focused on composition and orchestration.
+- Move reusable domain UI to feature `components/` folders.
+- Reuse existing preview/download/upload helpers for file behavior.
+- Keep table/grid toggle behavior aligned with `app-store` and view settings in `view-store`.
+
+## 11. Known Gaps and Active TODO Areas
+
+Based on current code comments, notable gaps include:
+
+- timezone display normalization in BO and related screens
+- edit-lock author checks in version detail flow
+- some refresh/loading UX refinements
+- BO unlink constraints when linked data rules should block action
+- i18n hardcoded language headers in mutations
+- config-file access assumptions for non-admin users still need verification
+- whitelist/mime sync with backend still marked for re-check
+
+Do not remove TODO markers blindly; validate backend and UX requirements first.
+
+## 12. Build, Lint, Deploy
 
 - Dev server: `npm run dev`
-- Production build: `npm run build`
+- Build: `npm run build`
 - Lint: `npm run lint`
-- Preview build: `npm run preview`
-- SAP deployment: `npm run deploy`
+- Preview: `npm run preview`
+- Deploy: `npm run deploy`
+- CI deploy command exists: `npm run deploy:ci`
 
-## 11. Pre-commit Checklist for Major Changes
+Lint note:
 
-- Ran `npm run lint`
-- Ran `npm run build`
-- Checked whether `metadata.xml` needs to be updated or re-read for any new OData usage
-- Kept SAP service roots centralized in `src/app-constant.ts`
-- Kept attachment endpoints/query/mutation logic inside the attachment feature module
-- Reviewed whether route, proxy, or `base: "./"` changes would affect SAP deployment
+- `scripts/check-eslint-disable.js` runs before ESLint and fails if `eslint-disable` appears under `src/`.
 
-## 12. Quick Orientation
+## 13. Working Rules for Agents
 
-If you need to understand this repo fast, start with these files in order:
+- Start from `src/main.tsx`, `src/app-env.ts`, `src/app-constant.ts`, then target feature module.
+- Keep service roots centralized in `src/app-constant.ts`.
+- Keep per-domain endpoints in each feature `constants.ts`.
+- Keep read/write logic in `options/query.ts` and `options/mutation.ts`.
+- Verify contract changes against the correct `metadata.*.xml` file.
+- Preserve `HashRouter`, Vite `base: './'`, and SAP deployment assumptions unless task explicitly requires otherwise.
+- Avoid editing `ui5-deploy.yaml` unless deployment behavior is part of the request.
+
+## 14. Quick Orientation Path
+
+For fast onboarding, read in this order:
 
 1. `src/main.tsx`
 2. `src/app-env.ts`
 3. `src/app-constant.ts`
-4. `src/features/attachments/types.ts`
-5. `src/features/attachments/options/query.ts`
-6. `src/features/attachments/options/mutation.ts`
-7. `metadata.xml`
-8. `vite.config.ts`
-9. `ui5-deploy.yaml`
-
-That path will give you the real runtime structure, environment rules, and attachment domain behavior faster than reading the whole repo at random.
+4. `src/libs/axios-instance.ts`
+5. `src/components/layouts/private-route.tsx`
+6. `src/features/auth-users/options/query.ts`
+7. `src/features/attachments/options/query.ts`
+8. `src/features/attachments/options/mutation.ts`
+9. `src/features/business-objects/options/query.ts`
+10. `src/features/config-files/options/query.ts`
+11. `src/features/dashboard/options/query.ts`
+12. `metadata.attachments.xml`
+13. `metadata.auth-users.xml`
+14. `metadata.business-objects.xml`
+15. `metadata.config-files.xml`
+16. `metadata.dashboard.xml`
+17. `vite.config.ts`
+18. `ui5-deploy.yaml`
