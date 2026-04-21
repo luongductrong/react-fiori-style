@@ -2,6 +2,7 @@ import * as React from 'react';
 import '@ui5/webcomponents-icons/delete.js';
 import '@ui5/webcomponents-icons/refresh.js';
 import { toast } from '@/libs/helpers/toast';
+import { useViewStore } from '@/stores/view-store';
 import { Title } from '@ui5/webcomponents-react/Title';
 import { Button } from '@ui5/webcomponents-react/Button';
 import { Toolbar } from '@ui5/webcomponents-react/Toolbar';
@@ -13,37 +14,53 @@ import { ToolbarSpacer } from '@ui5/webcomponents-react/ToolbarSpacer';
 import { ToolbarButton } from '@ui5/webcomponents-react/ToolbarButton';
 import { AnalyticalTable } from '@ui5/webcomponents-react/AnalyticalTable';
 import { authUsersQueryOptions } from '@/features/auth-users/options/query';
+import type { AuthUserListFieldId } from '@/features/auth-users/view-config';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { DynamicPageHeader } from '@ui5/webcomponents-react/DynamicPageHeader';
-import { AuthUserCreate, AuthUsersFilterBar } from '@/features/auth-users/components';
 import { deleteAuthUserMutationOptions } from '@/features/auth-users/options/mutation';
 import { pushApiErrorMessages, pushErrorMessages } from '@/libs/helpers/error-messages';
 import type { AnalyticalTableCellInstance } from '@ui5/webcomponents-react/AnalyticalTable';
+import { AuthUserCreate, AuthUsersFilterBar, UserViewSettings } from '@/features/auth-users/components';
 
-const rawColumns = [
-  { Header: 'User Name', accessor: 'Uname' },
-  { Header: 'Role', accessor: 'Role' },
-  { Header: 'Created On', accessor: 'Erdat' },
-  { Header: 'Created By', accessor: 'Ernam' },
-];
+type AuthUserListColumn = {
+  id: AuthUserListFieldId;
+} & Record<string, unknown>;
+
+const ALL_COLUMNS = [
+  { Header: 'User Name', accessor: 'Uname', id: 'Uname' },
+  { Header: 'Role', accessor: 'Role', id: 'Role' },
+  { Header: 'Created On', accessor: 'Erdat', id: 'Erdat' },
+  { Header: 'Created By', accessor: 'Ernam', id: 'Ernam' },
+] as const satisfies readonly AuthUserListColumn[];
 
 export function UserListView() {
   const queryClient = useQueryClient();
   const { data: currentAuthUser } = useCurrentAuthUser();
+  const selectedFieldIds = useViewStore((state) => state.authUserListVisibleFieldIds);
   const [search, setSearch] = React.useState('');
   const [filter, setFilter] = React.useState('');
   const [deleteDialogOpen, setDeleteDialogOpen] = React.useState(false);
   const [selectedUser, setSelectedUser] = React.useState<AuthUserItem | null>(null);
   const username = currentAuthUser?.username ?? null;
+  const authUserListSelect = React.useMemo(
+    () => Array.from(new Set([...selectedFieldIds, 'Uname', '__EntityControl/Deletable'])).join(','),
+    [selectedFieldIds],
+  );
+  const visibleColumns = React.useMemo(
+    () => ALL_COLUMNS.filter((col) => selectedFieldIds.includes(col.id)),
+    [selectedFieldIds],
+  );
 
-  const { data, isFetching, error, refetch } = useQuery(
-    authUsersQueryOptions({
+  const { data, isFetching, error, refetch } = useQuery({
+    ...authUsersQueryOptions({
       $count: true,
+      $select: authUserListSelect,
       $filter: filter || undefined,
       $search: search || undefined,
       $orderby: 'Uname asc',
     }),
-  );
+    enabled: selectedFieldIds.length > 0,
+  });
 
   const users = React.useMemo(() => data?.value ?? [], [data]);
   const totalCount = Number(data?.['@odata.count'] ?? users.length);
@@ -67,7 +84,7 @@ export function UserListView() {
 
   const columns = React.useMemo(
     () => [
-      ...rawColumns,
+      ...visibleColumns,
       {
         Header: 'Actions',
         Cell: (props: AnalyticalTableCellInstance) => (
@@ -88,7 +105,7 @@ export function UserListView() {
         ),
       },
     ],
-    [isDeletingUser, username],
+    [isDeletingUser, username, visibleColumns],
   );
 
   React.useEffect(() => {
@@ -126,14 +143,21 @@ export function UserListView() {
                 refetch();
               }}
             />
+            <UserViewSettings />
           </Toolbar>
         }
-        data={users}
-        columns={columns}
+        data={selectedFieldIds.length > 0 ? users : []}
+        columns={selectedFieldIds.length > 0 ? columns : []}
         sortable
         groupable={false}
         loading={isFetching || isDeletingUser}
-        noDataText={filter ? 'No users match the current filters.' : 'No users found.'}
+        noDataText={
+          selectedFieldIds.length === 0
+            ? 'There are no visible columns in the table right now. Please select the columns you need in the table settings.'
+            : filter || search
+              ? 'No users match the current filters.'
+              : 'No users found.'
+        }
         rowHeight={36}
         scaleWidthMode="Smart"
         visibleRowCountMode="Auto"
