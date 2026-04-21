@@ -23,7 +23,7 @@ import { useInfiniteQuery, useMutation, useQueryClient } from '@tanstack/react-q
 import type { AnalyticalTableCellInstance } from '@ui5/webcomponents-react/AnalyticalTable';
 import { BIZ_OBJECT_LINKED_ATTACHMENT_FIELDS, type BizObjectLinkedAttachmentFieldId } from '../view-config';
 
-type BizObjectLinkedAttachmentsProps = {
+type BizObjectAttachmentListProps = {
   boId: string;
   disabled?: boolean;
 };
@@ -79,7 +79,7 @@ const ALL_COLUMNS = [
   },
 ] as const satisfies readonly BizObjectLinkedAttachmentColumn[];
 
-export function BizObjectLinkedAttachments({ boId, disabled }: BizObjectLinkedAttachmentsProps) {
+export function BizObjectAttachmentList({ boId, disabled }: BizObjectAttachmentListProps) {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const selectedFieldIds = useViewStore((state) => state.bizObjectLinkedAttachmentVisibleFieldIds);

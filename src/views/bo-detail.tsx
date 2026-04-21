@@ -22,8 +22,8 @@ import { useQuery, useQueryClient, useMutation } from '@tanstack/react-query';
 import { getError, pushApiErrorMessages } from '@/libs/helpers/error-messages';
 import { ObjectPageSection } from '@ui5/webcomponents-react/ObjectPageSection';
 import { displayDetailDate, displayDetailTime } from '@/libs/helpers/date-time';
+import { BizObjectAttachmentList } from '@/features/business-objects/components';
 import { type BoType, type BoStatus } from '@/features/business-objects/constants';
-import { BizObjectLinkedAttachments } from '@/features/business-objects/components';
 import { BizForm, type BizFormValues } from '@/features/business-objects/components';
 import { bizObjectDetailQueryOptions } from '@/features/business-objects/options/query';
 import { updateBizObjectMutationOptions } from '@/features/business-objects/options/mutation';
@@ -225,7 +225,7 @@ export function BoDetailView() {
           titleText="Attachments"
           style={{ display: isBizObjectFetching ? 'none' : 'block' }}
         >
-          <BizObjectLinkedAttachments boId={id!} disabled={!bizObject} />
+          <BizObjectAttachmentList boId={id!} disabled={!bizObject} />
         </ObjectPageSection>
         {editMode && (
           <MutationBar
