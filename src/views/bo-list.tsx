@@ -147,15 +147,20 @@ export function BoListView() {
               />
               <ToolbarButton
                 icon="table-view"
+                design="Transparent"
                 tooltip="Toggle grid view"
-                disabled={isFetching || bizObjects.length === 0}
                 onClick={() => setViewMode('grid')}
               />
               <BoViewSettings />
             </Toolbar>
           }
-          data={bizObjects}
-          columns={columns}
+          data={boListVisibleFieldIds.length > 0 ? bizObjects : []}
+          columns={boListVisibleFieldIds.length > 0 ? columns : []}
+          noDataText={
+            boListVisibleFieldIds.length === 0
+              ? 'There are no visible columns in the table right now. Please select the columns you need in the table settings.'
+              : 'No data'
+          }
           sortable
           groupable={false}
           loading={isFetching || isFetchingNextPage}
@@ -180,17 +185,24 @@ export function BoListView() {
             />
             <ToolbarButton
               icon="list"
+              design="Transparent"
               tooltip="Toggle list view"
               onClick={() => setViewMode('table')}
-              disabled={isFetching || bizObjects.length === 0}
             />
             <BoViewSettings />
           </Toolbar>
-          {bizObjects.length === 0 && <IllustratedMessage name="NoData" />}
+          {bizObjects.length === 0 && boListVisibleFieldIds.length > 0 && <IllustratedMessage name="NoData" />}
+          {boListVisibleFieldIds.length === 0 && (
+            <h4 className="text-center">
+              There are no visible fields in the table right now. Please select the fields you need in the table
+              settings.
+            </h4>
+          )}
           <Grid defaultSpan="XL3 L4 M6 S12" hSpacing="1.5rem" vSpacing="1.5rem" className="px-3 md:px-0">
-            {bizObjects.map((bizObject) => (
-              <BizObjectCard key={bizObject.BoId} data={bizObject} loading={isFetching || isFetchingNextPage} />
-            ))}
+            {boListVisibleFieldIds.length > 0 &&
+              bizObjects.map((bizObject) => (
+                <BizObjectCard key={bizObject.BoId} data={bizObject} loading={isFetching || isFetchingNextPage} />
+              ))}
           </Grid>
         </FlexBox>
       )}

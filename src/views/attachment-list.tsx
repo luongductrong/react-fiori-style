@@ -148,14 +148,18 @@ export function AttachmentListView() {
                 icon="table-view"
                 design="Transparent"
                 tooltip="Toggle grid view"
-                disabled={isFetching || attachments.length === 0}
                 onClick={() => setViewMode('grid')}
               />
               <AttachmentViewSettings />
             </Toolbar>
           }
-          data={attachments}
-          columns={columns}
+          data={selectedFieldIds.length > 0 ? attachments : []}
+          columns={selectedFieldIds.length > 0 ? columns : []}
+          noDataText={
+            selectedFieldIds.length === 0
+              ? 'There are no visible columns in the table right now. Please select the columns you need in the table settings.'
+              : 'No data'
+          }
           sortable
           groupable={false}
           loading={isFetching || isFetchingNextPage}
@@ -184,15 +188,21 @@ export function AttachmentListView() {
               design="Transparent"
               tooltip="Toggle list view"
               onClick={() => setViewMode('table')}
-              disabled={isFetching || attachments.length === 0}
             />
             <AttachmentViewSettings />
           </Toolbar>
-          {attachments.length === 0 && <IllustratedMessage name="NoData" />}
+          {attachments.length === 0 && selectedFieldIds.length > 0 && <IllustratedMessage name="NoData" />}
+          {selectedFieldIds.length === 0 && (
+            <h4 className="text-center">
+              There are no visible fields in the table right now. Please select the fields you need in the table
+              settings.
+            </h4>
+          )}
           <Grid defaultSpan="XL3 L4 M6 S12" hSpacing="1.5rem" vSpacing="1.5rem" className="px-3 md:px-0">
-            {attachments.map((attachment) => (
-              <AttachmentCard key={attachment.FileId} data={attachment} loading={isFetching || isFetchingNextPage} />
-            ))}
+            {selectedFieldIds.length > 0 &&
+              attachments.map((attachment) => (
+                <AttachmentCard key={attachment.FileId} data={attachment} loading={isFetching || isFetchingNextPage} />
+              ))}
           </Grid>
         </FlexBox>
       )}
