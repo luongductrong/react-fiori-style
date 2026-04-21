@@ -21,6 +21,7 @@ import { DynamicPage } from '@ui5/webcomponents-react/DynamicPage';
 import { pushApiErrorMessages } from '@/libs/helpers/error-messages';
 import { ToolbarSpacer } from '@ui5/webcomponents-react/ToolbarSpacer';
 import { ToolbarButton } from '@ui5/webcomponents-react/ToolbarButton';
+import { buildSelectWithDateTimeFields } from '@/libs/helpers/odata-select';
 import { displayListDate, displayListTime } from '@/libs/helpers/date-time';
 import { DynamicPageHeader } from '@ui5/webcomponents-react/DynamicPageHeader';
 import { IllustratedMessage } from '@ui5/webcomponents-react/IllustratedMessage';
@@ -98,7 +99,7 @@ export function BoListView() {
     () => ALL_COLUMNS.filter((col) => boListVisibleFieldIds.includes(col.id)),
     [boListVisibleFieldIds],
   );
-  const boListSelect = React.useMemo(() => boListVisibleFieldIds.join(','), [boListVisibleFieldIds]);
+  const boListSelect = React.useMemo(() => buildSelectWithDateTimeFields(boListVisibleFieldIds), [boListVisibleFieldIds]);
   const [search, setSearch] = React.useState('');
   const [filter, setFilter] = React.useState('');
 

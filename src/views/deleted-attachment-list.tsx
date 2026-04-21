@@ -16,6 +16,7 @@ import { ToolbarSpacer } from '@ui5/webcomponents-react/ToolbarSpacer';
 import { ToolbarButton } from '@ui5/webcomponents-react/ToolbarButton';
 import { AttachmentsFilterBar } from '@/features/attachments/components';
 import { displayVersion } from '@/features/attachments/helpers/formatter';
+import { buildSelectWithDateTimeFields } from '@/libs/helpers/odata-select';
 import { displayListDate, displayListTime } from '@/libs/helpers/date-time';
 import { attachmentsQueryOptions } from '@/features/attachments/options/query';
 import { DynamicPageHeader } from '@ui5/webcomponents-react/DynamicPageHeader';
@@ -110,7 +111,7 @@ export function DeletedAttachmentListView() {
   const [search, setSearch] = React.useState('');
   const [filter, setFilter] = React.useState('');
   const attachmentListSelect = React.useMemo(
-    () => Array.from(new Set([...selectedFieldIds, 'FileId', '__OperationControl/Reactivate'])).join(','),
+    () => buildSelectWithDateTimeFields([...selectedFieldIds, 'FileId', '__OperationControl/Reactivate']),
     [selectedFieldIds],
   );
   const visibleColumns = React.useMemo(

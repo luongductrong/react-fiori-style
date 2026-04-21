@@ -11,6 +11,7 @@ import { BusyIndicator } from '@/components/busy-indicator';
 import { ToolbarButton } from '@ui5/webcomponents-react/ToolbarButton';
 import { ToolbarSpacer } from '@ui5/webcomponents-react/ToolbarSpacer';
 import { linkBoToAttachmentMutationOptions } from '../options/mutation';
+import { buildSelectWithDateTimeFields } from '@/libs/helpers/odata-select';
 import { displayListDate, displayListTime } from '@/libs/helpers/date-time';
 import { BizObjectsFilterBar } from '@/features/business-objects/components';
 import { bizObjectsQueryOptions } from '@/features/business-objects/options/query';
@@ -104,7 +105,7 @@ function AttachmentBizLinkCreateImpl({ fileId, linkedBizObjectIds, disabled }: A
     title: string;
   } | null>(null);
   const boListSelect = React.useMemo(
-    () => Array.from(new Set([...selectedFieldIds, 'BoId', 'BoTitle'])).join(','),
+    () => buildSelectWithDateTimeFields([...selectedFieldIds, 'BoId', 'BoTitle']),
     [selectedFieldIds],
   );
   const visibleColumns = React.useMemo(

@@ -12,8 +12,9 @@ import { pushApiErrorMessages } from '@/libs/helpers/error-messages';
 import { ToolbarButton } from '@ui5/webcomponents-react/ToolbarButton';
 import { ToolbarSpacer } from '@ui5/webcomponents-react/ToolbarSpacer';
 import { linkAttachmentToBoMutationOptions } from '../options/mutation';
-import { displayListDate, displayListTime } from '@/libs/helpers/date-time';
 import { displayVersion } from '@/features/attachments/helpers/formatter';
+import { buildSelectWithDateTimeFields } from '@/libs/helpers/odata-select';
+import { displayListDate, displayListTime } from '@/libs/helpers/date-time';
 import { attachmentsQueryOptions } from '@/features/attachments/options/query';
 import { useInfiniteQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { AttachmentsFilterBar } from '@/features/attachments/components/attachments-filter-bar';
@@ -105,7 +106,7 @@ function BizAttachmentLinkCreateImpl({ boId, linkedAttachmentIds, disabled }: Bi
   } | null>(null);
 
   const attachmentListSelect = React.useMemo(
-    () => Array.from(new Set([...selectedFieldIds, 'FileId', 'Title'])).join(','),
+    () => buildSelectWithDateTimeFields([...selectedFieldIds, 'FileId', 'Title']),
     [selectedFieldIds],
   );
   const visibleColumns = React.useMemo(

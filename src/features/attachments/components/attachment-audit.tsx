@@ -10,6 +10,7 @@ import { Toolbar } from '@ui5/webcomponents-react/Toolbar';
 import { attachmentAuditsQueryOptions } from '../options/query';
 import { pushApiErrorMessages } from '@/libs/helpers/error-messages';
 import { ToolbarSpacer } from '@ui5/webcomponents-react/ToolbarSpacer';
+import { buildSelectWithDateTimeFields } from '@/libs/helpers/odata-select';
 import { displayListDate, displayListTime } from '@/libs/helpers/date-time';
 import { ATTACHMENT_AUDIT_FIELDS, type AttachmentAuditFieldId } from '../view-config';
 import { AnalyticalTable, type AnalyticalTableCellInstance } from '@ui5/webcomponents-react/AnalyticalTable';
@@ -52,7 +53,7 @@ const ALL_COLUMNS = [
 export function AttachmentAudit({ fileId }: { fileId: string }) {
   const selectedFieldIds = useViewStore((state) => state.attachmentAuditVisibleFieldIds);
   const setSelectedFieldIds = useViewStore((state) => state.setAttachmentAuditVisibleFieldIds);
-  const attachmentAuditSelect = React.useMemo(() => selectedFieldIds.join(','), [selectedFieldIds]);
+  const attachmentAuditSelect = React.useMemo(() => buildSelectWithDateTimeFields(selectedFieldIds), [selectedFieldIds]);
   const visibleColumns = React.useMemo(
     () => ALL_COLUMNS.filter((col) => selectedFieldIds.includes(col.id)),
     [selectedFieldIds],

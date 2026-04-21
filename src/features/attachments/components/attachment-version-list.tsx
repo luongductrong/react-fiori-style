@@ -15,6 +15,7 @@ import { Link as UI5Link } from '@ui5/webcomponents-react/Link';
 import { attachmentVersionsQueryOptions } from '../options/query';
 import { pushApiErrorMessages } from '@/libs/helpers/error-messages';
 import { ToolbarSpacer } from '@ui5/webcomponents-react/ToolbarSpacer';
+import { buildSelectWithDateTimeFields } from '@/libs/helpers/odata-select';
 import { displayListDate, displayListTime } from '@/libs/helpers/date-time';
 import { VERSION_LIST_FIELDS, type AttachmentVersionListFieldId } from '../view-config';
 import { AnalyticalTable, type AnalyticalTableCellInstance } from '@ui5/webcomponents-react/AnalyticalTable';
@@ -86,7 +87,7 @@ export function AttachmentVersionList({
   const selectedFieldIds = useViewStore((state) => state.versionListVisibleFieldIds);
   const setSelectedFieldIds = useViewStore((state) => state.setVersionListVisibleFieldIds);
   const attachmentVersionListSelect = React.useMemo(
-    () => Array.from(new Set([...selectedFieldIds, 'VersionNo'])).join(','),
+    () => buildSelectWithDateTimeFields([...selectedFieldIds, 'VersionNo']),
     [selectedFieldIds],
   );
   const visibleColumns = React.useMemo(
