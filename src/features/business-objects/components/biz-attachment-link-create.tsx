@@ -1,5 +1,6 @@
 import * as React from 'react';
 import { toast } from '@/libs/helpers/toast';
+import { useViewStore } from '@/stores/view-store';
 import { Bar } from '@ui5/webcomponents-react/Bar';
 import { Title } from '@ui5/webcomponents-react/Title';
 import { Dialog } from '@ui5/webcomponents-react/Dialog';
@@ -10,7 +11,9 @@ import { pushApiErrorMessages } from '@/libs/helpers/error-messages';
 import { ToolbarButton } from '@ui5/webcomponents-react/ToolbarButton';
 import { ToolbarSpacer } from '@ui5/webcomponents-react/ToolbarSpacer';
 import { linkAttachmentToBoMutationOptions } from '../options/mutation';
+import { AttachmentViewSettings } from '@/features/attachments/components';
 import { attachmentsQueryOptions } from '@/features/attachments/options/query';
+import type { AttachmentListFieldId } from '@/features/attachments/view-config';
 import { useInfiniteQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { AttachmentsFilterBar } from '@/features/attachments/components/attachments-filter-bar';
 import { AnalyticalTable, type AnalyticalTableCellInstance } from '@ui5/webcomponents-react/AnalyticalTable';
@@ -21,29 +24,63 @@ interface BizAttachmentLinkCreateProps {
   disabled?: boolean;
 }
 
-const columns = [
+type AttachmentListColumn = {
+  id: AttachmentListFieldId;
+} & Record<string, unknown>;
+
+const ALL_COLUMNS = [
   {
     Header: 'File ID',
     accessor: 'FileId',
+    id: 'FileId',
   },
   {
     Header: 'Title',
     accessor: 'Title',
+    id: 'Title',
   },
   {
     Header: 'Version',
     accessor: 'CurrentVersion',
+    id: 'CurrentVersion',
+  },
+  {
+    Header: 'Created On',
+    accessor: 'Erdat',
+    id: 'Erdat',
   },
   {
     Header: 'Created At',
-    id: 'created-at',
-    Cell: (props: AnalyticalTableCellInstance) => `${props.row.original.Erdat ?? ''} ${props.row.original.Erzet ?? ''}`,
+    accessor: 'Erzet',
+    id: 'Erzet',
   },
   {
     Header: 'Created By',
     accessor: 'Ernam',
+    id: 'Ernam',
   },
-];
+  {
+    Header: 'Changed On',
+    accessor: 'Aedat',
+    id: 'Aedat',
+  },
+  {
+    Header: 'Changed At',
+    accessor: 'Aezet',
+    id: 'Aezet',
+  },
+  {
+    Header: 'Changed By',
+    accessor: 'Aenam',
+    id: 'Aenam',
+  },
+  {
+    Header: 'Edit Lock',
+    accessor: 'EditLock',
+    id: 'EditLock',
+    Cell: (props: AnalyticalTableCellInstance) => (props.value ? 'Enabled' : 'Disabled'),
+  },
+] as const satisfies readonly AttachmentListColumn[];
 
 export function BizAttachmentLinkCreate(props: BizAttachmentLinkCreateProps) {
   return <BizAttachmentLinkCreateImpl key={props.boId} {...props} />;
@@ -51,12 +88,22 @@ export function BizAttachmentLinkCreate(props: BizAttachmentLinkCreateProps) {
 
 function BizAttachmentLinkCreateImpl({ boId, linkedAttachmentIds, disabled }: BizAttachmentLinkCreateProps) {
   const queryClient = useQueryClient();
+  const selectedFieldIds = useViewStore((state) => state.attachmentListVisibleFieldIds);
   const [open, setOpen] = React.useState(false);
   const [filter, setFilter] = React.useState('');
   const [selectedAttachment, setSelectedAttachment] = React.useState<{
     id: string;
     title: string;
   } | null>(null);
+
+  const attachmentListSelect = React.useMemo(
+    () => Array.from(new Set([...selectedFieldIds, 'FileId', 'Title'])).join(','),
+    [selectedFieldIds],
+  );
+  const visibleColumns = React.useMemo(
+    () => ALL_COLUMNS.filter((col) => selectedFieldIds.includes(col.id)),
+    [selectedFieldIds],
+  );
 
   const { mutate: linkAttachmentToBo, isPending } = useMutation(
     linkAttachmentToBoMutationOptions({
@@ -74,22 +121,23 @@ function BizAttachmentLinkCreateImpl({ boId, linkedAttachmentIds, disabled }: Bi
       $skip: 0,
       $top: 10,
       $count: true,
+      $select: attachmentListSelect,
       $orderby: 'Erdat desc,Erzet desc',
       $filter: filter ? `IsActive eq true and ${filter}` : 'IsActive eq true', // Make sure to only fetch active attachments
     }),
-    enabled: open,
+    enabled: open && selectedFieldIds.length > 0,
   });
 
   const attachments = React.useMemo(() => {
     return (
       data?.pages
         .flatMap((page) => page.value)
-        .filter((attachment) => attachment.IsActive && !linkedAttachmentIds.includes(attachment.FileId)) ?? []
+        .filter((attachment) => !linkedAttachmentIds.includes(attachment.FileId)) ?? []
     );
   }, [data, linkedAttachmentIds]);
 
   const totalCount = data?.pages[0]?.['@odata.count'] ?? 0;
-  const remainingCount = totalCount - linkedAttachmentIds.length;
+  const remainingCount = Math.max(totalCount - linkedAttachmentIds.length, 0);
 
   React.useEffect(() => {
     if (error) {
@@ -154,17 +202,23 @@ function BizAttachmentLinkCreateImpl({ boId, linkedAttachmentIds, disabled }: Bi
             <Toolbar className="rounded-t-xl px-4 py-2">
               <Title level="H4">Attachments {remainingCount ? `(${remainingCount})` : ''}</Title>
               <ToolbarSpacer />
+              <AttachmentViewSettings />
             </Toolbar>
           }
-          data={attachments}
-          columns={columns}
+          data={selectedFieldIds.length > 0 ? attachments : []}
+          columns={selectedFieldIds.length > 0 ? visibleColumns : []}
+          noDataText={
+            selectedFieldIds.length === 0
+              ? 'There are no visible columns in the table right now. Please select the columns you need in the table settings.'
+              : 'No attachments available to link.'
+          }
           sortable
           groupable={false}
           loading={isFetching || isFetchingNextPage}
           rowHeight={36}
           scaleWidthMode="Smart"
           visibleRows={8}
-          selectionMode="Single"
+          selectionMode={selectedFieldIds.length > 0 ? 'Single' : 'None'}
           onRowClick={(event) => {
             const item = event.detail.row.original;
             if (!item?.FileId) return;

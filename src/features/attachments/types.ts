@@ -34,6 +34,7 @@ export type AttachmentListResponse = {
 
 export type AttachmentListParams = {
   $count: boolean;
+  $select?: string;
   $skip: number;
   $top: number;
   $filter?: string;
