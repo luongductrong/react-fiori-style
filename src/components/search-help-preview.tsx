@@ -39,8 +39,15 @@ function tokenStandardization(token: SearchHelpToken): string {
   return result;
 }
 
-export function SearchHelpPreview({ tokens, onTokensDelete, insideDialog, icon, ...props }: SearchHelpPreviewProps) {
-  const { onInputValue } = props;
+export function SearchHelpPreview({
+  tokens,
+  onTokensDelete,
+  insideDialog,
+  icon,
+  onInputValue,
+  onValueHelpTrigger,
+  ...props
+}: SearchHelpPreviewProps) {
   const handleTokenDelete: MultiInputPropTypes['onTokenDelete'] = function (e) {
     const tokenIds = e.detail.tokens
       .map((token) => token.dataset.id)
@@ -100,7 +107,7 @@ export function SearchHelpPreview({ tokens, onTokensDelete, insideDialog, icon, 
           className="border mx-px h-5"
         />
       ))}
-      onValueHelpTrigger={props.onValueHelpTrigger}
+      onValueHelpTrigger={onValueHelpTrigger}
     />
   );
 }

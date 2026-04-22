@@ -4,18 +4,26 @@ import '@ui5/webcomponents/dist/Assets.js';
 import { Toaster } from '@/components/toast';
 import { createRoot } from 'react-dom/client';
 import { AppLayout } from '@/components/layouts/app-layout';
-import '@ui5/webcomponents-react/dist/json-imports/i18n.js';
 import { AdminLayout } from '@/components/layouts/admin-layout';
 import { PrivateRoute } from '@/components/layouts/private-route';
 import { HashRouter, Route, Routes, Navigate } from 'react-router';
 import { ErrorsMessageBox } from '@/components/errors-message-box';
 import { QueryProvider } from '@/context-providers/query-provider';
 import { ThemeProvider } from '@ui5/webcomponents-react/ThemeProvider';
+import { setLanguage } from '@ui5/webcomponents-base/dist/config/Language.js';
 import { AttachmentListView, AttachmentDetailView, NotFoundView } from '@/views';
 import { VersionDetailView, ConfigFileListView, DeletedAttachmentListView } from '@/views';
 import { BoDetailView, BoListView, UserListView, LaunchpadView, DashboardView } from '@/views';
 
-createRoot(document.getElementById('root')!).render(
+await setLanguage('en');
+
+const rootElement = document.getElementById('root');
+
+if (!rootElement) {
+  throw new Error('Root element not found');
+}
+
+createRoot(rootElement).render(
   <StrictMode>
     <ThemeProvider>
       <QueryProvider>
