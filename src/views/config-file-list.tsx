@@ -8,13 +8,13 @@ import { Button } from '@ui5/webcomponents-react/Button';
 import { ViewSettings } from '@/components/view-settings';
 import { Toolbar } from '@ui5/webcomponents-react/Toolbar';
 import { FlexBox } from '@ui5/webcomponents-react/FlexBox';
+import { useQuery, useMutation } from '@tanstack/react-query';
 import { DynamicPage } from '@ui5/webcomponents-react/DynamicPage';
 import type { ConfigFileItem } from '@/features/config-files/types';
 import { pushApiErrorMessages } from '@/libs/helpers/error-messages';
 import { ToolbarSpacer } from '@ui5/webcomponents-react/ToolbarSpacer';
-import { ToolbarButton } from '@ui5/webcomponents-react/ToolbarButton';
 import { AnalyticalTable } from '@ui5/webcomponents-react/AnalyticalTable';
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useInvalidateConfigFileQuery } from '@/features/config-files/hooks';
 import { DynamicPageHeader } from '@ui5/webcomponents-react/DynamicPageHeader';
 import { configFilesQueryOptions } from '@/features/config-files/options/query';
 import { ConfigFileCreate, ConfigFileEdit } from '@/features/config-files/components';
@@ -22,6 +22,7 @@ import { ConfigFileView, ConfigFilesFilterBar } from '@/features/config-files/co
 import { enableConfigFileMutationOptions } from '@/features/config-files/options/mutation';
 import type { AnalyticalTableCellInstance } from '@ui5/webcomponents-react/AnalyticalTable';
 import { disableConfigFileMutationOptions } from '@/features/config-files/options/mutation';
+import { ToolbarButton, type ToolbarButtonPropTypes } from '@ui5/webcomponents-react/ToolbarButton';
 import { CONFIG_FILE_LIST_FIELDS, type ConfigFileListFieldId } from '@/features/config-files/view-config';
 
 type ConfigFileListColumn = {
@@ -53,7 +54,7 @@ const ALL_COLUMNS = [
 ] as const satisfies readonly ConfigFileListColumn[];
 
 export function ConfigFileListView() {
-  const queryClient = useQueryClient();
+  const invalidateConfig = useInvalidateConfigFileQuery();
   const selectedFieldIds = useViewStore((state) => state.configFileListVisibleFieldIds);
   const setSelectedFieldIds = useViewStore((state) => state.setConfigFileListVisibleFieldIds);
   const [search, setSearch] = React.useState('');
@@ -74,7 +75,7 @@ export function ConfigFileListView() {
     [filter, search],
   );
 
-  const { data, isFetching, error, refetch } = useQuery(configFilesQueryOptions(configFileListParams));
+  const { data, isFetching, error } = useQuery(configFilesQueryOptions(configFileListParams));
 
   const configFiles = React.useMemo(() => data?.value ?? [], [data]);
   const totalCount = Number(data?.['@odata.count'] ?? configFiles.length);
@@ -82,7 +83,7 @@ export function ConfigFileListView() {
   const { mutate: enableConfigFile, isPending: isEnablingConfigFile } = useMutation(
     enableConfigFileMutationOptions({
       onSuccess: () => {
-        queryClient.invalidateQueries({ queryKey: ['config-files'] });
+        invalidateConfig.invalidateConfigFileList();
         setFilter('');
         setSearch('');
         toast('Configuration file enabled successfully');
@@ -93,7 +94,7 @@ export function ConfigFileListView() {
   const { mutate: disableConfigFile, isPending: isDisablingConfigFile } = useMutation(
     disableConfigFileMutationOptions({
       onSuccess: () => {
-        queryClient.invalidateQueries({ queryKey: ['config-files'] });
+        invalidateConfig.invalidateConfigFileList();
         setFilter('');
         setSearch('');
         toast('Configuration file disabled successfully');
@@ -167,6 +168,10 @@ export function ConfigFileListView() {
     [disableConfigFile, enableConfigFile, isDisablingConfigFile, isEnablingConfigFile, visibleColumns],
   );
 
+  const handleRefetch: ToolbarButtonPropTypes['onClick'] = React.useCallback(() => {
+    invalidateConfig.invalidateConfigFileList();
+  }, [invalidateConfig]);
+
   React.useEffect(() => {
     if (error) {
       pushApiErrorMessages(error);
@@ -203,14 +208,7 @@ export function ConfigFileListView() {
             <Title level="H2">Configuration Files {totalCount ? `(${totalCount})` : ''}</Title>
             <ToolbarSpacer />
             <ConfigFileCreate />
-            <ToolbarButton
-              design="Transparent"
-              icon="refresh"
-              text="Refresh"
-              onClick={() => {
-                refetch();
-              }}
-            />
+            <ToolbarButton design="Transparent" icon="refresh" text="Refresh" onClick={handleRefetch} />
             <ViewSettings
               fields={CONFIG_FILE_LIST_FIELDS}
               selectedIds={selectedFieldIds}

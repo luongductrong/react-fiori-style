@@ -1,31 +1,32 @@
 import * as React from 'react';
 import { toast } from '@/libs/helpers/toast';
 import { Bar } from '@ui5/webcomponents-react/Bar';
+import { useMutation } from '@tanstack/react-query';
 import { Text } from '@ui5/webcomponents-react/Text';
 import { DEFAULT_AUTH_USER_ROLE } from '../constants';
+import { useInvalidateAuthUserQuery } from '../hooks';
 import { Input } from '@ui5/webcomponents-react/Input';
 import { Label } from '@ui5/webcomponents-react/Label';
 import { Dialog } from '@ui5/webcomponents-react/Dialog';
 import { Button } from '@ui5/webcomponents-react/Button';
 import { FlexBox } from '@ui5/webcomponents-react/FlexBox';
 import { BusyIndicator } from '@/components/busy-indicator';
-import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { createAuthUserMutationOptions } from '../options/mutation';
 import { ToolbarButton } from '@ui5/webcomponents-react/ToolbarButton';
 
 export function AuthUserCreate({ onCreated }: { onCreated: () => void }) {
-  const queryClient = useQueryClient();
+  const invalidateAuthUser = useInvalidateAuthUserQuery();
   const [open, setOpen] = React.useState(false);
   const [values, setValues] = React.useState({ Uname: '' });
 
   const { mutate: createAuthUser, isPending } = useMutation(
     createAuthUserMutationOptions({
       onSuccess: () => {
-        toast('User created successfully');
-        queryClient.invalidateQueries({ queryKey: ['auth-users'] });
+        invalidateAuthUser.invalidateAuthUserList();
         onCreated();
         setOpen(false);
         setValues({ Uname: '' });
+        toast('User created successfully');
       },
     }),
   );

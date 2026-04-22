@@ -6,9 +6,11 @@ import { FilePreview } from './file-preview';
 import { formatFileSize } from '@/libs/utils';
 import type { UploadedFileData } from '../types';
 import { Bar } from '@ui5/webcomponents-react/Bar';
+import { useMutation } from '@tanstack/react-query';
 import { Text } from '@ui5/webcomponents-react/Text';
 import { Input } from '@ui5/webcomponents-react/Input';
 import { Label } from '@ui5/webcomponents-react/Label';
+import { useInvalidateAttachmentQuery } from '../hooks';
 import { Dialog } from '@ui5/webcomponents-react/Dialog';
 import { Button } from '@ui5/webcomponents-react/Button';
 import { GoogleDrivePicker } from './google-drive-picker';
@@ -16,7 +18,6 @@ import { FlexBox } from '@ui5/webcomponents-react/FlexBox';
 import { BusyIndicator } from '@/components/busy-indicator';
 import { pushErrorMessages } from '@/libs/helpers/error-messages';
 import { uploadVersionMutationOptions } from '../options/mutation';
-import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { createAttachmentMutationOptions } from '../options/mutation';
 import { ToolbarButton } from '@ui5/webcomponents-react/ToolbarButton';
 import { buildFileName, getEditableFileName } from '../helpers/file-name';
@@ -25,7 +26,7 @@ import { validateFileTitle, validateFileName } from '../helpers/input-validate';
 
 export function AttachmentCreate() {
   const navigate = useNavigate();
-  const queryClient = useQueryClient();
+  const invalidateAtt = useInvalidateAttachmentQuery();
   const [driveLoading, setDriveLoading] = React.useState(false);
   const [open, setOpen] = React.useState<'local' | 'drive' | null>(null);
   const [fileData, setFileData] = React.useState<UploadedFileData | null>(null);
@@ -58,12 +59,7 @@ export function AttachmentCreate() {
   };
 
   const finalizeCreateFlow = function (fileId: string) {
-    queryClient.invalidateQueries({
-      queryKey: ['attachments'],
-    });
-    queryClient.invalidateQueries({
-      queryKey: ['attachments', fileId],
-    });
+    invalidateAtt.invalidateAttachmentList();
     resetState();
     navigate(`/attachments/${fileId}`);
   };

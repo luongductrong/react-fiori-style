@@ -3,12 +3,14 @@ import { toast } from '@/libs/helpers/toast';
 import { useViewStore } from '@/stores/view-store';
 import { Bar } from '@ui5/webcomponents-react/Bar';
 import { Title } from '@ui5/webcomponents-react/Title';
+import { useInvalidateBizObjectQuery } from '../hooks';
 import { Dialog } from '@ui5/webcomponents-react/Dialog';
 import { Button } from '@ui5/webcomponents-react/Button';
 import { ViewSettings } from '@/components/view-settings';
 import { Toolbar } from '@ui5/webcomponents-react/Toolbar';
 import { BusyIndicator } from '@/components/busy-indicator';
 import { pushApiErrorMessages } from '@/libs/helpers/error-messages';
+import { useInfiniteQuery, useMutation } from '@tanstack/react-query';
 import { ToolbarButton } from '@ui5/webcomponents-react/ToolbarButton';
 import { ToolbarSpacer } from '@ui5/webcomponents-react/ToolbarSpacer';
 import { linkAttachmentToBoMutationOptions } from '../options/mutation';
@@ -16,7 +18,6 @@ import { displayVersion } from '@/features/attachments/helpers/formatter';
 import { buildSelectWithDateTimeFields } from '@/libs/helpers/odata-select';
 import { displayListDate, displayListTime } from '@/libs/helpers/date-time';
 import { attachmentsQueryOptions } from '@/features/attachments/options/query';
-import { useInfiniteQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { AttachmentsFilterBar } from '@/features/attachments/components/attachments-filter-bar';
 import { ATTACHMENT_LIST_FIELDS, type AttachmentListFieldId } from '@/features/attachments/view-config';
 import { AnalyticalTable, type AnalyticalTableCellInstance } from '@ui5/webcomponents-react/AnalyticalTable';
@@ -95,7 +96,7 @@ export function BizAttachmentLinkCreate(props: BizAttachmentLinkCreateProps) {
 }
 
 function BizAttachmentLinkCreateImpl({ boId, linkedAttachmentIds, disabled }: BizAttachmentLinkCreateProps) {
-  const queryClient = useQueryClient();
+  const invalidateBiz = useInvalidateBizObjectQuery();
   const selectedFieldIds = useViewStore((state) => state.attachmentListVisibleFieldIds);
   const setSelectedFieldIds = useViewStore((state) => state.setAttachmentListVisibleFieldIds);
   const [open, setOpen] = React.useState(false);
@@ -117,10 +118,11 @@ function BizAttachmentLinkCreateImpl({ boId, linkedAttachmentIds, disabled }: Bi
   const { mutate: linkAttachmentToBo, isPending } = useMutation(
     linkAttachmentToBoMutationOptions({
       onSuccess: () => {
+        invalidateBiz.invalidateBizObjectDetail(boId);
+        invalidateBiz.invalidateBizObjectAttachmentLinks(boId);
         toast('Attachment linked successfully');
         setSelectedAttachment(null);
         setOpen(false);
-        queryClient.invalidateQueries({ queryKey: ['biz-objects', boId] });
       },
     }),
   );

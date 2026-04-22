@@ -5,6 +5,7 @@ import { Link, useNavigate } from 'react-router';
 import { Bar } from '@ui5/webcomponents-react/Bar';
 import { useViewStore } from '@/stores/view-store';
 import { Title } from '@ui5/webcomponents-react/Title';
+import { useInvalidateBizObjectQuery } from '../hooks';
 import { Button } from '@ui5/webcomponents-react/Button';
 import { ViewSettings } from '@/components/view-settings';
 import { Toolbar } from '@ui5/webcomponents-react/Toolbar';
@@ -12,6 +13,7 @@ import '@ui5/webcomponents-icons/navigation-right-arrow.js';
 import { Link as UI5Link } from '@ui5/webcomponents-react/Link';
 import { MessageBox } from '@ui5/webcomponents-react/MessageBox';
 import { pushApiErrorMessages } from '@/libs/helpers/error-messages';
+import { useInfiniteQuery, useMutation } from '@tanstack/react-query';
 import { ToolbarSpacer } from '@ui5/webcomponents-react/ToolbarSpacer';
 import { BizAttachmentLinkCreate } from './biz-attachment-link-create';
 import { displayVersion } from '@/features/attachments/helpers/formatter';
@@ -19,7 +21,6 @@ import { bizObjectLinkedAttachmentsQueryOptions } from '../options/query';
 import { AnalyticalTable } from '@ui5/webcomponents-react/AnalyticalTable';
 import { unlinkAttachmentFromBoMutationOptions } from '../options/mutation';
 import { displayListDate, displayListTime } from '@/libs/helpers/date-time';
-import { useInfiniteQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import type { AnalyticalTableCellInstance } from '@ui5/webcomponents-react/AnalyticalTable';
 import { BIZ_OBJECT_LINKED_ATTACHMENT_FIELDS, type BizObjectLinkedAttachmentFieldId } from '../view-config';
 
@@ -81,7 +82,7 @@ const ALL_COLUMNS = [
 
 export function BizObjectAttachmentList({ boId, disabled }: BizObjectAttachmentListProps) {
   const navigate = useNavigate();
-  const queryClient = useQueryClient();
+  const invalidateBiz = useInvalidateBizObjectQuery();
   const selectedFieldIds = useViewStore((state) => state.bizObjectLinkedAttachmentVisibleFieldIds);
   const setSelectedFieldIds = useViewStore((state) => state.setBizObjectLinkedAttachmentVisibleFieldIds);
   const [deleteDialogOpen, setDeleteDialogOpen] = React.useState(false);
@@ -104,7 +105,8 @@ export function BizObjectAttachmentList({ boId, disabled }: BizObjectAttachmentL
     unlinkAttachmentFromBoMutationOptions({
       onSuccess: () => {
         toast('Attachment unlinked successfully');
-        queryClient.invalidateQueries({ queryKey: ['biz-objects', boId] });
+        invalidateBiz.invalidateBizObjectDetail(boId);
+        invalidateBiz.invalidateBizObjectAttachmentLinks(boId);
       },
     }),
   );

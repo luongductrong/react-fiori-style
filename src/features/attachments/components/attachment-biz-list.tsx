@@ -5,6 +5,7 @@ import { Link, useNavigate } from 'react-router';
 import { Bar } from '@ui5/webcomponents-react/Bar';
 import { useViewStore } from '@/stores/view-store';
 import { Title } from '@ui5/webcomponents-react/Title';
+import { useInvalidateAttachmentQuery } from '../hooks';
 import { Button } from '@ui5/webcomponents-react/Button';
 import { ViewSettings } from '@/components/view-settings';
 import { Toolbar } from '@ui5/webcomponents-react/Toolbar';
@@ -13,11 +14,12 @@ import { attachmentBOsQueryOptions } from '../options/query';
 import { Link as UI5Link } from '@ui5/webcomponents-react/Link';
 import { MessageBox } from '@ui5/webcomponents-react/MessageBox';
 import { pushApiErrorMessages } from '@/libs/helpers/error-messages';
+import { useInfiniteQuery, useMutation } from '@tanstack/react-query';
 import { AttachmentBizLinkCreate } from './attachment-biz-link-create';
 import { ToolbarSpacer } from '@ui5/webcomponents-react/ToolbarSpacer';
 import { unlinkBoFromAttachmentMutationOptions } from '../options/mutation';
 import { displayListDate, displayListTime } from '@/libs/helpers/date-time';
-import { useInfiniteQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useInvalidateBizObjectQuery } from '@/features/business-objects/hooks';
 import { ATTACHMENT_BIZ_LIST_FIELDS, type AttachmentBizListFieldId } from '../view-config';
 import { displayBoStatus, displayBoType } from '@/features/business-objects/helpers/formatter';
 import { AnalyticalTable, type AnalyticalTableCellInstance } from '@ui5/webcomponents-react/AnalyticalTable';
@@ -75,7 +77,8 @@ const ALL_COLUMNS = [
 
 export function AttachmentBizList({ fileId, disabled }: { fileId: string; disabled: boolean }) {
   const navigate = useNavigate();
-  const queryClient = useQueryClient();
+  const invalidateBiz = useInvalidateBizObjectQuery();
+  const invalidateAtt = useInvalidateAttachmentQuery();
   const selectedFieldIds = useViewStore((state) => state.attachmentBizListVisibleFieldIds);
   const setSelectedFieldIds = useViewStore((state) => state.setAttachmentBizListVisibleFieldIds);
   const [deleteDialogOpen, setDeleteDialogOpen] = React.useState(false);
@@ -103,10 +106,10 @@ export function AttachmentBizList({ fileId, disabled }: { fileId: string; disabl
   const { mutate: unlinkBoFromAttachment, isPending } = useMutation(
     unlinkBoFromAttachmentMutationOptions({
       onSuccess: () => {
+        invalidateAtt.invalidateAttachmentDetail(fileId);
+        invalidateAtt.invalidateAttachmentAudit(fileId);
+        invalidateAtt.invalidateAttachmentBoLinks(fileId);
         toast('Business object unlinked successfully');
-        queryClient.invalidateQueries({ queryKey: ['attachments', fileId, 'detail'] });
-        queryClient.invalidateQueries({ queryKey: ['attachments', fileId, 'audit'] });
-        queryClient.invalidateQueries({ queryKey: ['attachments', fileId, 'biz-objects'] });
       },
     }),
   );
@@ -214,6 +217,8 @@ export function AttachmentBizList({ fileId, disabled }: { fileId: string; disabl
         onClose={(action) => {
           setDeleteDialogOpen(false);
           if (action === 'OK' && bizObjectToDelete?.boId) {
+            invalidateBiz.invalidateBizObjectDetail(bizObjectToDelete.boId);
+            invalidateBiz.invalidateBizObjectAttachmentLinks(bizObjectToDelete.boId);
             unlinkBoFromAttachment({
               FileId: fileId,
               BoId: bizObjectToDelete.boId,

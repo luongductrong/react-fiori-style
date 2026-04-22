@@ -3,12 +3,13 @@ import { toast } from '@/libs/helpers/toast';
 import type { ConfigFileItem } from '../types';
 import { Bar } from '@ui5/webcomponents-react/Bar';
 import { ConfigFileForm } from './config-file-form';
+import { useMutation } from '@tanstack/react-query';
+import { useInvalidateConfigFileQuery } from '../hooks';
 import { Dialog } from '@ui5/webcomponents-react/Dialog';
 import { Button } from '@ui5/webcomponents-react/Button';
 import { BusyIndicator } from '@/components/busy-indicator';
 import { getInitialConfigFileFormValues } from '../helpers/form';
 import { validateConfigFileForm } from '../helpers/input-validate';
-import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { updateConfigFileMutationOptions } from '../options/mutation';
 import { normalizeMimeTypesForStorage } from '../helpers/mime-types';
 import type { ConfigFileFormTouchedFields } from './config-file-form';
@@ -27,7 +28,7 @@ interface ConfigFileEditProps {
 }
 
 export function ConfigFileEdit({ configFile, open, onClose }: ConfigFileEditProps) {
-  const queryClient = useQueryClient();
+  const invalidateConfig = useInvalidateConfigFileQuery();
   const [values, setValues] = React.useState(() => getInitialConfigFileFormValues(configFile));
   const [touchedFields, setTouchedFields] = React.useState(INITIAL_TOUCHED_FIELDS);
   const [showAllValidation, setShowAllValidation] = React.useState(false);
@@ -36,8 +37,8 @@ export function ConfigFileEdit({ configFile, open, onClose }: ConfigFileEditProp
     updateConfigFileMutationOptions({
       fileExt: configFile?.FileExt ?? '',
       onSuccess: () => {
+        invalidateConfig.invalidateConfigFileList();
         toast('Configuration file updated successfully');
-        queryClient.invalidateQueries({ queryKey: ['config-files'] });
         onClose();
       },
     }),

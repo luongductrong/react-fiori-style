@@ -14,6 +14,7 @@ import { MutationBar } from '@/components/mutation-bar';
 import { Button } from '@ui5/webcomponents-react/Button';
 import { Toolbar } from '@ui5/webcomponents-react/Toolbar';
 import { BusyIndicator } from '@/components/busy-indicator';
+import { useQuery, useMutation } from '@tanstack/react-query';
 import { useCurrentAuthUser } from '@/features/auth-users/hooks';
 import { ObjectPage } from '@ui5/webcomponents-react/ObjectPage';
 import { MessageBox } from '@ui5/webcomponents-react/MessageBox';
@@ -22,8 +23,9 @@ import { ToolbarButton } from '@ui5/webcomponents-react/ToolbarButton';
 import { NotFoundIllustrated } from '@/components/not-found-illustrated';
 import { displayVersion } from '@/features/attachments/helpers/formatter';
 import { ObjectPageTitle } from '@ui5/webcomponents-react/ObjectPageTitle';
+import { useInvalidateAttachmentQuery } from '@/features/attachments/hooks';
 import { downloadFile } from '@/features/attachments/helpers/download-file';
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useInvalidateConfigFileQuery } from '@/features/config-files/hooks';
 import { ObjectPageSection } from '@ui5/webcomponents-react/ObjectPageSection';
 import { displayDetailDate, displayDetailTime } from '@/libs/helpers/date-time';
 import { validateFileTitle } from '@/features/attachments/helpers/input-validate';
@@ -38,7 +40,8 @@ import { AttachmentForm, type AttachmentFormValues } from '@/features/attachment
 export function AttachmentDetailView() {
   const { id } = useParams();
   const navigate = useNavigate();
-  const queryClient = useQueryClient();
+  const invalidateAtt = useInvalidateAttachmentQuery();
+  const invalidateConfig = useInvalidateConfigFileQuery();
   const { data: currentAuthUser, isPending: isAuthPending } = useCurrentAuthUser();
   const [isEditMode, setIsEditMode] = React.useState(false);
   const [titleError, setTitleError] = React.useState('');
@@ -61,9 +64,8 @@ export function AttachmentDetailView() {
     updateAttachmentTitleMutationOptions({
       fileId: id!,
       onSuccess: () => {
-        queryClient.invalidateQueries({
-          queryKey: ['attachments', id],
-        });
+        invalidateAtt.invalidateAttachmentDetail(id!);
+        invalidateAtt.invalidateAttachmentTitle(id!);
         toast('Attachment updated successfully');
         setIsEditMode(false);
         setTitleError('');
@@ -75,10 +77,9 @@ export function AttachmentDetailView() {
     deleteAttachmentMutationOptions({
       fileId: id!,
       onSuccess: () => {
+        invalidateAtt.invalidateAttachmentList();
+        invalidateAtt.invalidateAttachmentDetail(id!);
         toast('Attachment deleted successfully');
-        queryClient.invalidateQueries({
-          queryKey: ['attachments'],
-        });
         navigate('/attachments');
       },
     }),
@@ -87,10 +88,9 @@ export function AttachmentDetailView() {
   const { mutate: restoreAttachment, isPending: isRestoring } = useMutation(
     restoreAttachmentMutationOptions({
       onSuccess: () => {
+        invalidateAtt.invalidateAttachmentList();
+        invalidateAtt.invalidateAttachmentDetail(id!);
         toast('Attachment restored successfully');
-        queryClient.invalidateQueries({
-          queryKey: ['attachments'],
-        });
       },
     }),
   );
@@ -107,9 +107,13 @@ export function AttachmentDetailView() {
   );
 
   const refetchAttachment = function () {
-    queryClient.invalidateQueries({
-      queryKey: ['attachments', id],
-    });
+    invalidateAtt.invalidateAttachmentDetail(id!);
+    invalidateAtt.invalidateAttachmentVersions(id!);
+    invalidateAtt.invalidateAttachmentAudit(id!);
+    invalidateAtt.invalidateAttachmentTitle(id!);
+    invalidateAtt.invalidateAttachmentCurrentVersion(id!);
+    invalidateAtt.invalidateAttachmentBoLinks(id!);
+    invalidateConfig.invalidateConfigFileList();
   };
 
   const handleEditModeOn = function () {

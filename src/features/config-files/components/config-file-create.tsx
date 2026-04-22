@@ -1,13 +1,14 @@
 import * as React from 'react';
 import { toast } from '@/libs/helpers/toast';
 import { Bar } from '@ui5/webcomponents-react/Bar';
+import { useMutation } from '@tanstack/react-query';
 import { ConfigFileForm } from './config-file-form';
+import { useInvalidateConfigFileQuery } from '../hooks';
 import { Dialog } from '@ui5/webcomponents-react/Dialog';
 import { Button } from '@ui5/webcomponents-react/Button';
 import { BusyIndicator } from '@/components/busy-indicator';
 import { getInitialConfigFileFormValues } from '../helpers/form';
 import { validateConfigFileForm } from '../helpers/input-validate';
-import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { normalizeMimeTypesForStorage } from '../helpers/mime-types';
 import { createConfigFileMutationOptions } from '../options/mutation';
 import { ToolbarButton } from '@ui5/webcomponents-react/ToolbarButton';
@@ -21,7 +22,7 @@ const INITIAL_TOUCHED_FIELDS: ConfigFileFormTouchedFields = {
 };
 
 export function ConfigFileCreate() {
-  const queryClient = useQueryClient();
+  const invalidateConfig = useInvalidateConfigFileQuery();
   const [open, setOpen] = React.useState(false);
   const [values, setValues] = React.useState(getInitialConfigFileFormValues);
   const [touchedFields, setTouchedFields] = React.useState(INITIAL_TOUCHED_FIELDS);
@@ -31,7 +32,7 @@ export function ConfigFileCreate() {
     createConfigFileMutationOptions({
       onSuccess: () => {
         toast('Configuration file created successfully');
-        queryClient.invalidateQueries({ queryKey: ['config-files'] });
+        invalidateConfig.invalidateConfigFileList();
         setOpen(false);
         setValues(getInitialConfigFileFormValues());
         setTouchedFields(INITIAL_TOUCHED_FIELDS);

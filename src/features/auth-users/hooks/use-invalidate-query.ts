@@ -9,7 +9,7 @@ export function useInvalidateAuthUserQuery() {
   };
 
   return {
-    invalidateAuthUsersList: () => invalidateQuery(QUERY_KEYS.authUsersList()),
+    invalidateAuthUserList: () => invalidateQuery(QUERY_KEYS.authUserList()),
     invalidateCurrentAuthUser: () => invalidateQuery(QUERY_KEYS.currentAuthUser()),
     invalidateCurrentPublicAuthUser: () => invalidateQuery(QUERY_KEYS.currentPublicAuthUser()),
   };

@@ -8,7 +8,7 @@ import type { AuthUsersQueryParams, AuthUsersResponse, CurrentAuthUserResponse }
 
 export function authUsersQueryOptions(params: AuthUsersQueryParams) {
   return queryOptions<AuthUsersResponse, AxiosApiError>({
-    queryKey: QUERY_KEYS.authUsersListWithParams(params),
+    queryKey: QUERY_KEYS.authUserListWithParams(params),
     queryFn: () => {
       const res = axiosInstance.get<AuthUsersResponse>(`${ODATA_SERVICE.AUTH}${API.endpoint}`, {
         params,

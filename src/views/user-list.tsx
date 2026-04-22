@@ -8,20 +8,21 @@ import { Button } from '@ui5/webcomponents-react/Button';
 import { ViewSettings } from '@/components/view-settings';
 import { Toolbar } from '@ui5/webcomponents-react/Toolbar';
 import { displayListDate } from '@/libs/helpers/date-time';
+import { useQuery, useMutation } from '@tanstack/react-query';
 import type { AuthUserItem } from '@/features/auth-users/types';
 import { MessageBox } from '@ui5/webcomponents-react/MessageBox';
 import { useCurrentAuthUser } from '@/features/auth-users/hooks';
 import { DynamicPage } from '@ui5/webcomponents-react/DynamicPage';
 import { ToolbarSpacer } from '@ui5/webcomponents-react/ToolbarSpacer';
-import { ToolbarButton } from '@ui5/webcomponents-react/ToolbarButton';
+import { useInvalidateAuthUserQuery } from '@/features/auth-users/hooks';
 import { AnalyticalTable } from '@ui5/webcomponents-react/AnalyticalTable';
 import { authUsersQueryOptions } from '@/features/auth-users/options/query';
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { DynamicPageHeader } from '@ui5/webcomponents-react/DynamicPageHeader';
 import { AuthUserCreate, AuthUsersFilterBar } from '@/features/auth-users/components';
 import { deleteAuthUserMutationOptions } from '@/features/auth-users/options/mutation';
 import { pushApiErrorMessages, pushErrorMessages } from '@/libs/helpers/error-messages';
 import type { AnalyticalTableCellInstance } from '@ui5/webcomponents-react/AnalyticalTable';
+import { ToolbarButton, type ToolbarButtonPropTypes } from '@ui5/webcomponents-react/ToolbarButton';
 import { AUTH_USER_LIST_FIELDS, type AuthUserListFieldId } from '@/features/auth-users/view-config';
 
 type AuthUserListColumn = {
@@ -41,7 +42,7 @@ const ALL_COLUMNS = [
 ] as const satisfies readonly AuthUserListColumn[];
 
 export function UserListView() {
-  const queryClient = useQueryClient();
+  const invalidateUser = useInvalidateAuthUserQuery();
   const { data: currentAuthUser } = useCurrentAuthUser();
   const selectedFieldIds = useViewStore((state) => state.authUserListVisibleFieldIds);
   const setSelectedFieldIds = useViewStore((state) => state.setAuthUserListVisibleFieldIds);
@@ -59,7 +60,7 @@ export function UserListView() {
     [selectedFieldIds],
   );
 
-  const { data, isFetching, error, refetch } = useQuery({
+  const { data, isFetching, error } = useQuery({
     ...authUsersQueryOptions({
       $count: true,
       $select: authUserListSelect,
@@ -76,7 +77,7 @@ export function UserListView() {
   const { mutate: deleteUser, isPending: isDeletingUser } = useMutation(
     deleteAuthUserMutationOptions({
       onSuccess: () => {
-        queryClient.invalidateQueries({ queryKey: ['auth-users'] });
+        invalidateUser.invalidateAuthUserList();
         setFilter('');
         setSearch('');
         toast('User deleted successfully');
@@ -116,6 +117,11 @@ export function UserListView() {
     [isDeletingUser, username, visibleColumns],
   );
 
+  const handleRefetch: ToolbarButtonPropTypes['onClick'] = React.useCallback(
+    () => invalidateUser.invalidateAuthUserList(),
+    [invalidateUser],
+  );
+
   React.useEffect(() => {
     if (error) {
       pushApiErrorMessages(error);
@@ -143,14 +149,7 @@ export function UserListView() {
                 setSearch('');
               }}
             />
-            <ToolbarButton
-              design="Transparent"
-              icon="refresh"
-              text="Refresh"
-              onClick={() => {
-                refetch();
-              }}
-            />
+            <ToolbarButton design="Transparent" icon="refresh" text="Refresh" onClick={handleRefetch} />
             <ViewSettings
               fields={AUTH_USER_LIST_FIELDS}
               selectedIds={selectedFieldIds}

@@ -2,17 +2,18 @@ import * as React from 'react';
 import { useNavigate } from 'react-router';
 import { toast } from '@/libs/helpers/toast';
 import { Bar } from '@ui5/webcomponents-react/Bar';
+import { useMutation } from '@tanstack/react-query';
+import { useInvalidateBizObjectQuery } from '../hooks';
 import { BizForm, type BizFormValues } from './biz-form';
 import { Dialog } from '@ui5/webcomponents-react/Dialog';
 import { Button } from '@ui5/webcomponents-react/Button';
 import { BusyIndicator } from '@/components/busy-indicator';
-import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { createBizObjectMutationOptions } from '../options/mutation';
 import { ToolbarButton } from '@ui5/webcomponents-react/ToolbarButton';
 
 export function BizCreate() {
   const navigate = useNavigate();
-  const queryClient = useQueryClient();
+  const invalidateBiz = useInvalidateBizObjectQuery();
   const [open, setOpen] = React.useState(false);
   const [values, setValues] = React.useState<BizFormValues>({
     title: '',
@@ -25,7 +26,7 @@ export function BizCreate() {
       onSuccess: (data) => {
         toast('Business Object created successfully');
         setOpen(false);
-        queryClient.invalidateQueries({ queryKey: ['biz-objects'] });
+        invalidateBiz.invalidateBizObjectList();
         navigate(`/business-objects/${data.BoId}`);
       },
       onError: () => {

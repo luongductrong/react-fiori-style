@@ -18,14 +18,16 @@ import { Link as UI5Link } from '@ui5/webcomponents-react/Link';
 import { LoadMoreTrigger } from '@/components/load-more-trigger';
 import { DynamicPage } from '@ui5/webcomponents-react/DynamicPage';
 import { pushApiErrorMessages } from '@/libs/helpers/error-messages';
-import { ToolbarButton } from '@ui5/webcomponents-react/ToolbarButton';
 import { ToolbarSpacer } from '@ui5/webcomponents-react/ToolbarSpacer';
 import { displayVersion } from '@/features/attachments/helpers/formatter';
 import { displayListDate, displayListTime } from '@/libs/helpers/date-time';
+import { useInvalidateAttachmentQuery } from '@/features/attachments/hooks';
 import { buildSelectWithDateTimeFields } from '@/libs/helpers/odata-select';
+import { useInvalidateConfigFileQuery } from '@/features/config-files/hooks';
 import { attachmentsQueryOptions } from '@/features/attachments/options/query';
 import { DynamicPageHeader } from '@ui5/webcomponents-react/DynamicPageHeader';
 import { IllustratedMessage } from '@ui5/webcomponents-react/IllustratedMessage';
+import { ToolbarButton, type ToolbarButtonPropTypes } from '@ui5/webcomponents-react/ToolbarButton';
 import { ATTACHMENT_LIST_FIELDS, type AttachmentListFieldId } from '@/features/attachments/view-config';
 import { AttachmentsFilterBar, AttachmentCard, AttachmentCreate } from '@/features/attachments/components';
 import { AnalyticalTable, type AnalyticalTableCellInstance } from '@ui5/webcomponents-react/AnalyticalTable';
@@ -88,7 +90,8 @@ const ALL_COLUMNS = [
 
 export function AttachmentListView() {
   const navigate = useNavigate();
-
+  const invalidateAtt = useInvalidateAttachmentQuery();
+  const invalidateConfig = useInvalidateConfigFileQuery();
   const viewMode = useAppStore((state) => state.viewMode);
   const setViewMode = useAppStore((state) => state.setViewMode);
   const selectedFieldIds = useViewStore((state) => state.attachmentListVisibleFieldIds);
@@ -112,7 +115,7 @@ export function AttachmentListView() {
     }),
     [attachmentListSelect, filter, search],
   );
-  const { data, isFetching, hasNextPage, fetchNextPage, isFetchingNextPage, refetch, error } = useInfiniteQuery({
+  const { data, isFetching, hasNextPage, fetchNextPage, isFetchingNextPage, error } = useInfiniteQuery({
     ...attachmentsQueryOptions(attachmentListParams),
     enabled: selectedFieldIds.length > 0,
   });
@@ -140,6 +143,11 @@ export function AttachmentListView() {
     [navigate, visibleColumns],
   );
 
+  const handleRefresh: ToolbarButtonPropTypes['onClick'] = React.useCallback(() => {
+    invalidateAtt.invalidateAttachmentList();
+    invalidateConfig.invalidateConfigFileList();
+  }, [invalidateAtt, invalidateConfig]);
+
   React.useEffect(() => {
     if (error) {
       pushApiErrorMessages(error);
@@ -164,14 +172,7 @@ export function AttachmentListView() {
               <ToolbarSpacer />
               {/* ToolbarButton - AttachmentCreate */}
               <AttachmentCreate />
-              <ToolbarButton
-                design="Transparent"
-                icon="refresh"
-                text="Refresh"
-                onClick={() => {
-                  refetch();
-                }}
-              />
+              <ToolbarButton design="Transparent" icon="refresh" text="Refresh" onClick={handleRefresh} />
               <ToolbarButton
                 icon="table-view"
                 design="Transparent"
@@ -207,14 +208,7 @@ export function AttachmentListView() {
             <ToolbarSpacer />
             {/* ToolbarButton - AttachmentCreate */}
             <AttachmentCreate />
-            <ToolbarButton
-              design="Transparent"
-              icon="refresh"
-              text="Refresh"
-              onClick={() => {
-                refetch();
-              }}
-            />
+            <ToolbarButton design="Transparent" icon="refresh" text="Refresh" onClick={handleRefresh} />
             <ToolbarButton
               icon="list"
               design="Transparent"
