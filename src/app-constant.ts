@@ -2,6 +2,8 @@ export { ODATA_BASE_URL, ODATA_SAP_CLIENT } from '@/app-env';
 
 export const DEFAULT_VIEW_MODE: 'table' | 'grid' = 'table';
 
+export const APP_LOCALE = 'en-US';
+
 export const ODATA_SERVICE = {
   ATTACHMENT: '/sap/opu/odata4/sap/zui_attach_o4/srvd/sap/zsd_attach/0001',
   AUTH: '/sap/opu/odata4/sap/zui_att_auth_o4/srvd/sap/zsd_att_auth/0001',

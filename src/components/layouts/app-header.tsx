@@ -1,5 +1,6 @@
 import * as React from 'react';
 import { ODATA_BASE_URL } from '@/app-env';
+import { APP_LOCALE } from '@/app-constant';
 import { toast } from '@/libs/helpers/toast';
 import '@ui5/webcomponents-icons/refresh.js';
 import '@ui5/webcomponents-icons/nav-back.js';
@@ -162,7 +163,7 @@ export function AppHeader({ primaryTitle = 'Corporate Portal', secondaryTitle, u
             avatarInitials={avatarInitials}
             subtitleText={accountSubtitle || undefined}
             titleText={displayName + (authUser?.value[0]?.Role === 'ADMIN' ? ' (Administrator)' : '')}
-            description={navigator.language ? 'Device Language: ' + navigator.language : ''}
+            description={'Language: ' + APP_LOCALE}
           />
         }
         onClose={() => {

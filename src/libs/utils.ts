@@ -1,4 +1,5 @@
 import { twMerge } from 'tailwind-merge';
+import { APP_LOCALE } from '@/app-constant';
 import clsx, { type ClassValue } from 'clsx';
 
 type SapToIsoParams = {
@@ -18,9 +19,8 @@ type FormatDateParams = {
   };
 };
 
-const locale = navigator.language || 'en-US';
-const countFormatter = new Intl.NumberFormat(locale);
-const sizeFormatter = new Intl.NumberFormat(locale, {
+const countFormatter = new Intl.NumberFormat(APP_LOCALE);
+const sizeFormatter = new Intl.NumberFormat(APP_LOCALE, {
   minimumFractionDigits: 0,
   maximumFractionDigits: 2,
 });
@@ -123,14 +123,14 @@ function formatDate({ date, time, fallback = '', options }: FormatDateParams) {
   }
 
   if (mode === 'date') {
-    return parsedDate.toLocaleDateString(locale, formatOptions);
+    return parsedDate.toLocaleDateString(APP_LOCALE, formatOptions);
   }
 
   if (mode === 'time') {
-    return parsedDate.toLocaleTimeString(locale, formatOptions);
+    return parsedDate.toLocaleTimeString(APP_LOCALE, formatOptions);
   }
 
-  return parsedDate.toLocaleString(locale, formatOptions);
+  return parsedDate.toLocaleString(APP_LOCALE, formatOptions);
 }
 
 export { cn, formatFileSize, formatCount, formatDate };
