@@ -32,8 +32,6 @@ export function DashboardSystemComposition({ className }: { className?: string }
 
   const fileTypeItems = React.useMemo(() => buildFileTypeItems(data ?? []), [data]);
 
-  const isLoading = !data && isFetching;
-
   return (
     <SectionCard
       title="System Composition"
@@ -45,6 +43,7 @@ export function DashboardSystemComposition({ className }: { className?: string }
           <Text className="text-xs font-semibold uppercase tracking-widest">
             Storage by Extension ({fileTypeItems.length})
           </Text>
+          {!data && isFetching && <BusyIndicator type="loading" show={isFetching} />}
           {fileTypeItems.length === 0 ? (
             <Text className="text-sm">No attachment type usage available.</Text>
           ) : (
@@ -72,7 +71,7 @@ export function DashboardSystemComposition({ className }: { className?: string }
           )}
         </div>
       </div>
-      <BusyIndicator type="pending" show={isLoading} />
+      <BusyIndicator type="pending" show={fileTypeItems.length > 0 && isFetching} />
     </SectionCard>
   );
 }

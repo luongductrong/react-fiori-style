@@ -42,7 +42,7 @@ function formatGuid(value: string) {
 }
 
 export function DashboardRecentAudit({ className }: { className?: string }) {
-  const { data: items, error, isFetching } = useQuery(dashboardRecentAuditLogsQueryOptions());
+  const { data: items, error, isFetching, isLoading } = useQuery(dashboardRecentAuditLogsQueryOptions());
 
   React.useEffect(() => {
     if (error) {
@@ -56,7 +56,8 @@ export function DashboardRecentAudit({ className }: { className?: string }) {
       subtitle="Latest attachment-related activity captured by the service"
       className={cn('relative', className)}
     >
-      {items ? (
+      {isLoading && <BusyIndicator type="loading" show={isFetching} />}
+      {items && items.length > 0 && (
         <div className="space-y-3">
           {items.map((item) => (
             <div key={`${item.FileId}-${item.Erdat}-${item.Erzet}-${item.Action}`} className="rounded-2xl border p-3">
@@ -80,10 +81,11 @@ export function DashboardRecentAudit({ className }: { className?: string }) {
             </div>
           ))}
         </div>
-      ) : (
+      )}
+      {items && items.length === 0 && !isLoading && (
         <Text className="text-sm">No recent audit activity available.</Text>
       )}
-      <BusyIndicator type="pending" show={isFetching} />
+      <BusyIndicator type="pending" show={!isLoading && isFetching} />
     </SectionCard>
   );
 }
