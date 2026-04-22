@@ -156,5 +156,3 @@ export function unlinkAttachmentFromBoMutationOptions({ onSuccess, onError }: Un
     },
   });
 }
-
-// TODO: handle csrf token deletion

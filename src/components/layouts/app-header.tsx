@@ -1,16 +1,21 @@
 import * as React from 'react';
 import { ODATA_BASE_URL } from '@/app-env';
+import { toast } from '@/libs/helpers/toast';
+import '@ui5/webcomponents-icons/refresh.js';
 import '@ui5/webcomponents-icons/nav-back.js';
 import { useQuery } from '@tanstack/react-query';
+import { useAuthStore } from '@/stores/auth-store';
 import { useLocation, useNavigate } from 'react-router';
 import { Avatar } from '@ui5/webcomponents-react/Avatar';
 import { Button } from '@ui5/webcomponents-react/Button';
+import { clearCsrfToken } from '@/libs/helpers/csrf-token';
 import { UserMenuAccount } from '@ui5/webcomponents-react/UserMenuAccount';
 import { UserMenu, type UserMenuDomRef } from '@ui5/webcomponents-react/UserMenu';
 import { currentAuthUserQueryOptions } from '@/features/auth-users/options/query';
 import { ShellBar, type ShellBarPropTypes } from '@ui5/webcomponents-react/ShellBar';
 import { ODATA_PUBLIC_SERVICE, SAP_LOGO_URL, ODATA_SAP_CLIENT } from '@/app-constant';
 import { currentPublicUserProfileQueryOptions } from '@/features/auth-users/options/query';
+import { UserMenuItem, type UserMenuItemPropTypes } from '@ui5/webcomponents-react/UserMenuItem';
 
 interface AppHeaderProps {
   primaryTitle?: string;
@@ -19,7 +24,7 @@ interface AppHeaderProps {
 }
 
 function getAvatarInitials(username: string) {
-  const tokens = username.trim().split(/\s+/).filter(Boolean);
+  const tokens = username.trim().split(/\s+/).filter(Boolean); // \s+ === whitespace
 
   if (tokens.length === 0) {
     return 'U';
@@ -42,8 +47,9 @@ export function AppHeader({ primaryTitle = 'Corporate Portal', secondaryTitle, u
   const headerRef = React.useRef<HTMLDivElement>(null);
   const userMenuRef = React.useRef<UserMenuDomRef>(null);
   const [headerHeight, setHeaderHeight] = React.useState(0);
+  const csrfToken = useAuthStore((state) => state.csrfToken);
   const [isUserMenuOpen, setIsUserMenuOpen] = React.useState(false);
-  const { data: authUser } = useQuery(currentAuthUserQueryOptions());
+  const { data: authUser, refetch } = useQuery(currentAuthUserQueryOptions());
   const { data: publicUserProfile } = useQuery(currentPublicUserProfileQueryOptions());
 
   const displayName =
@@ -92,13 +98,22 @@ export function AppHeader({ primaryTitle = 'Corporate Portal', secondaryTitle, u
     setIsUserMenuOpen(true);
   };
 
-  const handleSignOut = () => {
-    setIsUserMenuOpen(false);
+  const handleSignOut = function () {
     logout();
   };
 
-  const handleBack = () => {
+  const handleBack = function () {
     navigate(-1);
+  };
+
+  const handleLoadNewToken: UserMenuItemPropTypes['onClick'] = function () {
+    clearCsrfToken();
+    toast('Requested new token');
+  };
+
+  const handleRefreshAccountRoles: UserMenuItemPropTypes['onClick'] = function () {
+    refetch();
+    toast('Refreshed account roles');
   };
 
   return (
@@ -155,7 +170,10 @@ export function AppHeader({ primaryTitle = 'Corporate Portal', secondaryTitle, u
         }}
         onSignOutClick={handleSignOut}
         open={isUserMenuOpen}
-      />
+      >
+        {csrfToken && <UserMenuItem icon="refresh" text="Load new account token" onClick={handleLoadNewToken} />}
+        <UserMenuItem icon="refresh" text="Refresh account roles" onClick={handleRefreshAccountRoles} />
+      </UserMenu>
     </>
   );
 }

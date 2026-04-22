@@ -50,5 +50,3 @@ function validateFileTitle(value: string) {
 }
 
 export { validateFileName, validateFileTitle };
-
-// TODO: All validate user input here

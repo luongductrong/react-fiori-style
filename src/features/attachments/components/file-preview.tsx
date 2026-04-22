@@ -1,23 +1,29 @@
 import { cn } from '@/libs/utils';
+import { downloadFile } from '../helpers/download-file';
 import { useFilePreview } from '../hooks/use-file-preview';
+import { Link as UI5Link } from '@ui5/webcomponents-react/Link';
+import { pushErrorMessages } from '@/libs/helpers/error-messages';
 import { MessageStrip } from '@ui5/webcomponents-react/MessageStrip';
 
-export function FilePreview({
-  mimeType,
-  fileContent,
-  fileName,
-  fileExtension,
-  className,
-  onlyImage,
-}: {
+interface FilePreviewProps {
   mimeType?: string;
   fileContent?: string;
   fileName?: string;
   fileExtension?: string;
   className?: string;
   onlyImage?: boolean;
-}) {
+}
+
+export function FilePreview(props: FilePreviewProps) {
+  const { mimeType, fileContent, fileName, fileExtension, className, onlyImage } = props;
   const preview = useFilePreview(mimeType, fileContent, fileName);
+
+  const handleDownload = function () {
+    const success = downloadFile(fileContent, fileName, mimeType);
+    if (!success) {
+      pushErrorMessages(['Failed to download file.']);
+    }
+  };
 
   if (onlyImage && !preview.isImage) {
     return null;
@@ -52,15 +58,15 @@ export function FilePreview({
 
   if (preview.isUnsupported) {
     return (
-      <MessageStrip design="Critical" hideCloseButton style={{ width: '100%' }}>
-        This {fileExtension ? `".${fileExtension}"` : ''} file is not supported for preview.
+      <MessageStrip design="Critical" hideCloseButton className="w-full text-wrap">
+        This {fileExtension ? `".${fileExtension}"` : ''} file is not supported for preview.{' '}
+        <UI5Link onClick={handleDownload}>Click here to download</UI5Link>
       </MessageStrip>
     );
   }
-  // TODO: Make it a button to download the file
 
   return (
-    <MessageStrip design="Negative" hideCloseButton style={{ width: '100%' }}>
+    <MessageStrip design="Negative" hideCloseButton className="w-full">
       No preview available.
     </MessageStrip>
   );
