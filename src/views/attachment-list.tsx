@@ -172,7 +172,13 @@ export function AttachmentListView() {
               <ToolbarSpacer />
               {/* ToolbarButton - AttachmentCreate */}
               <AttachmentCreate />
-              <ToolbarButton design="Transparent" icon="refresh" text="Refresh" onClick={handleRefresh} />
+              <ToolbarButton
+                design="Transparent"
+                icon="refresh"
+                text="Refresh"
+                onClick={handleRefresh}
+                disabled={isFetching || isFetchingNextPage}
+              />
               <ToolbarButton
                 icon="table-view"
                 design="Transparent"
@@ -208,7 +214,13 @@ export function AttachmentListView() {
             <ToolbarSpacer />
             {/* ToolbarButton - AttachmentCreate */}
             <AttachmentCreate />
-            <ToolbarButton design="Transparent" icon="refresh" text="Refresh" onClick={handleRefresh} />
+            <ToolbarButton
+              design="Transparent"
+              icon="refresh"
+              text="Refresh"
+              onClick={handleRefresh}
+              disabled={isFetching || isFetchingNextPage}
+            />
             <ToolbarButton
               icon="list"
               design="Transparent"

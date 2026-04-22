@@ -139,7 +139,13 @@ export function BoDetailView() {
                     onClick={() => setDeleteDialogOpen(true)}
                     disabled={!bizObject?.__EntityControl.Deletable || isDeleting}
                   />
-                  <ToolbarButton design="Default" icon="refresh" text="Refresh" onClick={refetchBizObject} />
+                  <ToolbarButton
+                    design="Default"
+                    icon="refresh"
+                    text="Refresh"
+                    onClick={refetchBizObject}
+                    disabled={isBizObjectFetching || isUpdating || isDeleting}
+                  />
                 </Toolbar>
               ) : undefined
             }

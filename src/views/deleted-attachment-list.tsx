@@ -216,7 +216,13 @@ export function DeletedAttachmentListView() {
           <Toolbar className="py-2 px-4 rounded-t-xl">
             <Title level="H2">Deleted Attachments {totalCount ? `(${totalCount})` : ''}</Title>
             <ToolbarSpacer />
-            <ToolbarButton design="Transparent" icon="refresh" text="Refresh" onClick={handleRefetch} />
+            <ToolbarButton
+              design="Transparent"
+              icon="refresh"
+              text="Refresh"
+              onClick={handleRefetch}
+              disabled={isFetching || isFetchingNextPage || isRestoring}
+            />
             <ViewSettings
               fields={ATTACHMENT_LIST_FIELDS}
               selectedIds={selectedFieldIds}

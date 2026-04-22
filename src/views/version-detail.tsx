@@ -141,7 +141,7 @@ export function VersionDetailView() {
                   icon="refresh"
                   tooltip="Refresh"
                   onClick={refetchVersion}
-                  disabled={isFetching}
+                  disabled={isFetching || isRollbacking}
                 />
               </Toolbar>
             }

@@ -208,7 +208,13 @@ export function ConfigFileListView() {
             <Title level="H2">Configuration Files {totalCount ? `(${totalCount})` : ''}</Title>
             <ToolbarSpacer />
             <ConfigFileCreate />
-            <ToolbarButton design="Transparent" icon="refresh" text="Refresh" onClick={handleRefetch} />
+            <ToolbarButton
+              design="Transparent"
+              icon="refresh"
+              text="Refresh"
+              onClick={handleRefetch}
+              disabled={isFetching || isEnablingConfigFile || isDisablingConfigFile}
+            />
             <ViewSettings
               fields={CONFIG_FILE_LIST_FIELDS}
               selectedIds={selectedFieldIds}

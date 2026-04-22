@@ -38,7 +38,6 @@ export function attachmentsQueryOptions(params: AttachmentListParams) {
     gcTime: 5 * 60 * 1000, // 5 minutes
     refetchOnWindowFocus: false,
     placeholderData: keepPreviousData,
-    // TODO: remove placeholderData in other infinite queries
   });
 }
 

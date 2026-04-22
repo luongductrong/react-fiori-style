@@ -149,7 +149,13 @@ export function UserListView() {
                 setSearch('');
               }}
             />
-            <ToolbarButton design="Transparent" icon="refresh" text="Refresh" onClick={handleRefetch} />
+            <ToolbarButton
+              design="Transparent"
+              icon="refresh"
+              text="Refresh"
+              onClick={handleRefetch}
+              disabled={isFetching || isDeletingUser}
+            />
             <ViewSettings
               fields={AUTH_USER_LIST_FIELDS}
               selectedIds={selectedFieldIds}

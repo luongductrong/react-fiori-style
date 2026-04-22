@@ -167,7 +167,13 @@ export function BoListView() {
               <Title level="H2">Business Objects {totalCount ? `(${totalCount})` : ''}</Title>
               <ToolbarSpacer />
               <BizCreate />
-              <ToolbarButton design="Transparent" icon="refresh" text="Refresh" onClick={handleRefetch} />
+              <ToolbarButton
+                design="Transparent"
+                icon="refresh"
+                text="Refresh"
+                onClick={handleRefetch}
+                disabled={isFetching || isFetchingNextPage}
+              />
               <ToolbarButton
                 icon="table-view"
                 design="Transparent"
@@ -202,7 +208,13 @@ export function BoListView() {
             <Title level="H2">Business Objects {totalCount ? `(${totalCount})` : ''}</Title>
             <ToolbarSpacer />
             <BizCreate />
-            <ToolbarButton design="Transparent" icon="refresh" text="Refresh" onClick={handleRefetch} />
+            <ToolbarButton
+              design="Transparent"
+              icon="refresh"
+              text="Refresh"
+              onClick={handleRefetch}
+              disabled={isFetching || isFetchingNextPage}
+            />
             <ToolbarButton
               icon="list"
               design="Transparent"

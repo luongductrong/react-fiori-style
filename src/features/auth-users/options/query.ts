@@ -1,7 +1,7 @@
 import { API, QUERY_KEYS } from '../constants';
 import type { AxiosApiError } from '@/types/common';
-import { queryOptions } from '@tanstack/react-query';
 import { axiosInstance } from '@/libs/axios-instance';
+import { queryOptions, keepPreviousData } from '@tanstack/react-query';
 import { ODATA_PUBLIC_SERVICE, ODATA_SERVICE, ODATA_SAP_CLIENT } from '@/app-constant';
 import type { CurrentPublicUserProfile, CurrentPublicUserProfileResponse } from '../types';
 import type { AuthUsersQueryParams, AuthUsersResponse, CurrentAuthUserResponse } from '../types';
@@ -18,6 +18,7 @@ export function authUsersQueryOptions(params: AuthUsersQueryParams) {
     staleTime: 2 * 60 * 1000,
     gcTime: 5 * 60 * 1000,
     refetchOnWindowFocus: false,
+    placeholderData: keepPreviousData,
   });
 }
 

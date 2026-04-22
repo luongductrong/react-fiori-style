@@ -230,8 +230,7 @@ export function AttachmentDetailView() {
                     icon="refresh"
                     tooltip="Refresh"
                     onClick={() => refetchAttachment()}
-                    disabled={isFetching}
-                    // TODO: Disable all Refresh buttons when isFetching is true
+                    disabled={isFetching || isUpdating || isRestoring || isDeleting}
                   />
                 </Toolbar>
               ) : undefined
