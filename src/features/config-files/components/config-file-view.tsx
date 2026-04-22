@@ -53,7 +53,7 @@ export function ConfigFileView({ configFile, open, onClose }: ConfigFileViewProp
           </div>
           <div className="flex flex-col gap-1">
             <Label showColon>Max Size</Label>
-            <Text>{formatFileSize(configFile.MaxBytes)}</Text>
+            <Text>{formatFileSize(configFile.MaxBytes, 'N/A')}</Text>
           </div>
           <div className="flex flex-col gap-1">
             <Label showColon>Is Active</Label>

@@ -139,7 +139,7 @@ function validateUploadFileData(input: UploadValidationInput, configFiles?: Conf
     matchedConfig.MaxBytes > 0 &&
     input.fileSize > matchedConfig.MaxBytes
   ) {
-    return `File exceeds the configured limit of ${formatFileSize(matchedConfig.MaxBytes)} for ".${fileExtension}" files.`;
+    return `File exceeds the configured limit of ${formatFileSize(matchedConfig.MaxBytes, 'N/A')} for ".${fileExtension}" files.`;
   }
 
   return '';

@@ -3,6 +3,7 @@ import axios from 'axios';
 import { toast } from '@/libs/helpers/toast';
 import '@ui5/webcomponents-icons/decline.js';
 import '@ui5/webcomponents-icons/refresh.js';
+import { formatFileSize } from '@/libs/utils';
 import '@ui5/webcomponents-icons/attachment.js';
 import { Icon } from '@ui5/webcomponents-react/Icon';
 import { Text } from '@ui5/webcomponents-react/Text';
@@ -51,6 +52,7 @@ export function AttachmentDetailView() {
     title: '',
     editLock: false,
   });
+
   const {
     data: attachment,
     isFetching,
@@ -288,6 +290,10 @@ export function AttachmentDetailView() {
                   <div className="flex flex-col">
                     <Label showColon>Current Version</Label>
                     <Text>{displayVersion(attachment?.CurrentVersion, '-')}</Text>
+                  </div>
+                  <div className="flex flex-col">
+                    <Label showColon>Current Version Size</Label>
+                    <Text>{formatFileSize(attachment?._CurrentVersion?.FileSize, '-')}</Text>
                   </div>
                   <div className="flex flex-col">
                     <Label showColon>Is Active</Label>

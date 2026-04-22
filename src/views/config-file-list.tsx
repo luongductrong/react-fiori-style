@@ -43,7 +43,7 @@ const ALL_COLUMNS = [
     Header: 'Max Size',
     accessor: 'MaxBytes',
     id: 'MaxBytes',
-    Cell: (props: AnalyticalTableCellInstance) => formatFileSize(props.value),
+    Cell: (props: AnalyticalTableCellInstance) => formatFileSize(props.value, ''),
   },
   {
     Header: 'Is Active',

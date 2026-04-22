@@ -1,6 +1,6 @@
 export const API = {
   endpoint: '/Attachments',
-  detailExpand: '_CurrentVersion($select=FileContent,FileId,FileName,FileExtension,MimeType,VersionNo)',
+  detailExpand: '_CurrentVersion',
   versionsEndpoint: (fileId: string) => `/Attachments(${fileId})/_Versions`,
   versionDetailEndpoint: (fileId: string, versionNo: string) =>
     `/Attachments(${fileId})/_Versions(FileId=${fileId},VersionNo='${versionNo}')`,

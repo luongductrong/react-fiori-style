@@ -53,6 +53,7 @@ export type AttachmentDetailResponse = AttachmentItem & {
     MimeType: string;
     FileContent: string;
     FileExtension: string;
+    FileSize: number;
   };
 };
 

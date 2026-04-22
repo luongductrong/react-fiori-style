@@ -58,7 +58,7 @@ export function DashboardConfigurationCoverage({ className }: { className?: stri
               </div>
               <div className="grid gap-1 text-xs">
                 <span>{formatMimeTypesForDisplay(item.MimeType) || '-'}</span>
-                <span>Max size {formatFileSize(item.MaxBytes)}</span>
+                <span>Max size {formatFileSize(item.MaxBytes, 'N/A')}</span>
               </div>
             </div>
           ))}

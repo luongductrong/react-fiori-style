@@ -15,7 +15,7 @@ function buildFileTypeItems(items: { FileExt: string; VersionCount: number; Tota
 
   return items.map((item) => ({
     label: `.${item.FileExt}`,
-    value: formatFileSize(item.TotalSize),
+    value: formatFileSize(item.TotalSize, 'N/A'),
     meta: `${formatCount(item.VersionCount)} files`,
     percent: totalSize > 0 ? (item.TotalSize / totalSize) * 100 : 0,
   }));

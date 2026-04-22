@@ -84,7 +84,6 @@ export function FilePicker({ disabled, onPick, onGoogleBtnClick, requiredType, c
       const fileData = await fileToUploadedFileData(file, matchedConfig?.MaxBytes);
       onPick(fileData);
     } catch (err) {
-      console.error(err);
       pushErrorMessages([err instanceof Error ? err.message : "Can't read file"]);
     } finally {
       // Clear the input so selecting the same file again still fires onChange.

@@ -56,7 +56,7 @@ const ALL_COLUMNS = [
     Header: 'File Size',
     accessor: 'FileSize',
     id: 'FileSize',
-    Cell: (props: AnalyticalTableCellInstance) => formatFileSize(props.value),
+    Cell: (props: AnalyticalTableCellInstance) => formatFileSize(props.value, ''),
   },
   {
     Header: 'Created On',
