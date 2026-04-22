@@ -47,6 +47,7 @@ export function BoDetailView() {
   const {
     data: bizObject,
     error: bizObjectError,
+    isLoading: isBizObjectLoading,
     isFetching: isBizObjectFetching,
   } = useQuery(bizObjectDetailQueryOptions(id!));
 
@@ -168,15 +169,16 @@ export function BoDetailView() {
           />
         }
       >
-        {isBizObjectFetching && <BusyIndicator type="loading" />}
+        {isBizObjectLoading && <BusyIndicator type="loading" />}
         <ObjectPageSection
           aria-label="General Information"
           id="general"
           titleText="General Information"
           hideTitleText={true}
-          style={{ display: isBizObjectFetching ? 'none' : 'block' }}
+          style={{ display: isBizObjectLoading ? 'none' : 'block' }}
         >
-          <div className="md:grid md:grid-cols-3 gap-3">
+          <div className="md:grid md:grid-cols-3 gap-3 relative">
+            <BusyIndicator type="pending" show={isBizObjectFetching} />
             <div className="space-y-3">
               <Title level="H3">Basic Data</Title>
               {editMode ? (
@@ -237,7 +239,7 @@ export function BoDetailView() {
           aria-label="Attachments"
           id="attachments"
           titleText="Attachments"
-          style={{ display: isBizObjectFetching ? 'none' : 'block' }}
+          style={{ display: isBizObjectLoading ? 'none' : 'block' }}
         >
           <BizObjectAttachmentList boId={id!} disabled={!bizObject} onCountChange={setLinkedCount} />
         </ObjectPageSection>

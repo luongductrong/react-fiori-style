@@ -56,6 +56,7 @@ export function AttachmentDetailView() {
   const {
     data: attachment,
     isFetching,
+    isLoading,
     error: attachmentError,
   } = useQuery(
     attachmentDetailQueryOptions(id!, {
@@ -258,15 +259,16 @@ export function AttachmentDetailView() {
           />
         }
       >
-        {isFetching && <BusyIndicator type="loading" />}
+        {isLoading && <BusyIndicator type="loading" />}
         <ObjectPageSection
           aria-label="General Information"
           id="general"
           titleText="General Information"
           hideTitleText={true}
-          style={{ display: isFetching ? 'none' : 'block' }}
+          style={{ display: isLoading ? 'none' : 'block' }}
         >
-          <div className="md:grid md:grid-cols-3 gap-3">
+          <div className="md:grid md:grid-cols-3 gap-3 relative">
+            <BusyIndicator type="pending" show={isFetching} />
             <div className="space-y-3">
               <Title level="H3">Basic Data</Title>
               {isEditMode ? (
@@ -341,7 +343,7 @@ export function AttachmentDetailView() {
           aria-label="Preview"
           id="preview"
           titleText="Preview"
-          style={{ display: isFetching ? 'none' : 'block' }}
+          style={{ display: isLoading ? 'none' : 'block' }}
         >
           <div className="p-2 rounded-lg bg-background">
             <FilePreview
@@ -356,7 +358,7 @@ export function AttachmentDetailView() {
           aria-label="Version History"
           id="version-history"
           titleText="Version History"
-          style={{ display: isFetching ? 'none' : 'block' }}
+          style={{ display: isLoading ? 'none' : 'block' }}
         >
           <AttachmentVersionList
             fileId={id!}
@@ -369,7 +371,7 @@ export function AttachmentDetailView() {
           aria-label="Linked Objects"
           id="linked-objects"
           titleText="Linked Objects"
-          style={{ display: isFetching ? 'none' : 'block' }}
+          style={{ display: isLoading ? 'none' : 'block' }}
         >
           <AttachmentBizList fileId={id!} disabled={!canEditAttachment} onCountChange={setLinkedCount} />
         </ObjectPageSection>
@@ -377,7 +379,7 @@ export function AttachmentDetailView() {
           aria-label="Audit Log"
           id="audit-log"
           titleText="Audit Log"
-          style={{ display: isFetching ? 'none' : 'block' }}
+          style={{ display: isLoading ? 'none' : 'block' }}
         >
           <AttachmentAudit fileId={id!} />
         </ObjectPageSection>
