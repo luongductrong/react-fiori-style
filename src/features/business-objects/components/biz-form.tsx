@@ -15,7 +15,7 @@ export type BizFormValues = {
 
 interface BizFormProps {
   value: BizFormValues;
-  onChange: (_nextValue: BizFormValues) => void;
+  onChange: (nextValue: BizFormValues) => void;
   className?: string;
   fieldClassName?: string;
   inputClassName?: string;

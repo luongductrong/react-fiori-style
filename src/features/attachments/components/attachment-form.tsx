@@ -12,7 +12,7 @@ export type AttachmentFormValues = {
 
 interface AttachmentFormProps {
   value: AttachmentFormValues;
-  onChange: (_nextValue: AttachmentFormValues) => void;
+  onChange: (nextValue: AttachmentFormValues) => void;
   className?: string;
   fieldClassName?: string;
   inputClassName?: string;

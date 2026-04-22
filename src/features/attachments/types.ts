@@ -27,6 +27,8 @@ export type AttachmentItem = {
 export type CreateAttachmentResponse = AttachmentItem;
 export type LinkedAttachment = AttachmentItem;
 
+export type RestoreAttachmentResponse = AttachmentItem;
+
 export type AttachmentListResponse = {
   value: AttachmentItem[];
   '@odata.count': number;

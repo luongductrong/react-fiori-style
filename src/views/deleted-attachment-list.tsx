@@ -146,8 +146,9 @@ export function DeletedAttachmentListView() {
     variables: restoringFileId,
   } = useMutation(
     restoreAttachmentMutationOptions({
-      onSuccess: () => {
+      onSuccess: (data) => {
         invalidateAtt.invalidateAttachmentList();
+        invalidateAtt.invalidateAttachmentDetail(data.FileId);
         toast('Attachment restored successfully');
       },
     }),
@@ -158,10 +159,9 @@ export function DeletedAttachmentListView() {
       if (isRestoring) {
         return;
       }
-      invalidateAtt.invalidateAttachmentDetail(fileId);
       restoreAttachment(fileId);
     },
-    [isRestoring, restoreAttachment, invalidateAtt],
+    [isRestoring, restoreAttachment],
   );
 
   const columns = React.useMemo(

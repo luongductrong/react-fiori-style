@@ -39,7 +39,10 @@ function cn(...inputs: ClassValue[]) {
 
 function formatFileSize(bytes: number | string | undefined, fallback = '0 Bytes') {
   const numBytes = typeof bytes === 'string' ? Number(bytes) : bytes;
-  if (!numBytes || isNaN(numBytes)) return fallback;
+
+  if (numBytes === undefined || numBytes === null || isNaN(numBytes)) {
+    return fallback;
+  }
 
   const k = 1024;
 

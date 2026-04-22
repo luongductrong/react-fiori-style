@@ -186,7 +186,7 @@ export function VersionDetailView() {
                   </div>
                   <div className="flex flex-col">
                     <Label showColon>File Size</Label>
-                    <Text>{version?.FileSize ? formatFileSize(version.FileSize) : '-'}</Text>
+                    <Text>{formatFileSize(version?.FileSize, '-')}</Text>
                   </div>
                 </div>
                 <div className="space-y-3">

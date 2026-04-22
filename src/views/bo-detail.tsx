@@ -35,7 +35,7 @@ export function BoDetailView() {
   const { id } = useParams();
   const navigate = useNavigate();
   const invalidateBo = useInvalidateBizObjectQuery();
-  const [linkedCount, setLinkedCount] = React.useState(0);
+  const [linkedCount, setLinkedCount] = React.useState<number | null>(null);
   const [deleteDialogOpen, setDeleteDialogOpen] = React.useState(false);
   const [editMode, setEditMode] = React.useState(false);
   const [editValues, setEditValues] = React.useState<BizFormValues>({
@@ -139,13 +139,13 @@ export function BoDetailView() {
                     design="Default"
                     text="Delete"
                     onClick={() => {
-                      if (linkedCount > 0) {
+                      if (linkedCount && linkedCount > 0) {
                         pushErrorMessages(['Cannot delete business object with linked attachments']);
                         return;
                       }
                       setDeleteDialogOpen(true);
                     }}
-                    disabled={!bizObject?.__EntityControl.Deletable || isDeleting}
+                    disabled={!bizObject?.__EntityControl.Deletable || isDeleting || linkedCount === null}
                   />
                   <ToolbarButton
                     design="Default"

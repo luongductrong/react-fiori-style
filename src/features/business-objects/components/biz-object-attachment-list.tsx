@@ -27,7 +27,7 @@ import { BIZ_OBJECT_LINKED_ATTACHMENT_FIELDS, type BizObjectLinkedAttachmentFiel
 type BizObjectAttachmentListProps = {
   boId: string;
   disabled?: boolean;
-  onCountChange: (count: number) => void;
+  onCountChange: (count: number | null) => void;
 };
 
 type BizObjectLinkedAttachmentColumn = {
@@ -120,7 +120,8 @@ export function BizObjectAttachmentList({ boId, disabled, onCountChange }: BizOb
     return linkedAttachments.map((attachment) => attachment.FileId);
   }, [linkedAttachments]);
 
-  const totalCount = Number(data?.pages[0]?.['@odata.count'] ?? 0);
+  const firstPage = data?.pages[0];
+  const totalCount = Number(firstPage?.['@odata.count'] ?? 0);
   const visibleColumns = React.useMemo(
     () => ALL_COLUMNS.filter((col) => selectedFieldIds.includes(col.id)),
     [selectedFieldIds],
@@ -174,8 +175,14 @@ export function BizObjectAttachmentList({ boId, disabled, onCountChange }: BizOb
   }, [error]);
 
   React.useEffect(() => {
-    onCountChange(totalCount);
-  }, [totalCount, onCountChange]);
+    if (error) {
+      onCountChange(null);
+    } else if (firstPage) {
+      onCountChange(totalCount);
+    } else {
+      onCountChange(null);
+    }
+  }, [firstPage, totalCount, onCountChange, error]);
 
   return (
     <>

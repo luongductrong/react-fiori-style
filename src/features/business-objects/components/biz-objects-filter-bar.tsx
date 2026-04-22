@@ -9,8 +9,8 @@ import { displayBoStatus, displayBoType } from '../helpers/formatter';
 import { FilterGroupItem } from '@ui5/webcomponents-react/FilterGroupItem';
 
 interface BizObjectsFilterBarProps {
-  onFilterChange: (_filter: string) => void;
-  onSearchChange: (_search: string) => void;
+  onFilterChange: (filter: string) => void;
+  onSearchChange: (search: string) => void;
 }
 
 const DEFAULT_FILTER_KEYS = ['BoId', 'BoType', 'BoTitle', 'Status', 'Erdat', 'Ernam'];

@@ -27,7 +27,7 @@ import { AnalyticalTable, type AnalyticalTableCellInstance } from '@ui5/webcompo
 interface AttachmentBizListProps {
   fileId: string;
   disabled: boolean;
-  onCountChange: (count: number) => void;
+  onCountChange: (count: number | null) => void;
 }
 
 type AttachmentBizListColumn = {
@@ -121,7 +121,8 @@ export function AttachmentBizList({ fileId, disabled, onCountChange }: Attachmen
   );
 
   const bizObjects = bizObjectsData?.pages.flatMap((page) => page.value) ?? [];
-  const totalCount = bizObjectsData?.pages[0]['@odata.count'] ?? 0;
+  const firstPage = bizObjectsData?.pages[0];
+  const totalCount = firstPage?.['@odata.count'] ?? 0;
   const visibleColumns = React.useMemo(
     () => ALL_COLUMNS.filter((col) => selectedFieldIds.includes(col.id)),
     [selectedFieldIds],
@@ -134,8 +135,14 @@ export function AttachmentBizList({ fileId, disabled, onCountChange }: Attachmen
   }, [error]);
 
   React.useEffect(() => {
-    onCountChange(totalCount);
-  }, [totalCount, onCountChange]);
+    if (error) {
+      onCountChange(null);
+    } else if (firstPage) {
+      onCountChange(totalCount);
+    } else {
+      onCountChange(null);
+    }
+  }, [firstPage, totalCount, onCountChange, error]);
 
   const columns = React.useMemo(
     () => [

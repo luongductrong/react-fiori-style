@@ -4,34 +4,34 @@ import { axiosInstance } from '@/libs/axios-instance';
 import { mutationOptions } from '@tanstack/react-query';
 import { pushApiErrorMessages } from '@/libs/helpers/error-messages';
 import { fetchCsrfToken, getCsrfToken } from '@/libs/helpers/csrf-token';
-import type { RollbackVersionPayload, UploadVersionResponse } from '../types';
 import type { UploadVersionPayload, CreateAttachmentResponse } from '../types';
+import type { RollbackVersionPayload, UploadVersionResponse, RestoreAttachmentResponse } from '../types';
 import type { LinkBoPayload, UnlinkBoPayload, CreateAttachmentPayload, UpdateAttachmentPayload } from '../types';
 
 type Params = {
   fileId: string;
   onSuccess?: () => void;
-  onError?: (_error: unknown) => void;
+  onError?: (error: unknown) => void;
 };
 
 type CreateAttachmentParams = {
   onSuccess?: (data: CreateAttachmentResponse) => void;
-  onError?: (_error: unknown) => void;
+  onError?: (error: unknown) => void;
 };
 
 type RestoreAttachmentParams = {
-  onSuccess?: () => void;
-  onError?: (_error: unknown) => void;
+  onSuccess?: (data: RestoreAttachmentResponse) => void;
+  onError?: (error: unknown) => void;
 };
 
 type LinkBoMutationParams = {
   onSuccess?: () => void;
-  onError?: (_error: unknown) => void;
+  onError?: (error: unknown) => void;
 };
 
 type UnlinkBoMutationParams = {
   onSuccess?: () => void;
-  onError?: (_error: unknown) => void;
+  onError?: (error: unknown) => void;
 };
 
 export function rollbackVersionMutationOptions({ fileId, onSuccess, onError }: Params) {
@@ -101,7 +101,7 @@ export function restoreAttachmentMutationOptions({ onSuccess, onError }: Restore
         token = getCsrfToken();
       }
 
-      const res = await axiosInstance.post<unknown>(
+      const res = await axiosInstance.post<RestoreAttachmentResponse>(
         `${ODATA_SERVICE.ATTACHMENT}${MUTATION_API.restoreAttachment(fileId)}`,
         undefined,
         {

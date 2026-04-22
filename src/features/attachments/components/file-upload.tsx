@@ -152,7 +152,7 @@ function FileUploadImpl({ fileId, currentExtension, disabled }: FileUploadProps)
         <FlexBox alignItems="Start" justifyContent="Start" wrap="Wrap" className="gap-8 mb-6">
           <FlexBox direction="Column">
             <Label showColon>File Size</Label>
-            <Text>{fileData?.FileSize ? formatFileSize(fileData.FileSize) : '-'}</Text>
+            <Text>{formatFileSize(fileData.FileSize, '-')}</Text>
           </FlexBox>
           <FlexBox direction="Column">
             <Label showColon>Mime Type</Label>

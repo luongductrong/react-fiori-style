@@ -33,8 +33,8 @@ interface ConfigFileFormProps {
   validation: ConfigFileFormValidation;
   touchedFields: ConfigFileFormTouchedFields;
   showAllValidation?: boolean;
-  onFieldTouch: (_field: keyof ConfigFileFormTouchedFields) => void;
-  onChange: (_nextValue: ConfigFileFormValues) => void;
+  onFieldTouch: (field: keyof ConfigFileFormTouchedFields) => void;
+  onChange: (nextValue: ConfigFileFormValues) => void;
   className?: string;
   fieldClassName?: string;
   inputClassName?: string;
