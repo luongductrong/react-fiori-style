@@ -134,7 +134,9 @@ function BizAttachmentLinkCreateImpl({ boId, linkedAttachmentIds, disabled }: Bi
       $count: true,
       $select: attachmentListSelect,
       $orderby: 'Erdat desc,Erzet desc',
-      $filter: filter ? `IsActive eq true and ${filter}` : 'IsActive eq true', // Make sure to only fetch active attachments
+      $filter: filter
+        ? `IsActive eq true and CurrentVersion ne '0' and ${filter}`
+        : "IsActive eq true and CurrentVersion ne '0'", // Make sure to only fetch active attachments
     }),
     enabled: open && selectedFieldIds.length > 0,
   });

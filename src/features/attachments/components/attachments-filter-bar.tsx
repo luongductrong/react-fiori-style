@@ -102,6 +102,7 @@ export function AttachmentsFilterBar({ onFilterChange, onSearchChange }: Attachm
           key={count}
           label="Version"
           field="CurrentVersion"
+          options={['equal to']}
           afterFilterStringBuild={setCurrentVersionFilterString}
         />
       </FilterGroupItem>

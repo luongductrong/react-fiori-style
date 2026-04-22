@@ -85,7 +85,7 @@ export function SearchHelpDialog({ options = defaultOptions, field, label, ...pr
           case 'contains':
             return `contains(${field},${text})`;
           case 'equal to':
-            return `${field} eq ${text}`;
+            return token.sign === 'negative' ? `${field} ne ${text}` : `${field} eq ${text}`;
           case 'starts with':
             return `startswith(${field},${text})`;
           case 'ends with':
@@ -105,7 +105,7 @@ export function SearchHelpDialog({ options = defaultOptions, field, label, ...pr
       const positiveExpressions = cleanTokens.filter((token) => token.sign === 'positive').map(buildExpression);
       const negativeExpressions = cleanTokens
         .filter((token) => token.sign === 'negative')
-        .map((token) => `not ${buildExpression(token)}`);
+        .map((token) => (token.key === 'equal to' ? buildExpression(token) : `not ${buildExpression(token)}`));
 
       return [wrapGroup(positiveExpressions, 'or'), wrapGroup(negativeExpressions, 'and')]
         .filter(Boolean)
