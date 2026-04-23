@@ -116,7 +116,7 @@ export function AttachmentListView() {
     }),
     [attachmentListSelect, filter, search],
   );
-  const { data, isFetching, hasNextPage, fetchNextPage, isFetchingNextPage, error } = useInfiniteQuery({
+  const { data, isFetching, isLoading, hasNextPage, fetchNextPage, isFetchingNextPage, error } = useInfiniteQuery({
     ...attachmentsQueryOptions(attachmentListParams),
     enabled: selectedFieldIds.length > 0,
   });
@@ -202,7 +202,7 @@ export function AttachmentListView() {
           }
           sortable
           groupable={false}
-          loading={isFetching || isFetchingNextPage}
+          loading={isFetching && !isFetchingNextPage}
           rowHeight={36}
           scaleWidthMode="Smart"
           visibleRowCountMode="Auto"
@@ -240,9 +240,9 @@ export function AttachmentListView() {
           {!isFetching && attachments.length === 0 && selectedFieldIds.length > 0 && (
             <IllustratedMessage name="NoData" />
           )}
-          {isFetching && (
+          {isLoading && (
             <div className="flex justify-center">
-              <BusyIndicator type="loading" show={isFetching} />
+              <BusyIndicator type="loading" show={isLoading} />
             </div>
           )}
           {selectedFieldIds.length === 0 && (
@@ -254,11 +254,16 @@ export function AttachmentListView() {
           {selectedFieldIds.length > 0 && (
             <Grid defaultSpan="XL3 L4 M6 S12" hSpacing="1.5rem" vSpacing="1.5rem" className="px-3 md:px-0">
               {attachments.map((attachment) => (
-                <AttachmentCard key={attachment.FileId} data={attachment} loading={isFetching || isFetchingNextPage} />
+                <AttachmentCard key={attachment.FileId} data={attachment} loading={isFetching && !isFetchingNextPage} />
               ))}
             </Grid>
           )}
         </FlexBox>
+      )}
+      {isFetchingNextPage && (
+        <div className="flex justify-center">
+          <BusyIndicator type="loading" show={isFetchingNextPage} style={{ minHeight: '2rem' }} />
+        </div>
       )}
       <LoadMoreTrigger
         hasMore={viewMode === 'grid' && hasNextPage}

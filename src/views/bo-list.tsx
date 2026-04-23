@@ -106,7 +106,7 @@ export function BoListView() {
   const [search, setSearch] = React.useState('');
   const [filter, setFilter] = React.useState('');
 
-  const { data, isFetching, isFetchingNextPage, error, hasNextPage, fetchNextPage } = useInfiniteQuery({
+  const { data, isFetching, isLoading, isFetchingNextPage, error, hasNextPage, fetchNextPage } = useInfiniteQuery({
     ...bizObjectsQueryOptions({
       $skip: 0,
       $top: 20,
@@ -197,7 +197,7 @@ export function BoListView() {
           }
           sortable
           groupable={false}
-          loading={isFetching || isFetchingNextPage}
+          loading={isFetching && !isFetchingNextPage}
           rowHeight={36}
           scaleWidthMode="Smart"
           visibleRowCountMode="Auto"
@@ -234,9 +234,9 @@ export function BoListView() {
           {!isFetching && bizObjects.length === 0 && boListVisibleFieldIds.length > 0 && (
             <IllustratedMessage name="NoData" />
           )}
-          {isFetching && (
+          {isLoading && (
             <div className="flex justify-center">
-              <BusyIndicator type="loading" show={isFetching} />
+              <BusyIndicator type="loading" show={isLoading} />
             </div>
           )}
           {boListVisibleFieldIds.length === 0 && (
@@ -248,11 +248,16 @@ export function BoListView() {
           {boListVisibleFieldIds.length > 0 && (
             <Grid defaultSpan="XL3 L4 M6 S12" hSpacing="1.5rem" vSpacing="1.5rem" className="px-3 md:px-0">
               {bizObjects.map((bizObject) => (
-                <BizObjectCard key={bizObject.BoId} data={bizObject} loading={isFetching || isFetchingNextPage} />
+                <BizObjectCard key={bizObject.BoId} data={bizObject} loading={isFetching && !isFetchingNextPage} />
               ))}
             </Grid>
           )}
         </FlexBox>
+      )}
+      {isFetchingNextPage && (
+        <div className="flex justify-center">
+          <BusyIndicator type="loading" show={isFetchingNextPage} style={{ minHeight: '2rem' }} />
+        </div>
       )}
       <LoadMoreTrigger
         hasMore={viewMode === 'grid' && hasNextPage}
