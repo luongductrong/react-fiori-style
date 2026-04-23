@@ -4,6 +4,7 @@ import { Select } from '@ui5/webcomponents-react/Select';
 import { Option } from '@ui5/webcomponents-react/Option';
 import { FilterBar } from '@ui5/webcomponents-react/FilterBar';
 import { SearchHelpDialog } from '@/components/search-help-dialog';
+import { DateRangeSearchHelp } from '@/components/date-range-search-help';
 import { FilterGroupItem } from '@ui5/webcomponents-react/FilterGroupItem';
 
 interface AttachmentsFilterBarProps {
@@ -112,14 +113,7 @@ export function AttachmentsFilterBar({ onFilterChange, onSearchChange }: Attachm
         hiddenInFilterBar={!filterKeys.includes('Erdat')}
         active={!!createdOnFilterString}
       >
-        <SearchHelpDialog
-          key={count}
-          label="Created On"
-          field="Erdat"
-          options={['equal to']}
-          useApostrophe={false}
-          afterFilterStringBuild={setCreatedOnFilterString}
-        />
+        <DateRangeSearchHelp field="Erdat" afterFilterStringBuild={setCreatedOnFilterString} />
       </FilterGroupItem>
       <FilterGroupItem
         filterKey="Ernam"
@@ -140,14 +134,7 @@ export function AttachmentsFilterBar({ onFilterChange, onSearchChange }: Attachm
         hiddenInFilterBar={!filterKeys.includes('Aedat')}
         active={!!changedOnFilterString}
       >
-        <SearchHelpDialog
-          key={count}
-          label="Changed On"
-          field="Aedat"
-          options={['equal to']}
-          useApostrophe={false}
-          afterFilterStringBuild={setChangedOnFilterString}
-        />
+        <DateRangeSearchHelp field="Aedat" afterFilterStringBuild={setChangedOnFilterString} />
       </FilterGroupItem>
       <FilterGroupItem
         filterKey="Aenam"

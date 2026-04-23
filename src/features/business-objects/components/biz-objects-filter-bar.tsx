@@ -6,6 +6,7 @@ import { Option } from '@ui5/webcomponents-react/Option';
 import { FilterBar } from '@ui5/webcomponents-react/FilterBar';
 import { SearchHelpDialog } from '@/components/search-help-dialog';
 import { displayBoStatus, displayBoType } from '../helpers/formatter';
+import { DateRangeSearchHelp } from '@/components/date-range-search-help';
 import { FilterGroupItem } from '@ui5/webcomponents-react/FilterGroupItem';
 
 interface BizObjectsFilterBarProps {
@@ -130,14 +131,7 @@ export function BizObjectsFilterBar({ onFilterChange, onSearchChange }: BizObjec
         hiddenInFilterBar={!filterKeys.includes('Erdat')}
         active={!!createdOnFilterString}
       >
-        <SearchHelpDialog
-          key={count}
-          label="Created On"
-          field="Erdat"
-          options={['equal to']}
-          useApostrophe={false}
-          afterFilterStringBuild={setCreatedOnFilterString}
-        />
+        <DateRangeSearchHelp field="Erdat" afterFilterStringBuild={setCreatedOnFilterString} />
       </FilterGroupItem>
       <FilterGroupItem
         filterKey="Ernam"
@@ -158,14 +152,7 @@ export function BizObjectsFilterBar({ onFilterChange, onSearchChange }: BizObjec
         hiddenInFilterBar={!filterKeys.includes('Aedat')}
         active={!!changedOnFilterString}
       >
-        <SearchHelpDialog
-          key={count}
-          label="Changed On"
-          field="Aedat"
-          options={['equal to']}
-          useApostrophe={false}
-          afterFilterStringBuild={setChangedOnFilterString}
-        />
+        <DateRangeSearchHelp field="Aedat" afterFilterStringBuild={setChangedOnFilterString} />
       </FilterGroupItem>
       <FilterGroupItem
         filterKey="Aenam"

@@ -1,6 +1,6 @@
 import '@/index.css';
 import { StrictMode } from 'react';
-import '@ui5/webcomponents/dist/Assets.js';
+import '@/libs/ui5-english-assets.js';
 import { Toaster } from '@/components/toast';
 import { createRoot } from 'react-dom/client';
 import { AppLayout } from '@/components/layouts/app-layout';
