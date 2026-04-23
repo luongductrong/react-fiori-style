@@ -19,6 +19,6 @@ builder:
         app:
           name: ZGSP26SAP20UI
           package: YGSP26SAP20_FILE_ATTACH
-          transport: S40K908842
+          transport: S40K918019
         exclude:
           - /test/
