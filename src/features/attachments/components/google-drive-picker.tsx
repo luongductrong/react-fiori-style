@@ -32,14 +32,19 @@ export function GoogleDrivePicker({ onPick, onPickCancel, onLoadingChange, requi
       : configFilesData.value;
   }, [configFilesData?.value, requiredType]);
 
+  const handleErrorPush = function (message: string) {
+    pushErrorMessages([message]);
+    onPickCancel();
+  };
+
   const handleOAuthError: DrivePickerEventHandlers['onOauthError'] = function (e) {
     const errorType = e.detail.type;
     if (errorType === 'popup_failed_to_open') {
-      pushErrorMessages(['Popup failed to open. Please allow popups for this website.']);
+      handleErrorPush('Popup failed to open. Please allow popups for this website.');
     } else if (errorType === 'popup_closed') {
       toast('Popup closed by user or browser.');
     } else {
-      pushErrorMessages(['An unexpected error occurred. Please try again.']);
+      handleErrorPush('An unexpected error occurred. Please try again.');
     }
     setGoogleAccessToken(null);
     onPickCancel();
@@ -57,19 +62,19 @@ export function GoogleDrivePicker({ onPick, onPickCancel, onLoadingChange, requi
     const selectedDocument = e.detail.docs?.[0] as GooglePickerDocument | undefined;
 
     if (!selectedDocument?.id) {
-      pushErrorMessages(['No Google Drive file was selected.']);
+      handleErrorPush('No Google Drive file was selected.');
       onPickCancel();
       return;
     }
 
     if (!googleAccessToken) {
-      pushErrorMessages(['Google Drive authorization is unavailable. Please try again.']);
+      handleErrorPush('Google Drive authorization is unavailable. Please try again.');
       onPickCancel();
       return;
     }
 
     if (!filteredConfigFiles) {
-      pushErrorMessages(['Upload configuration is unavailable. Please try again.']);
+      handleErrorPush('Upload configuration is unavailable. Please try again.');
       onPickCancel();
       return;
     }
@@ -80,7 +85,7 @@ export function GoogleDrivePicker({ onPick, onPickCancel, onLoadingChange, requi
       const preValidationMessage = validateUploadFileData(uploadMetadata, filteredConfigFiles);
 
       if (preValidationMessage) {
-        pushErrorMessages([preValidationMessage]);
+        handleErrorPush(preValidationMessage);
         onPickCancel();
         return;
       }
@@ -102,14 +107,14 @@ export function GoogleDrivePicker({ onPick, onPickCancel, onLoadingChange, requi
       );
 
       if (validationMessage) {
-        pushErrorMessages([validationMessage]);
+        handleErrorPush(validationMessage);
         onPickCancel();
         return;
       }
       onPick?.(fileData);
     } catch (error) {
       const message = error instanceof Error ? error.message : 'Cannot import file from Google Drive.';
-      pushErrorMessages([message]);
+      handleErrorPush(message);
       onPickCancel();
     } finally {
       onLoadingChange(false);

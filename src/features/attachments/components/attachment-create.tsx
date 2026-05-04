@@ -225,7 +225,7 @@ export function AttachmentCreate() {
         onPick={(nextFileData) => {
           handleFilePick(nextFileData);
         }}
-        onPickCancel={() => setOpen('local')}
+        onPickCancel={() => setOpen(null)}
       />
     );
   }

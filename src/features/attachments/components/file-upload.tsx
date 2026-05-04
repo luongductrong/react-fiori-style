@@ -185,7 +185,7 @@ function FileUploadImpl({ fileId, currentExtension, disabled }: FileUploadProps)
             setFileNameError(validateFileName(nextFileData.FileName));
           }
         }}
-        onPickCancel={() => setOpen('local')}
+        onPickCancel={() => setOpen(null)}
       />
     );
   }

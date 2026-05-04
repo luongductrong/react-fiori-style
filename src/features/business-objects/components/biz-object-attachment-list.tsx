@@ -16,6 +16,7 @@ import { pushApiErrorMessages } from '@/libs/helpers/error-messages';
 import { useInfiniteQuery, useMutation } from '@tanstack/react-query';
 import { ToolbarSpacer } from '@ui5/webcomponents-react/ToolbarSpacer';
 import { BizAttachmentLinkCreate } from './biz-attachment-link-create';
+import { ToolbarButton } from '@ui5/webcomponents-react/ToolbarButton';
 import { displayVersion } from '@/features/attachments/helpers/formatter';
 import { bizObjectLinkedAttachmentsQueryOptions } from '../options/query';
 import { AnalyticalTable } from '@ui5/webcomponents-react/AnalyticalTable';
@@ -209,6 +210,12 @@ export function BizObjectAttachmentList({ boId, disabled, onCountChange }: BizOb
               boId={boId}
               linkedAttachmentIds={linkedAttachmentIds}
               disabled={disabled || !boId}
+            />
+            <ToolbarButton
+              design="Transparent"
+              text="Manage Attachments"
+              onClick={() => navigate('/attachments')}
+              className="h-8"
             />
             <ViewSettings
               fields={BIZ_OBJECT_LINKED_ATTACHMENT_FIELDS}
